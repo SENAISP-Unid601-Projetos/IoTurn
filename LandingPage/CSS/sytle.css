@@ -71,7 +71,7 @@ body, html {
     transition: 0.5s;
 }
 
-.enroll-btn:hover {
+.enroll-btn:hover, .cta-button:hover {
     transform: scale(1.1);
 }
 
@@ -82,10 +82,10 @@ body, html {
     padding: 40px;
     gap: 40px;
     flex: 1;
+    margin-top: 4%;
 }
 
 .bottomCotent {
-    margin-top: 5%;
     flex-flow: row-reverse;
     gap: 0;
 }
@@ -119,6 +119,7 @@ body, html {
     font-weight: bold;
     border-radius: 5px;
     cursor: pointer;
+    transition: 0.3s ease-in;
 }
 
 /* Seção de imagem */

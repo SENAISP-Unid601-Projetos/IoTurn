@@ -96,6 +96,10 @@ body, html {
     flex: 1;
 }
 
+.text-section2 {
+    text-align: end;
+}
+
 .course-name {
     color: #4bb989;
     font-size: 60%;
@@ -124,10 +128,22 @@ body, html {
 .image-section {
     text-align: center;
     flex: 1;
+    height: 50%;
 }
 
 .image-section img {
-    height: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 10px 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.image-section2 {
+    text-align: center;
+    flex: 1;
+}
+
+.image-section2 img {
+    transform: scale(0.8);
     border-radius: 10px;
     box-shadow: 10px 5px 15px rgba(0, 0, 0, 0.2);
 }

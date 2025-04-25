@@ -152,15 +152,14 @@ body, html {
 }
 
 .saibaMais {
-    display: none;
     z-index: 2;
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) scale(1);
+    transform-origin: center;
     padding: 50px;
-    height: 95dvh;
     border-radius: 20px;
-
+    transition: 1s ease-in;
     background-color: #4bb989;
 }

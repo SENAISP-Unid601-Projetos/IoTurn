@@ -85,8 +85,9 @@ body, html {
 }
 
 .bottomCotent {
-    border: #01497c solid 2px;
+    margin-top: 5%;
     flex-flow: row-reverse;
+    gap: 0;
 }
 
 /* Seção de texto */
@@ -131,12 +132,6 @@ body, html {
     height: auto;
     border-radius: 10px;
     box-shadow: 10px 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-.image-section2 {
-    border: #01497c solid 2px;
-    text-align: center;
-    flex: 1;
 }
 
 .image-section2 {

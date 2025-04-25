@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "@prisma/client": "^6.6.0",
+    "fastify": "^5.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.2",
+    "prisma": "^6.6.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,0 +1,48 @@
+# 🚀 Dependências do projeto NextronIS
+
+# Inicialização do projeto
+npm init -y
+
+# 🧠 TypeScript + compilador
+npm install typescript ts-node --save-dev
+
+# 🧰 Fastify (Framework HTTP)
+npm install fastify
+
+# 📡 Cliente MQTT
+npm install mqtt
+
+# 🌐 WebSocket com 'ws'
+npm install ws
+
+# 📚 Tipagens para desenvolvimento com TypeScript
+npm install @types/node @types/ws --save-dev
+
+# 🧹 Utilitários recomendados (opcional, mas úteis)
+npm install dotenv # para variáveis de ambiente
+npm install nodemon --save-dev # para reinício automático do servidor
+
+# Core do servidor
+fastify
+fastify-websocket
+
+# MQTT client
+mqtt
+
+# Integração com a API Gemini (Google Generative AI)
+@google/generative-ai
+
+# Tipagem e suporte para TypeScript
+typescript
+ts-node
+@types/node
+
+# Variáveis de ambiente
+dotenv
+
+# (Opcional) Linter e qualidade de código
+eslint
+prettier
+
+# (Se estiver usando ESModules ou import/export mesmo fora de React)
+tsconfig-paths

@@ -1,0 +1,35 @@
+# Fluxo do Sistema: Integração entre IA, Back-end e React Native
+
+Este tutorial descreve o fluxo de dados entre os diferentes componentes do sistema, utilizando IA, Back-end e React Native para gerar um resultado humanizado.
+
+## Fluxo de Execução
+
+### 1. Input do Usuário
+O fluxo começa com o usuário fornecendo um input no aplicativo React Native. Este input pode ser uma solicitação de dados ou uma pergunta, que será enviada para o Back-end para processamento.
+
+### 2. Processamento pela IA e Criação da Query
+Após o envio do input, o sistema passa a interação para a IA. A IA interpreta a solicitação do usuário e cria a query necessária para buscar as informações pertinentes no banco de dados ou executar outra lógica específica.
+
+### 3. Execução da Query no Back-end
+O Back-end recebe a query gerada pela IA e a executa. Isso pode envolver consultas ao banco de dados, operações de cálculo ou acesso a APIs externas para coletar ou processar dados.
+
+### 4. Devolução dos Resultados para a IA
+Após a execução da query, o Back-end retorna os resultados para a IA. A IA agora tem as informações necessárias para gerar uma resposta personalizada.
+
+### 5. Geração do Texto Humanizado pela IA
+Com os dados fornecidos, a IA constrói um texto humanizado baseado nos resultados da consulta. O objetivo aqui é apresentar a informação de forma amigável, natural e compreensível para o usuário final.
+
+### 6. Devolução do Texto para o React Native
+Finalmente, o texto humanizado gerado pela IA é enviado de volta ao aplicativo React Native. O React Native exibe a resposta para o usuário, completando o ciclo de interação.
+
+---
+
+## Fluxo Detalhado:
+
+```mermaid
+graph TD
+    A[Input do Usuário (React Native)] --> B[IA Interpreta e Cria a Query]
+    B --> C[Back-end Executa a Query]
+    C --> D[Back-end Retorna os Resultados para a IA]
+    D --> E[IA Gera Texto Humanizado]
+    E --> F[React Native Exibe a Resposta]

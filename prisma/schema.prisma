@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = "mysql://root:123456@localhost:3306/senaizinho"
+}
+
+model User {
+  id     Int     @id @default(autoincrement())
+  name   String
+  email  String  @unique
+  vendas Venda[] // Um usuário pode ter várias vendas
+}
+
+model Produto {
+  id           Int         @id @default(autoincrement())
+  nome         String
+  descricao    String?
+  preco        Float
+  estoque      Int
+  criadoEm     DateTime    @default(now())
+  atualizadoEm DateTime    @updatedAt
+  itensVenda   ItemVenda[] // Relacionamento com os itens de venda
+}
+
+model Venda {
+  id         Int         @id @default(autoincrement())
+  data       DateTime    @default(now())
+  valorTotal Float
+  usuarioId  Int
+  usuario    User        @relation(fields: [usuarioId], references: [id])
+  itens      ItemVenda[] // Lista de itens da venda (cada item com produto e quantidade)
+}
+model ItemVenda {
+  id         Int      @id @default(autoincrement())
+  vendaId    Int
+  produtoId  Int
+  quantidade Int
+  precoUnit  Float
+
+  venda      Venda    @relation(fields: [vendaId], references: [id])
+  produto    Produto  @relation(fields: [produtoId], references: [id])
+}
+model InteracaoIA {
+  id                 Int      @id @default(autoincrement())
+  perguntaUsuario    String
+  queryMontada       String
+  respostaHumanizada String
+  feedbackUsuario    String?     // Campo opcional
+  criadoEm           DateTime    @default(now())
+  atualizadoEm       DateTime    @updatedAt
+}

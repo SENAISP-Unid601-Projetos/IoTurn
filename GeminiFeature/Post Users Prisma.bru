@@ -1,0 +1,18 @@
+meta {
+  name: Post Users Prisma
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:3000/users
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name":"jao",
+    "email":"bombardirolou@gmail.com"
+  }
+}

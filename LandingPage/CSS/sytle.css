@@ -85,19 +85,15 @@ body, html {
 }
 
 .bottomCotent {
+    border: #01497c solid 2px;
     flex-flow: row-reverse;
 }
 
 /* Seção de texto */
 .text-section {
     margin-left: 5%;
-    line-height: 200%;
     font-size: 200%;
     flex: 1;
-}
-
-.text-section2 {
-    text-align: end;
 }
 
 .course-name {
@@ -138,11 +134,12 @@ body, html {
 }
 
 .image-section2 {
+    border: #01497c solid 2px;
     text-align: center;
     flex: 1;
 }
 
-.image-section2 img {
+.image-section2 {
     transform: scale(0.8);
     border-radius: 10px;
     box-shadow: 10px 5px 15px rgba(0, 0, 0, 0.2);

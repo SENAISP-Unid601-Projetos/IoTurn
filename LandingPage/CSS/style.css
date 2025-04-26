@@ -1,8 +1,6 @@
-/* Importando fonte para melhor estilização */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
 * {
-
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -21,11 +19,51 @@ body, html {
     flex-direction: column;
 }
 
+.divLogo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 250px;
+}
+
+
 .imgLogo {
-    margin-top: 15px;
-    margin-bottom: 15px;
-    width: 25%;
-    transform: scale(3);
+  margin: 15px 0;
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  transform: scale(1);
+}
+
+
+/* Navbar */
+.top-bar {
+    background-color: #01497c;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    margin-right: 10%;
+    padding: 10px;
+}
+
+.enroll-btn {
+    color: inherit;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: 0.5s;
+}
+
+.enroll-btn:hover, .cta-button:hover {
+    transform: scale(1.1);
 }
 
 .iconLogin {
@@ -40,41 +78,7 @@ body, html {
     transform: scale(2.5);
 }
 
-.navbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    margin-right: 10%;
-    padding: 10px;
-}
-
-/* Barra superior */
-.top-bar {
-    background-color: #01497c;
-    color: white;
-    text-align: center;
-    font-weight: bold;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-}
-
-.enroll-btn {
-    color: inherit;
-    padding: 10px 20px;
-    display: flex;
-    justify-content: center;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: 0.5s;
-}
-
-.enroll-btn:hover, .cta-button:hover {
-    transform: scale(1.1);
-}
-
-/* Conteúdo principal */
+/* Conteúdo */
 .content {
     display: flex;
     align-items: center;
@@ -84,12 +88,10 @@ body, html {
     margin-top: 4%;
 }
 
-.bottomCotent {
+.bottomContent {
     flex-flow: row-reverse;
-    gap: 0;
 }
 
-/* Seção de texto */
 .text-section {
     margin-left: 5%;
     font-size: 200%;
@@ -121,26 +123,19 @@ body, html {
     transition: 0.3s ease-in;
 }
 
-/* Seção de imagem */
-.image-section {
+.image-section, .image-section2 {
     text-align: center;
     flex: 1;
-    height: 50%;
+    height: auto;
 }
 
-.image-section img {
+.image-section img, .image-section2 {
+    width: 100%;
     height: auto;
     border-radius: 10px;
     box-shadow: 10px 5px 15px rgba(0, 0, 0, 0.2);
 }
 
-.image-section2 {
-    transform: scale(0.8);
-    border-radius: 10px;
-    box-shadow: 10px 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-/* Div no fundo do container */
 .footer-background {
     background-color: #01497c;
     color: white;
@@ -148,27 +143,31 @@ body, html {
     padding: 10px;
     font-size: 14px;
     margin-top: auto;
-    /* Garante que fique no fundo */
 }
 
-.saibaMais {
+/* Popup */
+.popup {
     z-index: 2;
-    height: 90dvh;
-    width: 80%;
     position: absolute;
     top: 50%;
     left: 50%;
+    background-color: #4bb989;
+    border-radius: 20px;
+    padding: 50px;
     transform: translate(-50%, -50%) scale(0);
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 50px;
-    border-radius: 20px;
-    transition: 1s ease-in;
-    background-color: #4bb989;
+    transition: 0.5s ease-in;
 }
 
+/* Responsividade */
 @media screen and (max-width: 768px) {
+    .popup {
+      width: 85%;
+      font-size: 80%;
+    }
+
     .top-bar {
         flex-direction: column;
     }
@@ -187,19 +186,7 @@ body, html {
         font-size: 150%;
     }
 
-    .image-section {
+    .image-section img, .image-section2 {
         width: 100%;
-        height: auto;
     }
-
-    .image-section img {
-        width: 100%;
-        height: auto;
-    }
-
-    .image-section2 {
-        width: 100%;
-        height: auto;
-    }
-    
 }

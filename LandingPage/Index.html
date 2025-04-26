@@ -13,23 +13,24 @@
       href="Recursos/Logo/favicon.ico"
       type="image/x-icon"
     />
-    <link rel="stylesheet" href="CSS/sytle.css" />
-    <script src="JS/script.js "></script>
+    <link rel="stylesheet" href="CSS/style.css" />
+    <script src="JS/script.js" defer></script>
   </head>
 
   <body>
     <div class="container">
       <header class="top-bar">
         <div class="divLogo">
-          <img src="Recursos/Logo/LogoSemBorda2.png" alt="" class="imgLogo" />
+          <img src="Recursos/Logo/LogoSemBorda2.png" alt="Logo IoTurn" class="imgLogo" />
         </div>
-        <div class="navbar">
+        <nav class="navbar">
           <p class="enroll-btn btn-action">Saiba mais</p>
           <p class="enroll-btn btn-action-contato">Contato</p>
-          <a href="#" class="fa fa-user-circle-o iconLogin"></a>
-        </div>
+          <a href="#" class="fa fa-user-circle-o iconLogin" title="Login"></a>
+        </nav>
       </header>
-      <div class="content">
+
+      <main class="content">
         <section class="text-section">
           <p class="course-name">
             IoTurn: Monitoramento Inteligente para Torneamento de Alta Precisão
@@ -44,12 +45,14 @@
           </p>
           <button class="cta-button btn-action">SAIBA MAIS</button>
         </section>
+
         <div class="image-section">
-          <img src="Recursos/ImgBody/imgBody1.png" alt="imagem body 1" />
+          <img src="Recursos/ImgBody/imgBody1.png" alt="Imagem ilustrativa de monitoramento" />
         </div>
-      </div>
-      <div class="content bottomCotent">
-        <section class="text-section">
+      </main>
+
+      <section class="content bottomContent">
+        <div class="text-section">
           <h2>Transforme dados em decisões com inteligência em tempo real</h2>
           <p class="description">
             A IoTurn transforma o funcionamento do torno em dados valiosos por
@@ -58,14 +61,14 @@
             interface web, possibilitando identificar falhas, otimizar o
             desempenho e aumentar o controle no chão de fábrica.
           </p>
-        </section>
-        <img
-          class="image-section2"
-          src="Recursos/ImgBody/ImgBody2.jpeg"
-          alt="ImgBody2"
-        />
-      </div>
-      <article class="saibaMais">
+        </div>
+
+        <div class="image-section">
+          <img src="Recursos/ImgBody/ImgBody2.jpeg" alt="Dados em tempo real para tornos" class="image-section2" />
+        </div>
+      </section>
+
+      <article class="popup saibaMais">
         <div>
           <h1>IoTurn: Inteligência em Tempo Real para Torneamento</h1>
 
@@ -85,27 +88,22 @@
 
           <h2>Principais benefícios</h2>
           <ul>
-            <li>
-              <strong>Prevenção de falhas:</strong> Detecta anomalias antes que
-              causem paradas.
-            </li>
-            <li>
-              <strong>Mais produtividade:</strong> Identifica gargalos e melhora
-              o ritmo de produção.
-            </li>
-            <li>
-              <strong>Eficiência energética:</strong> Acompanha o consumo e
-              ajuda a evitar desperdícios.
-            </li>
-            <li>
-              <strong>Gestão por dados:</strong> Relatórios e alertas facilitam
-              decisões rápidas e precisas.
-            </li>
+            <li><strong>Prevenção de falhas:</strong> Detecta anomalias antes que causem paradas.</li>
+            <li><strong>Mais produtividade:</strong> Identifica gargalos e melhora o ritmo de produção.</li>
+            <li><strong>Eficiência energética:</strong> Acompanha o consumo e ajuda a evitar desperdícios.</li>
+            <li><strong>Gestão por dados:</strong> Relatórios e alertas facilitam decisões rápidas e precisas.</li>
           </ul>
         </div>
       </article>
 
-      <article class="contato saibaMais">aaaaaaaa</article>
+      <article class="popup contato">
+        <div>
+          <h1>Entre em Contato</h1>
+          <p>Email: contato@ioturn.com</p>
+          <p>Telefone: (11) 99999-9999</p>
+          <p>Endereço: Rua Senai, 123 - São Paulo, SP</p>
+        </div>
+      </article>
 
       <footer class="footer-background">
         <p>© 2023 IoTurn. Todos os direitos reservados.</p>

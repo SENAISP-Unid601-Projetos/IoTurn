@@ -37,9 +37,7 @@ function abrirPopup(element) {
   document.documentElement.style.overflow = 'hidden';
   document.addEventListener('touchmove', prevenirScroll, { passive: false });
 
-  element.addEventListener('click', (e) => {
-    e.stopPropagation();
-  });
+  element.addEventListener('click', (e) => e.stopPropagation());
 }
 
 function fecharPopup() {

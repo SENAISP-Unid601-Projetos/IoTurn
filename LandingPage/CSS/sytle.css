@@ -45,8 +45,7 @@ body, html {
     align-items: center;
     justify-content: space-around;
     margin-right: 10%;
-    width: 20%;
-
+    padding: 10px;
 }
 
 /* Barra superior */
@@ -154,13 +153,53 @@ body, html {
 
 .saibaMais {
     z-index: 2;
+    height: 90dvh;
+    width: 80%;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0);
-    transform-origin: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     padding: 50px;
     border-radius: 20px;
     transition: 1s ease-in;
     background-color: #4bb989;
+}
+
+@media screen and (max-width: 768px) {
+    .top-bar {
+        flex-direction: column;
+    }
+
+    .navbar {
+        margin: 20px 0;
+    }
+
+    .content {
+        flex-direction: column;
+        padding: 20px;
+    }
+
+    .text-section {
+        margin-left: 0;
+        font-size: 150%;
+    }
+
+    .image-section {
+        width: 100%;
+        height: auto;
+    }
+
+    .image-section img {
+        width: 100%;
+        height: auto;
+    }
+
+    .image-section2 {
+        width: 100%;
+        height: auto;
+    }
+    
 }

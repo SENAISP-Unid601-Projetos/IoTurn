@@ -14,11 +14,13 @@
     ></script>
     <script src="https://kit.fontawesome.com/be2221d752.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script src="https://code.jscharting.com/latest/jscharting.js"></script>
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/chat.css">
     <script src="js/chat.js" defer></script>
-    <script src="js/chart.js" defer></script>
+    <script src="js/chartGauge.js" defer></script>
+    <script src="js/chartLine.js" defer></script>
   </head>
   <body class="bg-blue text-light vh-100">
     <header class="bg-dark-blue text-white text-center py-3">
@@ -28,20 +30,20 @@
     <section class="container mt-4 w-80 h-100">
       <div class="container d-grid h-100 w-100 p-0 gap-3">
         <div class="d-grid gap-2" style="grid-template-columns: 2fr 1fr;">
-          <div class="bg-secondary rounded">container</div> <!--grafico linha-->
+          <div class="d-flex align-items-center bg-light rounded" id="graph-oleo"></div> <!--grafico linha-->
           <div class="rounded">
             <div class="d-grid gap-2 h-100" style="grid-template-rows: 1fr 1fr;">
-              <div class="bg-warning gap-2 rounded" id="chartDiv"></div>
-              <div class="bg-warning gap-2 rounded">aa</div>
+              <div class="gap-2 rounded" id="chartDiv1"></div>
+              <div class="gap-2 rounded" id="chartDiv2"></div>
             </div>
           </div>
         </div>
         <div class="d-grid gap-2" style="grid-template-columns: 2fr 1fr;">
-          <div class="bg-secondary rounded">container</div> <!--grafico linha-->
+          <div class="d-flex align-items-center bg-light rounded" id="graph-temp"></div> <!--grafico linha-->
           <div class="rounded">
             <div class="d-grid gap-3 h-100" style="grid-template-rows: 1fr 1fr;">
-              <div class="bg-warning gap-2 rounded">aa</div>
-              <div class="bg-warning gap-2 rounded">aa</div>
+              <div class="gap-2 rounded" id="chartDiv3"></div>
+              <div class="gap-2 rounded" id="chartDiv4"></div>
             </div>
           </div>
         </div>

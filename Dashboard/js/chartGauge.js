@@ -2,7 +2,13 @@ function createGauge(containerId) {
   let chart = JSC.chart(containerId, { 
     debug: false, 
     type: 'gauge', 
-    chartArea: { background: '#00000' },
+    chartArea: { 
+      background: {
+        fill: 'transparent', // ou qualquer cor HEX/RGB
+        outline: { width: 0 } // remove borda
+      }
+    },
+    backgroundColor: 'transparent',
     animation_duration: 1000, 
     legend_visible: false, 
     xAxis: { spacingPercentage: 0.25 }, 
@@ -32,21 +38,7 @@ function createGauge(containerId) {
         type: 'column roundcaps', 
         points: [{ id: '1', x: 'speed', y: 0 }],
       } 
-    ], 
-    toolbar_items: { 
-      Stop: { 
-        type: 'option', 
-        icon_name: 'system/default/pause', 
-        margin: 10, 
-        boxVisible: false, 
-        label_text: 'Pause', 
-        events: { change: playPause }, 
-        states_select: { 
-          icon_name: 'system/default/play', 
-          label_text: 'Play'
-        } 
-      } 
-    }
+    ]
   });
 
   let intervalId;
@@ -72,12 +64,16 @@ function createGauge(containerId) {
   }
 
   playPause(false);
+
+  // Retornar métodos para controle externo
   return { chart, playPause, setGauge };
 }
 
+// Inicializar gauges
 const gauge1 = createGauge('chartDiv1');
 const gauge2 = createGauge('chartDiv2');
 const gauge3 = createGauge('chartDiv3');
 const gauge4 = createGauge('chartDiv4');
 
-//gauge$.updateGaugeValue(number);
+// Exemplo de uso externo (opcional)
+// gauge1.setGauge(75);

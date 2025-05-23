@@ -1,0 +1,43 @@
+.bg-blue,
+.bg-light {
+  min-height: 200px;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  max-height: 400px;
+  transition: min-height 0.3s ease;
+}
+
+.gauge-container {
+  aspect-ratio: 1 / 1;
+}
+
+@media (max-width: 575.98px) {
+  .bg-blue,
+  .bg-light {
+    min-height: 120px;
+  }
+  .gauge-container {
+    min-height: 120px;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 991.98px) {
+  .bg-blue,
+  .bg-light {
+    min-height: 150px;
+  }
+  .gauge-container {
+    min-height: 150px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .bg-blue,
+  .bg-light {
+    max-height: 500px;
+  }
+  .gauge-container {
+    max-height: 500px;
+  }
+}

@@ -1,11 +1,76 @@
-.bg-blue {
-  background-color: #194f88 !important;
+body {
+  background-color: #f8f9fa;
+  color: #212529;
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.5;
+  min-height: 100vh;
 }
 
-.bg-dark-blue {
-  background-color: #01497c !important;
+/* Header */
+header {
+  background-color: #1a237e;
+  color: white;
+  text-align: center;
+  padding: 0.75rem 0;
 }
 
-.grid-2fr-1fr {
-  grid-template-columns: 2fr 1fr;
+header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+/* Dashboard Layout */
+.dashboard {
+  max-width: 1200px;
+  margin: 1rem auto;
+  padding: 0 1rem;
+}
+
+.dashboard-row {
+  display: flex;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.line-chart-container {
+  flex: 2;
+  background-color: #1976d2;
+  border-radius: 0.25rem;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gauges-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.gauge-container {
+  background-color: #f8f9fa;
+  border-radius: 0.25rem;
+  flex: 1;
+  min-height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .dashboard-row {
+    flex-direction: column;
+  }
+  
+  .gauges-column {
+    flex-direction: row;
+  }
+  
+  .gauge-container {
+    min-height: 200px;
+  }
 }

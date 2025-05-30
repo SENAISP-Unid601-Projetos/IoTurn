@@ -1,34 +1,23 @@
 let popupAtivo = null;
 
-window.onload = () => {
+document.addEventListener('DOMContentLoaded', () => {
   // Seletores dos botões
-  const acionarSaibaMais = document.querySelectorAll('.btn-action');
-  const acionarContato = document.querySelectorAll('.btn-action-contato');
+  const acionarSaibaMais = document.querySelector('#btn-action');
 
   // Seletores dos popups
   const saibaMais = document.querySelector('.saibaMais');
-  const contato = document.querySelector('.contato');
 
-  // Adiciona evento ao botão "Saiba Mais"
-  acionarSaibaMais.forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      abrirPopup(saibaMais);
-    });
-  });
-
-  // Adiciona evento ao botão "Contato"
-  acionarContato.forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      abrirPopup(contato);
-    });
+  acionarSaibaMais.addEventListener('click', e => {
+    e.stopPropagation();
+    abrirPopup(saibaMais);
+    fadeOutElement();
   });
 
   // Fecha popup ao clicar fora dele
   document.addEventListener('click', event => {
     if (popupAtivo && !popupAtivo.contains(event.target)) {
       fecharPopup();
+      fadeInElement();
     }
   });
 
@@ -38,10 +27,10 @@ window.onload = () => {
       fecharPopup();
     }
   });
-};
+});
 
 function abrirPopup(element) {
-  fecharPopup(); // Garante que só um popup fique aberto
+  fecharPopup();
 
   popupAtivo = element;
   element.classList.add('active');
@@ -58,10 +47,41 @@ function fecharPopup() {
   if (popupAtivo) {
     popupAtivo.classList.remove('active');
 
+    // Remove o blur do conteúdo
+    const conteudo = document.getElementById('conteudo-blur');
+    if (conteudo) {
+      conteudo.classList.remove('blur-ativo');
+    }
+
     // Libera o scroll da página
     document.body.style.overflow = 'auto';
     document.documentElement.style.overflow = 'auto';
 
     popupAtivo = null;
   }
+}
+
+function fadeOutElement() {
+  const el = document.querySelectorAll('.main');
+  setTimeout(() => {
+    el.forEach(element => {
+      if (element) {
+        element.classList.remove('fadeIn');
+        element.classList.add('fadeOut');
+      }
+    })
+  }, 100);
+}
+
+function fadeInElement() {
+  const el = document.querySelectorAll('.main');
+  setTimeout(() => {
+    el.forEach(element => {
+      if (element) {
+        element.style.display = 'block';
+        element.classList.remove('fadeOut');
+        element.classList.add('fadeIn');
+      }
+    });
+  }, 100);
 }

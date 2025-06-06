@@ -1,11 +1,20 @@
 let popupAtivo = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Seletores dos botões
   const acionarSaibaMais = document.querySelector('#btn-action');
-
-  // Seletores dos popups
   const saibaMais = document.querySelector('.saibaMais');
+
+  // Adiciona botão de fechar ao popup (se não existir)
+  if (!saibaMais.querySelector('.btn-close')) {
+    const botaoFechar = document.createElement('button');
+    botaoFechar.className = 'btn-close position-absolute top-0 end-0 m-3';
+    botaoFechar.setAttribute('aria-label', 'Fechar');
+    botaoFechar.addEventListener('click', () => {
+      fecharPopup();
+      fadeInElement();
+    });
+    saibaMais.appendChild(botaoFechar);
+  }
 
   acionarSaibaMais.addEventListener('click', e => {
     e.stopPropagation();
@@ -13,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fadeOutElement();
   });
 
-  // Fecha popup ao clicar fora dele
+  // Fecha popup ao clicar fora
   document.addEventListener('click', event => {
     if (popupAtivo && !popupAtivo.contains(event.target)) {
       fecharPopup();
@@ -21,10 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Fecha popup ao pressionar ESC
+  // Fecha com tecla ESC
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && popupAtivo) {
       fecharPopup();
+      fadeInElement();
     }
   });
 });
@@ -35,25 +45,30 @@ function abrirPopup(element) {
   popupAtivo = element;
   element.classList.add('active');
 
-  // Previne scroll do fundo da página
+  // Acessibilidade
+  element.setAttribute('role', 'dialog');
+  element.setAttribute('aria-modal', 'true');
+  element.setAttribute('tabindex', '-1');
+  element.focus();
+
+  // Impede scroll do fundo
   document.body.style.overflow = 'hidden';
   document.documentElement.style.overflow = 'hidden';
 
-  // Impede que clique dentro do popup feche ele
-  element.addEventListener('click', e => e.stopPropagation());
+  // Garante que o clique interno não feche o popup
+  element.onclick = e => e.stopPropagation();
 }
 
 function fecharPopup() {
   if (popupAtivo) {
     popupAtivo.classList.remove('active');
 
-    // Remove o blur do conteúdo
+    // Remove blur se existir
     const conteudo = document.getElementById('conteudo-blur');
     if (conteudo) {
       conteudo.classList.remove('blur-ativo');
     }
 
-    // Libera o scroll da página
     document.body.style.overflow = 'auto';
     document.documentElement.style.overflow = 'auto';
 
@@ -69,7 +84,7 @@ function fadeOutElement() {
         element.classList.remove('fadeIn');
         element.classList.add('fadeOut');
       }
-    })
+    });
   }, 100);
 }
 

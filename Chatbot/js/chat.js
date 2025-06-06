@@ -1,4 +1,4 @@
-const WS_URL = "ws://localhost:3000";
+const WS_URL = "ws://10.110.12.14:8080";
 
 document.addEventListener("DOMContentLoaded", initChat);
 

@@ -1,30 +1,20 @@
 import createGauge from './chartGauge.js'
 import createRealtimeEchart from './chartLineECharts.js'
 
-// client.ts
-const socket = new WebSocket('ws://10.110.12.14:8080')
+const client = mqtt.connect('ws://10.110.12.14:8080');
 
-socket.onopen = () => {
-    console.log('✅ Conectado ao servidor WebSocket')
-    socket.send('Olá servidor!')
-}
+client.on('connect', () => {
+  console.log('Conectado ao broker MQTT via WebSocket!');
+  client.subscribe('meu/topico', (err) => {
+    if (!err) {
+      client.publish('meu/topico', 'Olá via WebSocket!');
+    }
+  });
+});
 
-socket.onmessage = (event) => {
-    const data = event.data;
-    console.log(data);
-}
-
-//teste 1
-// socket.on('message', (data) => {
-//     console.log('teste')
-//     console.log('Dados recebidos do servidor:', data);
-// });
-
-socket.onerror = (err) => {
-    console.error('❌ Erro no WebSocket:', err)
-}
-createRealtimeEchart('graph-oleo');
-createRealtimeEchart('graph-temp');
+client.on('message', (topic, message) => {
+  console.log(`Mensagem recebida em ${topic}: ${message.toString()}`);
+});
 
 const gauge1 = createGauge('chartDiv1', 'RPM');
 const gauge2 = createGauge('chartDiv2', 'N. Óleo');

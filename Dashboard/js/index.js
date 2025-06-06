@@ -26,11 +26,64 @@ function createLineChart(containerId, title) {
         },
         dataLabels: { enabled: false },
         stroke: { curve: 'smooth' },
-        title: { text: title, align: 'left' },
+        title: {
+            text: title,
+            align: 'left',
+            style: {
+                color: '#333333' // Cor do título para tema claro (cinza escuro)
+            }
+        },
         markers: { size: 0 },
-        xaxis: { type: 'datetime', range: 20000 },
-        yaxis: { max: 100 },
-        legend: { show: false },
+        xaxis: {
+            type: 'datetime',
+            range: 20000,
+            labels: {
+                style: {
+                    colors: '#666666' // Cor dos labels do eixo X para tema claro (cinza médio)
+                }
+            },
+            axisBorder: {
+                show: true,
+                color: '#999999' // Cor da borda do eixo X para tema claro (cinza claro)
+            },
+            axisTicks: {
+                show: true,
+                color: '#999999' // Cor dos ticks do eixo X para tema claro (cinza claro)
+            }
+        },
+        yaxis: {
+            max: 100,
+            labels: {
+                style: {
+                    colors: '#666666' // Cor dos labels do eixo Y para tema claro (cinza médio)
+                }
+            },
+            axisBorder: {
+                show: true,
+                color: '#999999' // Cor da borda do eixo Y para tema claro (cinza claro)
+            },
+            axisTicks: {
+                show: true,
+                color: '#999999' // Cor dos ticks do eixo Y para tema claro (cinza claro)
+            }
+        },
+        grid: {
+            borderColor: '#E0E0E0', // Cor das linhas do grid para tema claro (cinza muito claro)
+            strokeDashArray: 4,
+            xaxis: {
+                lines: {
+                    show: false
+                }
+            },
+            yaxis: {
+                lines: {
+                    show: true
+                }
+            }
+        },
+        tooltip: {
+            theme: 'light' // Tema do tooltip para claro (texto escuro em fundo claro)
+        }
     };
 
     const chart = new ApexCharts(document.querySelector(`#${containerId}`), options);
@@ -59,11 +112,11 @@ function createGauge(containerId, subtitle) {
         type: 'gauge',
         chartArea: {
             background: {
-                fill: 'transparent',
+                fill: '#253443', // <--- ALtere esta linha para a cor de fundo da área do gráfico
                 outline: { width: 0 }
             }
         },
-        backgroundColor: 'transparent',
+        backgroundColor: '#253443', // <--- ALtere esta linha para a cor de fundo do container do gauge
         animation_duration: 1000,
         legend_visible: false,
         xAxis: { spacingPercentage: 0.25 },
@@ -139,7 +192,6 @@ client.on('message', (topic, message) => {
             chartCorrent.update(value);
             break;
         case 'esp32/rpm':
-
             gaugeRPM.setGauge(value);
             break;
         case 'esp32/nivelOleo':

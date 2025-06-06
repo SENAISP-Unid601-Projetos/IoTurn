@@ -6,7 +6,7 @@
   --text-light: #fff;
   --bg-body-gradient-start: #1a2a3a;
   --bg-body-gradient-end: #0d1a2a;
-  --bg-card-dark: rgba(255, 255, 255, 0.1);
+  --bg-card-dark: rgb(255, 255, 255);
   --bg-sidebar: rgba(0, 0, 0, 0.3);
   --bg-sidebar-hover: rgba(255, 255, 255, 0.08);
   --border-light-subtle: rgba(255, 255, 255, 0.15);
@@ -135,7 +135,7 @@ body, html {
 
 .line-chart-container {
   flex: 5;
-  min-width: 600px;
+  min-width: 50vw;
   background-color: var(--bg-card-dark);
   backdrop-filter: blur(15px);
   border-radius: var(--border-radius-md);

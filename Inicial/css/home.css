@@ -1,17 +1,50 @@
-* {
-    margin: 0;
-    padding: 0;
+.logo {
+  max-height: 60px;
 }
 
-body {
-    background-color: rgb(255, 255, 250);
+.user-icon {
+  font-size: 2rem;
+  color: white;
+  text-decoration: none;
 }
 
-.navbar {
-    background-color: darkblue;
-    padding: 20px;
+/* Main content */
+.main {
+  flex: 1;
+  padding: 2rem;
+  text-align: center;
 }
 
-.navbar h1 {
-    color: antiquewhite;
+.main h1 {
+  margin-bottom: 2rem;
+}
+
+.machine-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+}
+
+.machine-card {
+  background-color: #2d86e5;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 250px;
+  cursor: pointer;
+  transition: transform 0.3s, background-color 0.3s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.machine-card:hover {
+  background-color: #2164ac;
+  transform: translateY(-5px);
+}
+
+.machine-card h2 {
+  margin-bottom: 0.5rem;
+}
+
+.machine-card p {
+  font-size: 0.95rem;
 }

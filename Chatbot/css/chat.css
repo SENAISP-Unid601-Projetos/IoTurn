@@ -1,0 +1,96 @@
+/* =========  Container geral ========= */
+.chat-main {
+  flex: 1;
+  margin: 0 5%;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  max-height: calc(100vh - 120px); 
+  overflow: hidden;
+}
+
+
+/* =========  Histórico de mensagens ========= */
+.chat-container {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-right: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+
+/* =========  Bubbles ========= */
+.message {
+  max-width: 70%;
+  padding: 0.75rem 1rem;
+  border-radius: 16px;
+  word-wrap: break-word;
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+.message.user {
+  align-self: flex-end;
+  background: #2d86e5;
+}
+
+.message.bot {
+  align-self: flex-start;
+  background: #415a77;
+}
+
+/* =========  Formulário de envio ========= */
+.chat-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  align-items: flex-end;
+}
+
+.chat-textarea {
+  flex: 1;
+  resize: none;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: 'Poppins', sans-serif;
+  overflow-y: hidden;          /* evita scroll vertical interno */
+  line-height: 1.4;
+  min-height: 38px;
+  height: auto;                /* deixa o JS controlar a altura */
+  max-height: 150px;           /* altura máxima visível */
+  box-sizing: border-box;
+}
+
+.send-btn {
+  background-color: #2d86e5;
+  border: none;
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1.2rem;
+  border-radius: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+}
+
+.send-btn:hover {
+  background-color: #2164ac;
+}
+
+/* =========  Responsividade básica ========= */
+@media (max-width: 480px) {
+  .message {
+    max-width: 90%;
+    font-size: 0.85rem;
+  }
+}

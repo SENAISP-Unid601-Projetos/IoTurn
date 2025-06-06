@@ -28,5 +28,3 @@ createRealtimeEchart('graph-temp');
 
 const gauge1 = createGauge('chartDiv1', 'RPM');
 const gauge2 = createGauge('chartDiv2', 'N. Óleo');
-const gauge3 = createGauge('chartDiv3');
-const gauge4 = createGauge('chartDiv4');

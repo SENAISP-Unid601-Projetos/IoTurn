@@ -1,29 +1,6 @@
-body {
-  background-color: #f8f9fa;
-  color: #212529;
-  margin: 0;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  line-height: 1.5;
-  min-height: 100vh;
-}
-
-/* Header */
-header {
-  background-color: #1a237e;
-  color: white;
-  text-align: center;
-  padding: 0.75rem 0;
-}
-
-header h1 {
-  margin: 0;
-  font-size: 1.5rem;
-}
-
-/* Dashboard Layout */
 .dashboard {
-  max-width: 1200px;
-  margin: 1rem auto;
+  flex: 1;
+  margin: 1rem 10%;
   padding: 0 1rem;
 }
 

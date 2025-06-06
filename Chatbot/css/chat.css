@@ -1,14 +1,15 @@
 /* =========  Container geral ========= */
 .chat-main {
   flex: 1;
-  margin: 0 5%;
+  margin: 0 auto;
+  max-width: 800px;
+  width: 90%;
   display: flex;
   flex-direction: column;
-  padding: 1rem;
-  max-height: calc(100vh - 120px); 
+  padding: 1rem 0;
+  max-height: calc(100vh - 120px);
   overflow: hidden;
 }
-
 
 /* =========  Histórico de mensagens ========= */
 .chat-container {
@@ -16,37 +17,114 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  padding-right: 0.5rem;
-  padding-bottom: 0.5rem;
+  gap: 1.5rem; /* Aumenta o espaço entre as mensagens */
+  padding: 1rem;
 }
 
+/* ========= Estrutura da linha de mensagem (Avatar + Bolha) ========= */
+.message-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
 
-/* =========  Bubbles ========= */
+.message-row.user {
+  justify-content: flex-end; /* Alinha a mensagem do usuário à direita */
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #415a77;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+/* =========  Bolhas de Mensagem ========= */
+.message-content {
+  max-width: 75%;
+}
+
 .message {
-  max-width: 70%;
-  padding: 0.75rem 1rem;
-  border-radius: 16px;
+  padding: 0.75rem 1.2rem;
+  border-radius: 18px;
   word-wrap: break-word;
   font-size: 0.95rem;
-  line-height: 1.35;
+  line-height: 1.4;
+  position: relative;
 }
 
 .message.user {
-  align-self: flex-end;
   background: #2d86e5;
+  color: white;
+  border-bottom-right-radius: 4px; /* "Cauda" da bolha */
 }
 
 .message.bot {
-  align-self: flex-start;
   background: #415a77;
+  color: white;
+  border-bottom-left-radius: 4px; /* "Cauda" da bolha */
 }
+
+/* Inverte a ordem para o avatar do usuário aparecer à direita */
+.message-row.user {
+  flex-direction: row-reverse;
+}
+
+.message-row.bot .avatar {
+  background-color: #1b263b; /* Cor diferente para o bot */
+}
+
+
+/* =========  Feedback (Like/Dislike) ========= */
+.feedback-icons {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-start;
+}
+
+.feedback-icons button {
+  background: none;
+  border: none;
+  color: #a9c1de; /* Cor neutra */
+  cursor: pointer;
+  font-size: 1rem;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.feedback-icons button:hover {
+  transform: scale(1.15);
+  color: #fff;
+}
+
+/* Estilo para quando um botão é selecionado */
+.feedback-icons button.selected {
+  color: #2d86e5; /* Cor de destaque para o like */
+}
+
+.feedback-icons button.selected.dislike {
+  color: #e53d3d; /* Cor de destaque para o dislike */
+}
+
+/* Desabilita o outro botão */
+.feedback-icons.rated button:not(.selected) {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 
 /* =========  Formulário de envio ========= */
 .chat-form {
   display: flex;
   gap: 0.5rem;
   margin-top: 1rem;
+  padding: 0 1rem;
   align-items: flex-end;
 }
 
@@ -54,16 +132,21 @@
   flex: 1;
   resize: none;
   padding: 0.75rem 1rem;
-  border: none;
-  border-radius: 12px;
+  border: 1px solid #415a77;
+  background-color: #1b263b;
+  color: white;
+  border-radius: 20px;
   font-size: 1rem;
   font-family: 'Poppins', sans-serif;
-  overflow-y: hidden;          /* evita scroll vertical interno */
+  overflow-y: hidden;
   line-height: 1.4;
-  min-height: 38px;
-  height: auto;                /* deixa o JS controlar a altura */
-  max-height: 150px;           /* altura máxima visível */
+  min-height: 42px;
+  max-height: 150px;
   box-sizing: border-box;
+}
+
+.chat-textarea::placeholder {
+  color: #b5beca;
 }
 
 .send-btn {
@@ -71,26 +154,45 @@
   border: none;
   color: white;
   font-weight: 600;
-  padding: 0.75rem 1.2rem;
-  border-radius: 12px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
   cursor: pointer;
-  white-space: nowrap;
   flex-shrink: 0;
-  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 1.1rem;
   transition: background-color 0.3s ease;
 }
 
 .send-btn:hover {
   background-color: #2164ac;
 }
+/* Adicione no final do seu arquivo chat.css */
 
-/* =========  Responsividade básica ========= */
-@media (max-width: 480px) {
-  .message {
-    max-width: 90%;
-    font-size: 0.85rem;
+.typing-dots span {
+  height: 8px;
+  width: 8px;
+  background-color: #a9c1de;
+  border-radius: 50%;
+  display: inline-block;
+  animation: wave 1.3s infinite;
+}
+
+.typing-dots span:nth-of-type(2) {
+  animation-delay: -1.1s;
+}
+
+.typing-dots span:nth-of-type(3) {
+  animation-delay: -0.9s;
+}
+
+@keyframes wave {
+  0%, 60%, 100% {
+    transform: initial;
+  }
+  30% {
+    transform: translateY(-8px);
   }
 }

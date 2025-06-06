@@ -16,5 +16,9 @@ client.on('message', (topic, message) => {
   console.log(`Mensagem recebida em ${topic}: ${message.toString()}`);
 });
 
+
+createRealtimeEchart('graph-oleo');
+createRealtimeEchart('graph-temp');
+
 const gauge1 = createGauge('chartDiv1', 'RPM');
 const gauge2 = createGauge('chartDiv2', 'N. Óleo');

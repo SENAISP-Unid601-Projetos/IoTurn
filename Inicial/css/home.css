@@ -27,18 +27,23 @@
 }
 
 .machine-card {
-  background-color: #2d86e5;
+  display: flex;
+  flex-flow: column wrap;
+  background-color: rgba(255, 255, 255, 0.2);
   border-radius: 12px;
   padding: 2rem;
-  width: 250px;
   cursor: pointer;
   transition: transform 0.3s, background-color 0.3s;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .machine-card:hover {
-  background-color: #2164ac;
-  transform: translateY(-5px);
+  background-color: #194d84;
+  transform: translateY(-3px);
+}
+
+.machine-card img {
+  width: 100%;
 }
 
 .machine-card h2 {

@@ -2,6 +2,7 @@ const MAX_DATA_POINTS = 60;
 const brokerUrl = 'ws://10.110.12.59:8080';
 const topicos = ['esp32/temperatura', 'esp32/rpm', 'esp32/nivelOleo', 'esp32/corrente'];
 
+
 function createLineChart(containerId, title) {
     let data = [];
 
@@ -26,11 +27,67 @@ function createLineChart(containerId, title) {
         },
         dataLabels: { enabled: false },
         stroke: { curve: 'smooth' },
-        title: { text: title, align: 'left' },
+        title: {
+            text: title,
+            align: 'center',
+            style: {
+                color: '#333333',
+                fontSize: '22px' // Cor do título 
+            }
+        },
         markers: { size: 0 },
-        xaxis: { type: 'datetime', range: 20000 },
-        yaxis: { max: 100 },
-        legend: { show: false },
+        xaxis: {
+            type: 'datetime',
+            range: 20000,
+            labels: {
+                style: {
+                    colors: '#000',
+                    fontSize: '18px' // Cor dos labels do eixo X 
+                }
+            },
+            axisBorder: {
+                show: true,
+                color: '#000' // Cor da borda do eixo X 
+            },
+            axisTicks: {
+                show: true,
+                color: '#000' // Cor dos ticks do eixo X 
+            }
+        },
+        yaxis: {
+            max: 100,
+            labels: {
+                style: {
+                    colors: ' #000',
+                    fontSize: '18px' // Cor dos labels do eixo Y 
+                }
+            },
+            axisBorder: {
+                show: true,
+                color: ' #000' // Cor da borda do eixo Y 
+            },
+            axisTicks: {
+                show: true,
+                color: ' #000' // Cor dos ticks do eixo Y 
+            }
+        },
+        grid: {
+            borderColor: '#E0E0E0', // Cor das linhas do grid claro
+            strokeDashArray: 4,
+            xaxis: {
+                lines: {
+                    show: false
+                }
+            },
+            yaxis: {
+                lines: {
+                    show: true
+                }
+            }
+        },
+        tooltip: {
+            theme: 'light'
+        }
     };
 
     const chart = new ApexCharts(document.querySelector(`#${containerId}`), options);
@@ -63,18 +120,23 @@ function createGauge(containerId, subtitle) {
                 outline: { width: 0 }
             }
         },
+
         backgroundColor: 'transparent',
         animation_duration: 1000,
         legend_visible: false,
         xAxis: { spacingPercentage: 0.25 },
         yAxis: {
-            defaultTick: { padding: -5, label_style_fontSize: '14px' },
-            line: { width: 9, color: 'smartPalette', breaks_gap: 0.06 },
-            scale_range: [0, 100]
+            scale_range: [0, 100],
+            visible: false,
+            line: {
+                width: 0,
+                color: 'smartPalette',
+                breaks_gap: 0.06
+            },
         },
         palette: {
             pointValue: '{%value/100}',
-            colors: ['green', 'yellow', 'red']
+            colors: [' #87CEFA', ' #2d86e5', ' #194869 '] // Cores para diferentes faixas do medidor
         },
         defaultTooltip_enabled: false,
         defaultSeries: {
@@ -82,8 +144,7 @@ function createGauge(containerId, subtitle) {
             shape: {
                 innerSize: '70%',
                 label: {
-                    text: `<span color="%color">{%sum:n1}</span><br/><span color="#696969" fontSize="20px">${subtitle}</span>`,
-                    style_fontSize: '46px',
+                    text: `<span color="#333333" fontSize="46px">{%sum:n1}</span><br/><span color="#696969" fontSize="20px">${subtitle}</span>`,
                     verticalAlign: 'middle'
                 }
             }
@@ -116,7 +177,6 @@ const client = mqtt.connect(brokerUrl);
 
 client.on('connect', () => {
     console.log(`✅ Conectado ao broker MQTT em ${brokerUrl}`);
-
     topicos.forEach(topic => {
         client.subscribe(topic, err => {
             if (err) {
@@ -130,6 +190,10 @@ client.on('connect', () => {
 
 client.on('message', (topic, message) => {
     const value = parseFloat(message.toString());
+    if (isNaN(value)) {
+        console.warn(`Mensagem MQTT inválida para o tópico ${topic}: ${message.toString()}`);
+        return;
+    }
 
     switch (topic) {
         case 'esp32/temperatura':
@@ -139,7 +203,6 @@ client.on('message', (topic, message) => {
             chartCorrent.update(value);
             break;
         case 'esp32/rpm':
-
             gaugeRPM.setGauge(value);
             break;
         case 'esp32/nivelOleo':

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IoTurn • Dashboard</title>
+    <script
+      src="https://kit.fontawesome.com/be2221d752.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://code.jscharting.com/latest/jscharting.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <link rel="stylesheet" href="../resources/styles/global.css" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/chat.css" />
+    <link rel="stylesheet" href="css/chart.css" />
+    <script type="module" src="js/chartGauge.js" defer></script>
+    <script type="module" src="js/chartLineECharts.js" defer></script>
+    <script type="module" src="js/index.js"></script>
+    <script src="../resources/scripts/global.js" defer></script>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+  </head>
+
+  <body>
+    <header class="header">
+      <img
+        src="../resources/Logo/LogoSemBorda2.png"
+        alt="Logo IoTurn"
+        class="logo"
+      />
+      <button class="menu-toggle" id="menu-toggle">&#9776;</button>
+    </header>
+
+    <nav class="side-menu" id="side-menu">
+      <button class="close-menu" id="close-menu">&times;</button>
+      <ul>
+        <li><a href="../home.html">Página Inicial</a></li>
+        <li><a href="../Chatbot/chat.html">Chatbot</a></li>
+      </ul>
+    </nav>
+
+    <main class="dashboard">
+      <div class="dashboard-row">
+        <div class="line-chart-container bg-blue">
+          <div id="graph-oleo" class="echart-box"></div>
+        </div>
+
+        <div class="gauges-column">
+          <div class="gauge-container" id="chartDiv1">
+            <canvas id="gaugeChart1"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-row">
+        <div class="line-chart-container bg-light">
+          <div id="graph-temp" class="echart-box"></div>
+        </div>
+
+        <div class="gauges-column">
+          <div class="gauge-container" id="chartDiv2">
+            <canvas id="gaugeChart2"></canvas>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <p>© 2025 IoTurn. Todos os direitos reservados.</p>
+    </footer>
+  </body>
+</html>

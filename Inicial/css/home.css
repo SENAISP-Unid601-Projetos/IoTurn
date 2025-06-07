@@ -1,0 +1,55 @@
+.logo {
+  max-height: 60px;
+}
+
+.user-icon {
+  font-size: 2rem;
+  color: white;
+  text-decoration: none;
+}
+
+/* Main content */
+.main {
+  flex: 1;
+  padding: 2rem;
+  text-align: center;
+}
+
+.main h1 {
+  margin-bottom: 2rem;
+}
+
+.machine-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+}
+
+.machine-card {
+  display: flex;
+  flex-flow: column wrap;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 2rem;
+  cursor: pointer;
+  transition: transform 0.3s, background-color 0.3s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.machine-card:hover {
+  background-color: #194d84;
+  transform: translateY(-3px);
+}
+
+.machine-card img {
+  width: 100%;
+}
+
+.machine-card h2 {
+  margin-bottom: 0.5rem;
+}
+
+.machine-card p {
+  font-size: 0.95rem;
+}

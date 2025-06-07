@@ -10,7 +10,7 @@
   --bg-sidebar: rgba(0, 0, 0, 0.3);
   --bg-sidebar-hover: rgba(255, 255, 255, 0.08);
   --border-light-subtle: rgba(255, 255, 255, 0.15);
-  --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-soft: 0 4px 6px rgba(0, 0, 0, 0.8);
   --shadow-menu: 2px 0 10px rgba(0, 0, 0, 0.5);
   --shadow-menu-right: -2px 0 10px rgba(0, 0, 0, 0.5);
   --spacing-xs: 0.5rem;
@@ -20,6 +20,7 @@
   --spacing-xl: 3rem;
   --border-radius-sm: 8px;
   --border-radius-md: 20px;
+   --border-card-light: #e0e0e0;
 }
 
 * {
@@ -141,7 +142,7 @@ html {
   backdrop-filter: blur(15px);
   border-radius: var(--border-radius-md);
   padding: var(--spacing-md);
-  border: 1px solid var(--border-card-light);
+   border: 1px solid var(--border-card-light);
   box-shadow: var(--shadow-soft);
   display: flex;
   flex-direction: column;

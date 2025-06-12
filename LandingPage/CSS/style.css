@@ -28,7 +28,7 @@ body, html {
 /* Hero section */
 .hero {
   height: 100vh;
-  background-image: url('../../Resources/ImgLandPage/Fundo.jpg');
+  background-image: url('../../resources/ImgLandPage/Fundo.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

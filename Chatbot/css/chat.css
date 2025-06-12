@@ -36,7 +36,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: #415a77;
+  background-color: #4471a1;
   color: white;
   display: flex;
   align-items: center;
@@ -47,7 +47,14 @@
 
 /* =========  Bolhas de Mensagem ========= */
 .message-content {
-  max-width: 75%;
+   max-width: 75%;
+   display: flex;
+   flex-direction: column;
+}
+
+.message-row.user .message-content {
+  align-self: flex-end;
+  margin-left: auto;
 }
 
 .message {
@@ -60,7 +67,7 @@
 }
 
 .message.user {
-  background: #2d86e5;
+  background: #415a77;
   color: white;
   border-bottom-right-radius: 4px; /* "Cauda" da bolha */
 }
@@ -77,7 +84,7 @@
 }
 
 .message-row.bot .avatar {
-  background-color: #1b263b; /* Cor diferente para o bot */
+  background-color: #4471a1; /* Cor diferente para o bot */
 }
 
 
@@ -105,7 +112,7 @@
 
 /* Estilo para quando um botão é selecionado */
 .feedback-icons button.selected {
-  color: #2d86e5; /* Cor de destaque para o like */
+  color: #3392f8; /* Cor de destaque para o like */
 }
 
 .feedback-icons button.selected.dislike {
@@ -128,13 +135,12 @@
   align-items: flex-end;
 }
 
-.chat-textarea {
+.chat-textarea{
   flex: 1;
   resize: none;
   padding: 0.75rem 1rem;
-  border: 1px solid #415a77;
-  background-color: #1b263b;
-  color: white;
+  background-color: white;
+  color: black;
   border-radius: 20px;
   font-size: 1rem;
   font-family: 'Poppins', sans-serif;
@@ -142,7 +148,12 @@
   line-height: 1.4;
   min-height: 42px;
   max-height: 150px;
-  box-sizing: border-box;
+  outline: none;
+}
+
+
+.chat-textarea:focus {
+    box-shadow: 0 0 0 2px rgba(45, 134, 229, 0.5);  
 }
 
 .chat-textarea::placeholder {
@@ -150,7 +161,7 @@
 }
 
 .send-btn {
-  background-color: #2d86e5;
+  background-color: #4471a1; /* Cor diferente para o bot */
   border: none;
   color: white;
   font-weight: 600;

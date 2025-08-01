@@ -1,0 +1,181 @@
+/* src/components/landingPage.css */
+
+/* Remove margens padrão do navegador */
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+/* Container Principal */
+.hero-container {
+  position: relative;
+  min-height: 100vh;
+  background-size: cover;
+  background-position: center;
+  color: white;
+  overflow-x: hidden;
+}
+
+/* Header */
+.header {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  z-index: 10; /* Garante que o header fique sobre outros elementos */
+}
+
+.header .logo {
+  height: 4rem;
+}
+
+.header .login-button {
+  text-decoration: none;
+  color: white;
+  font-size: 2rem;
+  margin-right: 3rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.login-button .user-icon {
+  height: 2.5rem;
+  width: 2.5rem;
+}
+
+/* Conteúdo Principal (Hero) */
+.main-content {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  text-align: right;
+  padding-right: 5rem;
+}
+
+.hero-text {
+  max-width: 50%;
+}
+
+.hero-text .subtitle {
+  font-weight: 600;
+  font-size: 1.5rem;
+  color: #2d86e5;
+}
+
+.hero-text .title {
+  font-size: 3.75rem;
+  font-weight: 700;
+}
+
+.hero-text .description {
+  font-size: 1.25rem;
+  margin-top: 0.5rem;
+}
+
+/* Footer */
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  padding: 1rem 0;
+  color: white;
+}
+
+.footer p {
+  margin-bottom: 0;
+}
+
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  pointer-events: none;
+}
+
+.sidebar-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 35%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 1.5rem;
+  z-index: 100;
+  transition: right 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar.active {
+  right: 0;
+}
+
+.sidebar .close-sidebar-button {
+  align-self: flex-end;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+.sidebar .sidebar-content {
+  height: 80%;
+  margin-top: 2rem;
+  color: white;
+}
+
+.sidebar .sidebar-content h2 {
+  font-size: 1.5rem;
+  border-bottom: 1px solid #2d86e5;
+  padding-bottom: 0.5rem;
+}
+
+.sidebar .sidebar-content p {
+  margin-top: 1rem;
+  font-size: 1rem;
+}
+
+.formLogin {
+  border: 1px solid red;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.formLogin input {
+  width: 50%;
+  height: 2rem;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  color: #fff;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.formLogin div {
+  display: contents;
+}

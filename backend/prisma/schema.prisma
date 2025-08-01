@@ -1,0 +1,16 @@
+// backend/prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL") // Lê a URL do banco do arquivo .env
+}
+
+model User {
+  id    String   @id @default(uuid())
+  email String   @unique
+  name  String?
+  createdAt DateTime @default(now())
+}

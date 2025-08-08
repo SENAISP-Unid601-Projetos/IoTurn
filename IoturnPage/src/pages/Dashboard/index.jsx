@@ -1,33 +1,34 @@
 import React, { useState, useEffect, useRef } from "react";
 import ApexCharts from "apexcharts";
 import * as JSC from "jscharting";
-import mqtt from "mqtt";
+import mqtt from "mqtt"; // Embora não usado, mantido para reativação
 import Sidebar from "../../components/Sidebar";
 import logo from "../../assets/LogoSemBorda2.png";
 import "./dashboard.css";
 
+// --- Constantes de Configuração ---
 const MAX_DATA_POINTS = 60;
-const brokerUrl = "ws://10.110.12.59:8080";
-const topicos = [
-  "esp32/temperatura",
-  "esp32/rpm",
-  "esp32/nivelOleo",
-  "esp32/corrente",
-];
 
 const Dashboard = () => {
   const [isMenuOpen, setMenuOpen] = useState(false);
+  const [tempData, setTempData] = useState([]);
+  const [correntData, setCorrentData] = useState([]);
 
+  // --- Refs para os elementos DOM dos gráficos ---
   const chartTempRef = useRef(null);
   const chartCorrentRef = useRef(null);
   const gaugeRPMRef = useRef(null);
   const gaugeNOleoRef = useRef(null);
 
+  // --- Refs para as instâncias dos GRÁFICOS de linha ---
   const tempChart = useRef(null);
   const correntChart = useRef(null);
-  const rpmGauge = useRef(null);
-  const nOleoGauge = useRef(null);
 
+  // --- Refs para os PONTOS dos gauges que serão atualizados ---
+  const rpmPoint = useRef(null);
+  const nOleoPoint = useRef(null);
+
+  // Efeito principal para inicialização e simulação de dados
   useEffect(() => {
     const optionsTemp = {
       chart: {
@@ -36,29 +37,16 @@ const Dashboard = () => {
         animations: {
           enabled: true,
           easing: "linear",
-          dynamicAnimation: {
-            speed: 1000,
-          },
+          dynamicAnimation: { speed: 1000 },
         },
       },
-      series: [
-        {
-          name: "Temperatura (°C)",
-          data: [],
-        },
-      ],
-      xaxis: {
-        type: "datetime",
-        range: 20000,
-      },
-      yaxis: {
-        max: 100,
-      },
+      series: [{ name: "Temperatura (°C)", data: [] }],
+      xaxis: { type: "datetime", range: 20000 },
+      yaxis: { max: 100 },
     };
     tempChart.current = new ApexCharts(chartTempRef.current, optionsTemp);
     tempChart.current.render();
 
-    // Current Chart
     const optionsCorrent = {
       chart: {
         height: 350,
@@ -66,24 +54,12 @@ const Dashboard = () => {
         animations: {
           enabled: true,
           easing: "linear",
-          dynamicAnimation: {
-            speed: 1000,
-          },
+          dynamicAnimation: { speed: 1000 },
         },
       },
-      series: [
-        {
-          name: "Corrente (A)",
-          data: [],
-        },
-      ],
-      xaxis: {
-        type: "datetime",
-        range: 20000,
-      },
-      yaxis: {
-        max: 100,
-      },
+      series: [{ name: "Corrente (A)", data: [] }],
+      xaxis: { type: "datetime", range: 20000 },
+      yaxis: { max: 100 },
     };
     correntChart.current = new ApexCharts(
       chartCorrentRef.current,
@@ -91,105 +67,89 @@ const Dashboard = () => {
     );
     correntChart.current.render();
 
-    // RPM Gauge
-    rpmGauge.current = JSC.chart(gaugeRPMRef.current, {
+    JSC.chart(gaugeRPMRef.current, {
       type: "gauge",
       animation_duration: 800,
       yAxis: { scale_range: [0, 100] },
-      series: [
-        {
-          points: [{ x: "speed", y: 0 }],
+      series: [{ points: [{ x: "speed", y: 0 }] }],
+      events: {
+        load: function () {
+          rpmPoint.current = this.series(0).points(0);
         },
-      ],
+      },
     });
 
-    // Oil Level Gauge
-    nOleoGauge.current = JSC.chart(gaugeNOleoRef.current, {
+    JSC.chart(gaugeNOleoRef.current, {
       type: "gauge",
       animation_duration: 800,
       yAxis: { scale_range: [0, 100] },
-      series: [
-        {
-          points: [{ x: "speed", y: 0 }],
+      series: [{ points: [{ x: "speed", y: 0 }] }],
+      events: {
+        load: function () {
+          nOleoPoint.current = this.series(0).points(0);
         },
-      ],
+      },
     });
 
-    const client = mqtt.connect(brokerUrl);
-
-    client.on("connect", () => {
-      console.log(`✅ Conectado ao broker MQTT em ${brokerUrl}`);
-      topicos.forEach((topic) => {
-        client.subscribe(topic, (err) => {
-          if (err) {
-            console.error(`Erro ao se inscrever no tópico ${topic}:`, err);
-          } else {
-            console.log(`Inscrito no tópico: ${topic}`);
-          }
-        });
-      });
-    });
-
-    client.on("message", (topic, message) => {
-      const value = parseFloat(message.toString());
-      if (isNaN(value)) {
-        console.warn(
-          `Mensagem MQTT inválida para o tópico ${topic}: ${message.toString()}`
-        );
-        return;
-      }
-
+    const dataInterval = setInterval(() => {
       const timestamp = new Date().getTime();
 
-      switch (topic) {
-        case "esp32/temperatura":
-          if (tempChart.current) {
-            const series = tempChart.current.w.globals.series[0];
-            series.data.push({ x: timestamp, y: value });
-            if (series.data.length > MAX_DATA_POINTS) {
-              series.data.shift();
-            }
-            tempChart.current.updateSeries([{ data: series.data }]);
-          }
-          break;
-        case "esp32/corrente":
-          if (correntChart.current) {
-            const series = correntChart.current.w.globals.series[0];
-            series.data.push({ x: timestamp, y: value });
-            if (series.data.length > MAX_DATA_POINTS) {
-              series.data.shift();
-            }
-            correntChart.current.updateSeries([{ data: series.data }]);
-          }
-          break;
-        case "esp32/rpm":
-          if (rpmGauge.current) {
-            rpmGauge.current.series(0).points(0).options({ y: value });
-          }
-          break;
-        case "esp32/nivelOleo":
-          if (nOleoGauge.current) {
-            nOleoGauge.current.series(0).points(0).options({ y: value });
-          }
-          break;
-        default:
-          break;
-      }
-    });
+      setTempData((currentData) => {
+        const base = 35; 
+        const newData = [
+          ...currentData,
+          { x: timestamp, y: Math.floor(base + Math.random() * 10) },
+        ];
+        return newData.length > MAX_DATA_POINTS ? newData.slice(1) : newData;
+      });
 
-    client.on("error", (err) => {
-      console.error("Erro de conexão MQTT:", err);
-      client.end();
-    });
+      setCorrentData((currentData) => {
+        const base = 15;
+        const newData = [
+          ...currentData,
+          { x: timestamp, y: (base + Math.random() * 10).toFixed(2) },
+        ];
+        return newData.length > MAX_DATA_POINTS ? newData.slice(1) : newData;
+      });
+
+      // RPM Gauge
+      if (rpmPoint.current) {
+        const base = 50;
+        const randomValue = Math.floor(base + Math.random() * 10);
+        rpmPoint.current.options({ y: randomValue });
+      }
+
+      // Nível de Óleo Gauge
+      if (nOleoPoint.current) {
+        const base = 60;
+        const randomValue = Math.floor(base + Math.random() * 10);
+        nOleoPoint.current.options({ y: randomValue });
+      }
+    }, 1000);
+
 
     return () => {
+      clearInterval(dataInterval); // Para o intervalo ao desmontar o componente
       if (tempChart.current) tempChart.current.destroy();
       if (correntChart.current) correntChart.current.destroy();
-      if (rpmGauge.current) rpmGauge.current.destroy();
-      if (nOleoGauge.current) nOleoGauge.current.destroy();
-      client.end();
+      // A biblioteca JSCharting lida com a destruição automaticamente
+      // quando os elementos do DOM são removidos.
     };
   }, []);
+
+  // Efeito para sincronizar o estado 'tempData' com o gráfico de temperatura
+  useEffect(() => {
+    if (tempChart.current) {
+      tempChart.current.updateSeries([{ data: tempData }]);
+    }
+  }, [tempData]);
+
+  // Efeito para sincronizar o estado 'correntData' com o gráfico de corrente
+  useEffect(() => {
+    if (correntChart.current) {
+      correntChart.current.updateSeries([{ data: correntData }]);
+    }
+  }, [correntData]);
 
   return (
     <div className="bg-gradient-to-b from-[#1a2a3a] to-[#90b6e4] text-white min-h-screen">

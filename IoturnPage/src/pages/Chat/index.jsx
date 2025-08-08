@@ -2,14 +2,13 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import ChatMessage from "../../components/ChatMessage";
 import TypingIndicator from "../../components/TypingIndicator";
-import logo from "../../assets/LogoSemBorda2.png";
+import Header from "../../components/Header";
 import Sidebar from "../../components/Sidebar";
 import "./chat.css";
 
 const API_BASE_URL = "http://10.110.12.59:3000";
 
 const Chat = () => {
-  const [isMenuOpen, setMenuOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -104,21 +103,9 @@ const Chat = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#1a2a3a] to-[#90b6e4] text-white flex flex-col">
-      <header className="flex justify-between items-center p-4 lg:p-6 relative z-10">
-        <Link to="/">
-          <img src={logo} alt="Logo IoTurn" className="h-16" />
-        </Link>
-        <button
-          onClick={() => setMenuOpen(true)}
-          className="text-white text-3xl bg-transparent border-none cursor-pointer"
-        >
-          &#9776;
-        </button>
-      </header>
-
-      <Sidebar isOpen={isMenuOpen} onClose={() => setMenuOpen(false)} />
-
-      <main className="flex-1 max-w-3xl w-[90%] mx-auto flex flex-col p-4 overflow-hidden">
+      <Header />
+      <Sidebar />
+      <main className="flex-1 ml-20 max-w-3xl w-[90%] mx-auto flex flex-col p-4 overflow-hidden">
         <div
           ref={chatContainerRef}
           className="flex-1 overflow-y-auto flex flex-col gap-6 p-4"

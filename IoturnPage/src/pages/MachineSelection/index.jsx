@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 import MachineCard from "../../components/MachineCard";
-import logo from "../../assets/LogoSemBorda2.png";
 import assetImage from "../../assets/GH-1440TZ.png";
 import optimumImage from "../../assets/bv20.png";
 import yhdmImage from "../../assets/YHDM-1000.png";
+import Header from "../../components/Header";
 import Sidebar from "../../components/Sidebar";
 import "./animations.css";
 
@@ -38,25 +38,11 @@ const UpdatedMachineCard = ({ machine, delay }) => (
 );
 
 const MachineSelection = () => {
-  const [isMenuOpen, setMenuOpen] = useState(false);
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#1a2a3a] to-[#90b6e4] text-white">
-      <header className="flex justify-between items-center p-4 lg:p-6 relative z-10">
-        <Link to="/">
-          <img src={logo} alt="Logo IoTurn" className="h-16" />
-        </Link>
-        <button
-          onClick={() => setMenuOpen(true)}
-          className="text-white text-3xl bg-transparent border-none cursor-pointer"
-        >
-          &#9776;
-        </button>
-      </header>
-
-      <Sidebar isOpen={isMenuOpen} onClose={() => setMenuOpen(false)} />
-
-      <main className="flex-1 p-8 text-center">
+      <Header />
+      <Sidebar />
+      <main className="flex-1 ml-20 p-8 text-center">
         <h1 className="text-4xl font-bold mb-8 text-white">
           Selecione um Torno
         </h1>

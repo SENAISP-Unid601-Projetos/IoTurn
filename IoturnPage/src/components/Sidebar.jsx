@@ -1,56 +1,46 @@
+// senaisp-unid601-projetos/ioturn/IoTurn-PageProjectFront/IoturnPage/src/components/Sidebar.jsx
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { FaHome, FaTachometerAlt, FaRobot, FaSignOutAlt } from 'react-icons/fa';
 
-const Sidebar = ({ isOpen, onClose }) => {
+const Sidebar = () => {
+  const location = useLocation();
+
+  const navLinks = [
+    { to: "/selecao", icon: <FaHome />, text: "Página Inicial" },
+    { to: "/dashboard", icon: <FaTachometerAlt />, text: "Dashboard" },
+    { to: "/chatbot", icon: <FaRobot />, text: "Chatbot" },
+  ];
+
   return (
-    <>
-      <div
-        className={`fixed inset-0 bg-black/50 z-[99] transition-opacity duration-300 ease-in-out ${
-          isOpen
-            ? "opacity-100 pointer-events-auto"
-            : "opacity-0 pointer-events-none"
-        }`}
-        onClick={onClose}
-      ></div>
-      <nav
-        className={`fixed top-0 h-full w-64 bg-black/30 backdrop-blur-md p-6 transition-transform duration-300 ease-in-out z-[100] ${
-          isOpen ? "right-0" : "-right-full"
-        }`}
-      >
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-white text-4xl bg-transparent border-none cursor-pointer"
-        >
-          &times;
-        </button>
-        <ul className="mt-20 list-none p-0">
-          <li className="mb-4">
-            <Link
-              to="/selecao"
-              className="text-white text-lg no-underline hover:text-[#2d86e5]"
-            >
-              Página Inicial
-            </Link>
-          </li>
-          <li className="mb-4">
-            <Link
-              to="/dashboard"
-              className="text-white text-lg no-underline hover:text-[#2d86e5]"
-            >
-              Dashboard
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/chatbot"
-              className="text-white text-lg no-underline hover:text-[#2d86e5]"
-            >
-              Chatbot
-            </Link>
-          </li>
-        </ul>
+    <aside className="bg-black/30 backdrop-blur-md text-white w-20 min-h-screen p-4 flex flex-col items-center fixed left-0 top-0">
+      <nav className="flex flex-col flex-grow gap-4">
+        {navLinks.map((link) => (
+          <Link
+            key={link.to}
+            to={link.to}
+            title={link.text} // Adiciona um tooltip ao passar o mouse
+            className={`flex items-center justify-center p-4 rounded-lg transition-colors duration-200 ${
+              location.pathname === link.to
+                ? "bg-white/20 text-[#2d86e5]"
+                : "hover:bg-white/10"
+            }`}
+          >
+            <span className="text-2xl">{link.icon}</span>
+          </Link>
+        ))}
       </nav>
-    </>
+
+      <div>
+        <Link
+          to="/"
+          title="Sair"
+          className="flex items-center justify-center p-4 rounded-lg transition-colors duration-200 hover:bg-white/10"
+        >
+          <span className="text-2xl"><FaSignOutAlt /></span>
+        </Link>
+      </div>
+    </aside>
   );
 };
 

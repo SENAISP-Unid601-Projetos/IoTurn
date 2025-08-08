@@ -1,0 +1,69 @@
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+
+import MachineCard from '../../components/MachineCard';
+import logo from '../../assets/LogoSemBorda2.png';
+import assetImage from '../../assets/GH-1440TZ.png';
+import optimumImage from '../../assets/bv20.png';
+import yhdmImage from '../../assets/YHDM-1000.png';
+import './animations.css';
+
+const machines = [
+  { name: 'ASSET', model: 'GH-1440TZ', image: assetImage },
+  { name: 'Optimum', model: 'BV-20', image: optimumImage },
+  { name: 'YHDM', model: 'YHDM-1000', image: yhdmImage },
+];
+
+const UpdatedMachineCard = ({ machine, delay }) => (
+  <Link
+    to="/dashboard"
+    className="group machine-card bg-white/20 rounded-2xl shadow-lg overflow-hidden flex flex-col text-decoration-none transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl"
+    style={{ animationDelay: `${delay}s` }}
+  >
+    <div className="overflow-hidden">
+      <img src={machine.image} alt={`Torno Mecânico ${machine.name}`} className="w-full aspect-video object-cover transition-transform duration-300 ease-in-out group-hover:scale-105" />
+    </div>
+    <div className="p-6 flex flex-col flex-grow">
+      <h2 className="text-2xl font-bold text-gray-800 mb-2">{machine.name}</h2>
+      <p className="text-gray-600">Visualizar dados do modelo: {machine.model}</p>
+    </div>
+  </Link>
+);
+
+
+const MachineSelection = () => {
+  const [isMenuOpen, setMenuOpen] = useState(false);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#1a2a3a] to-[#90b6e4] text-white">
+      <header className="flex justify-between items-center p-4 lg:p-6 relative z-10">
+        <Link to="/">
+          <img src={logo} alt="Logo IoTurn" className="h-16" />
+        </Link>
+        <button onClick={() => setMenuOpen(true)} className="text-white text-3xl bg-transparent border-none cursor-pointer">
+          &#9776;
+        </button>
+      </header>
+
+      <nav className={`fixed top-0 h-full w-64 bg-black/30 backdrop-blur-md p-6 transition-transform duration-300 ease-in-out z-50 ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`} style={{ right: 0 }}>
+        <button onClick={() => setMenuOpen(false)} className="absolute top-4 right-4 text-white text-4xl bg-transparent border-none cursor-pointer">&times;</button>
+        <ul className="mt-20 list-none p-0">
+          <li className="mb-4">
+            <Link to="/chatbot" className="text-white text-lg no-underline hover:text-[#2d86e5]">Chatbot</Link>
+          </li>
+        </ul>
+      </nav>
+
+      <main className="flex-1 p-8 text-center">
+        <h1 className="text-4xl font-bold mb-8 text-white">Selecione um Torno</h1>
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {machines.map((machine, index) => (
+            <UpdatedMachineCard key={machine.model} machine={machine} delay={index * 0.1} />
+          ))}
+        </section>
+      </main>
+    </div>
+  );
+};
+
+export default MachineSelection;

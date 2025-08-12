@@ -17,6 +17,7 @@ set /p projectName=Digite o nome do seu projeto:
 :: Cria projeto em novo processo
 echo Criando o projeto %projectName%...
 call npx create-expo-app %projectName% --template blank --yes
+call npx expo install react-dom react-native-web @expo/metro-runtime
 IF %ERRORLEVEL% NEQ 0 (
     echo [ERRO] Falha ao criar o projeto.
     pause
@@ -39,3 +40,4 @@ start cmd /K "npm run web"
 
 pause
 ENDLOCAL
+

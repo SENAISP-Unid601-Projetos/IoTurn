@@ -3,42 +3,39 @@ SETLOCAL ENABLEEXTENSIONS
 
 echo ===== React Native + Expo Setup =====
 
-:: Verifica se o Node.js está instalado
+:: Verifica Node.js
 node -v >nul 2>&1
 IF %ERRORLEVEL% NEQ 0 (
-    echo [ERRO] Node.js nao esta instalado. Instale o Node.js antes de prosseguir.
+    echo [ERRO] Node.js nao esta instalado. Instale antes.
     pause
     exit /b
 )
 
-:: Pergunta o nome do projeto
+:: Nome do projeto
 set /p projectName=Digite o nome do seu projeto: 
 
-:: Cria o projeto com create-expo-app
+:: Cria projeto em novo processo
 echo Criando o projeto %projectName%...
 call npx create-expo-app %projectName% --template blank --yes
-pause
-
 IF %ERRORLEVEL% NEQ 0 (
     echo [ERRO] Falha ao criar o projeto.
     pause
     exit /b
 )
-echo Projeto criado com sucesso!
 
-:: Entra na pasta do projeto
-cd %projectName%
+:: Confirma que a pasta existe
+IF NOT EXIST "%projectName%" (
+    echo [ERRO] Projeto nao foi criado.
+    pause
+    exit /b
+)
 
-:: Abre no VS Code
-echo Abrindo no VS Code...
-code .
+:: Abre VS Code na pasta
+start code "%projectName%"
 
-:: Inicia no navegador em outro terminal
-echo Iniciando no navegador...
+:: Abre servidor web em outro terminal
+cd "%projectName%"
 start cmd /K "npm run web"
 
-ENDLOCAL
 pause
-
-
-
+ENDLOCAL

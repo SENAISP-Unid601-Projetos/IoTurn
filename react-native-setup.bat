@@ -31,9 +31,6 @@ IF NOT EXIST "%projectName%" (
     exit /b
 )
 
-:: Abre VS Code na pasta
-start code "%projectName%"
-
 :: Abre servidor web em outro terminal
 cd "%projectName%"
 
@@ -42,8 +39,13 @@ echo Instalando dependencias para suporte Web...
 call npx expo install react-dom@19.0.0 react-native-web@^0.20.0 @expo/metro-runtime@~5.0.4
 
 start cmd /K "npm run web"
+pause
+
+:: Abre VS Code na pasta
+start code "%projectName%"
 
 pause
 ENDLOCAL
+
 
 

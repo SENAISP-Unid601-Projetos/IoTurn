@@ -17,6 +17,7 @@ set /p projectName=Digite o nome do seu projeto:
 :: Cria o projeto com create-expo-app
 echo Criando o projeto %projectName%...
 npx create-expo-app %projectName% --template blank
+pause
 
 IF %ERRORLEVEL% NEQ 0 (
     echo [ERRO] Falha ao criar o projeto.
@@ -36,3 +37,4 @@ npm run web
 
 ENDLOCAL
 pause
+

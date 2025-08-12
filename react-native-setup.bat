@@ -33,6 +33,9 @@ cd %projectName%
 echo Iniciando o projeto no navegador...
 npm run web
 
+code .
+
 ENDLOCAL
 pause
+
 

@@ -16,7 +16,7 @@ set /p projectName=Digite o nome do seu projeto:
 
 :: Cria o projeto com create-expo-app
 echo Criando o projeto %projectName%...
-npx create-expo-app %projectName% --template blank --yes
+call npx create-expo-app %projectName% --template blank --yes
 pause
 
 IF %ERRORLEVEL% NEQ 0 (
@@ -39,5 +39,6 @@ start cmd /K "npm run web"
 
 ENDLOCAL
 pause
+
 
 

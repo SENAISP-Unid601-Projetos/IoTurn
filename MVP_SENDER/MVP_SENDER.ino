@@ -1,0 +1,219 @@
+
+#include "LoRaWan_APP.h"
+#include "Arduino.h"
+#include <Wire.h>  
+#include "HT_SSD1306Wire.h"
+#include "Sensor_DS18B20.h"
+#include "ArduinoJson.h"
+#include <cstdlib>
+#include <array>
+#include <numeric>
+
+#define RF_FREQUENCY                                915000000 // Hz
+
+#define TX_OUTPUT_POWER                             5        // dBm
+
+#define LORA_BANDWIDTH                              0         // [0: 125 kHz,
+                                                              //  1: 250 kHz,
+                                                              //  2: 500 kHz,
+                                                              //  3: Reserved]
+#define LORA_SPREADING_FACTOR                       7         // [SF7..SF12]
+#define LORA_CODINGRATE                             1         // [1: 4/5,
+                                                              //  2: 4/6,
+                                                              //  3: 4/7,
+                                                              //  4: 4/8]
+#define LORA_PREAMBLE_LENGTH                        8         // Same for Tx and Rx
+#define LORA_SYMBOL_TIMEOUT                         0         // Symbols
+#define LORA_FIX_LENGTH_PAYLOAD_ON                  false
+#define LORA_IQ_INVERSION_ON                        false
+
+
+#define RX_TIMEOUT_VALUE                            1000
+#define BUFFER_SIZE                                 30 // Define the payload size here
+
+SSD1306Wire  factory_display(0x3c, 500000, SDA_OLED, SCL_OLED, GEOMETRY_128_64, RST_OLED); // addr , freq , i2c group , resolution , rst
+char txpacket[BUFFER_SIZE];
+char rxpacket[BUFFER_SIZE];
+
+StaticJsonDocument<256> doc;
+char jsonBuffer[256];
+
+bool lora_idle=true;
+
+float currentTemperature;
+float lastSentTemperature = -100;
+const float tempChangeDelta  = 0.5;
+
+std::array<int,5> rpmReadings;
+int rpmReadingCount  = 0;
+int lastSentAverageRPM = -100;
+float averageRPM = 0;
+const float rpmChangeDelta = 50.0;
+
+int lastSentLevelPercentage = -100;
+const int levelChangeDelta = 25;
+const int deadZoneLevel = 5;
+int currentLevelPercentage; 
+
+
+float stagedTemperature;
+float stagedAverageRPM;
+int stagedLevelPercentage;
+
+unsigned long lastReadTime = 0;
+const int readInterval = 1000;
+
+static RadioEvents_t RadioEvents;
+static int packetCounter = 0;
+void OnTxDone( void );
+void OnTxTimeout( void );
+void AddReadingRPM( int newValue );
+
+void setup() {
+    Serial.begin(115200);
+    Mcu.begin(HELTEC_BOARD,SLOW_CLK_TPYE);
+
+    RadioEvents.TxDone = OnTxDone;
+    RadioEvents.TxTimeout = OnTxTimeout;
+    
+    Radio.Init( &RadioEvents );
+    Radio.SetChannel( RF_FREQUENCY );
+    Radio.SetTxConfig( MODEM_LORA, TX_OUTPUT_POWER, 0, LORA_BANDWIDTH,
+                                   LORA_SPREADING_FACTOR, LORA_CODINGRATE,
+                                   LORA_PREAMBLE_LENGTH, LORA_FIX_LENGTH_PAYLOAD_ON,
+                                   true, 0, 0, LORA_IQ_INVERSION_ON, 3000 );
+    startTemperature();
+    startRPM();
+    startLevel();
+    VextON();
+    delay(100);
+    factory_display.init();
+    factory_display.clear();
+    factory_display.display();
+
+   }
+
+
+
+void loop()
+{
+    Radio.IrqProcess(); 
+
+    if (millis() - lastReadTime > readInterval && lora_idle)
+    {
+        lastReadTime = millis();
+
+        currentTemperature = readTemperature();
+        AddReadingRPM(readRPM()); 
+        currentLevelPercentage = readLevel(30);
+
+        if (currentLevelPercentage <= deadZoneLevel) {
+            doc.clear();
+            doc["level"] = currentLevelPercentage;
+            doc["deadzone"] = true; 
+
+            serializeJson(doc, txpacket);
+            Radio.Send((uint8_t *)txpacket, strlen(txpacket));
+            
+            lora_idle = false; 
+            Serial.printf("\r\nEnviando PACOTE DE ALERTA: \"%s\"\r\n", txpacket);
+          
+            return; 
+        }
+
+        if (rpmReadingCount < rpmReadings.size()) {
+            return; 
+        }
+        
+        averageRPM = std::accumulate(rpmReadings.begin(), rpmReadings.end(), 0) / (float)rpmReadings.size();
+
+        doc.clear();
+
+        if (fabs(averageRPM - lastSentAverageRPM) > rpmChangeDelta) {
+            doc["rpm_avg"] = averageRPM;
+        }
+
+        if (fabs(currentTemperature - lastSentTemperature) > tempChangeDelta) {
+            doc["temperatura"] = currentTemperature;
+        }
+
+        if (abs(currentLevelPercentage - lastSentLevelPercentage) > levelChangeDelta) {
+            doc["level"] = currentLevelPercentage; 
+        }
+
+        if (doc.size() > 0) 
+        {
+            doc["count"] = packetCounter;
+            serializeJson(doc, txpacket);
+
+            if (doc.containsKey("rpm_avg")) {
+                stagedAverageRPM = averageRPM;
+            }
+            if (doc.containsKey("temperatura")) {
+                stagedTemperature = currentTemperature;
+            }
+            if (doc.containsKey("level")) {
+                stagedLevelPercentage = currentLevelPercentage;
+            }
+
+            Radio.Send((uint8_t *)txpacket, strlen(txpacket));
+            
+            lora_idle = false; 
+            
+            Serial.printf("\r\nEnviando pacote consolidado: \"%s\"\r\n", txpacket);
+            
+            factory_display.clear();
+            factory_display.setFont(ArialMT_Plain_10);
+            factory_display.drawString(0, 0, txpacket);
+            factory_display.display();
+        }
+    }
+}
+
+void OnTxDone( void )
+{
+  Serial.println("TX done......");
+  if (doc.containsKey("rpm_avg")) {
+        lastSentAverageRPM = stagedAverageRPM;
+  }
+  if (doc.containsKey("temperatura")) {
+      lastSentTemperature = stagedTemperature;
+  }
+  if (doc.containsKey("level")) {
+      lastSentLevelPercentage = stagedLevelPercentage;
+  }
+
+  packetCounter++;
+  lora_idle = true;
+}
+
+void OnTxTimeout( void )
+{
+    Radio.Sleep( );
+    Serial.println("TX Timeout......");
+    lora_idle = true;
+}
+void VextON(void)
+{
+  pinMode(Vext,OUTPUT);
+  digitalWrite(Vext, LOW);
+}
+
+void VextOFF(void) //Vext default OFF
+{
+  pinMode(Vext,OUTPUT);
+  digitalWrite(Vext, HIGH);
+}
+
+void AddReadingRPM(int newValue)
+{
+  if(rpmReadingCount  < rpmReadings.size()){
+    rpmReadings[rpmReadingCount ] = newValue;
+    rpmReadingCount ++;
+  } else {
+      for (size_t i = 0; i < rpmReadings.size() - 1; ++i) {
+          rpmReadings[i] = rpmReadings[i + 1];
+      }
+      rpmReadings[rpmReadings.size() - 1] = newValue;
+    }
+}

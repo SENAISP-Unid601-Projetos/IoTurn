@@ -3,6 +3,6 @@
 
 
 void startLevel();
-int readLevel();
+int readLevel(float tankHeight);
 
 #endif

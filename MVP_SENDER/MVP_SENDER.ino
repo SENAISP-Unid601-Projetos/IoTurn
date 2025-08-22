@@ -5,6 +5,7 @@
 #include "HT_SSD1306Wire.h"
 #include "Sensor_DS18B20.h"
 #include "ArduinoJson.h"
+#include "Sensor_HCSR04.h"
 #include <cstdlib>
 #include <array>
 #include <numeric>
@@ -29,7 +30,7 @@
 
 
 #define RX_TIMEOUT_VALUE                            1000
-#define BUFFER_SIZE                                 30 // Define the payload size here
+#define BUFFER_SIZE                                 64 // Define the payload size here
 
 SSD1306Wire  factory_display(0x3c, 500000, SDA_OLED, SCL_OLED, GEOMETRY_128_64, RST_OLED); // addr , freq , i2c group , resolution , rst
 char txpacket[BUFFER_SIZE];
@@ -38,7 +39,7 @@ char rxpacket[BUFFER_SIZE];
 StaticJsonDocument<256> doc;
 char jsonBuffer[256];
 
-bool lora_idle=true;
+volatile bool lora_idle= true;
 
 float currentTemperature;
 float lastSentTemperature = -100;
@@ -53,7 +54,8 @@ const float rpmChangeDelta = 50.0;
 int lastSentLevelPercentage = -100;
 const int levelChangeDelta = 25;
 const int deadZoneLevel = 5;
-int currentLevelPercentage; 
+int currentLevelPercentage;
+float tankHeight = 10.0;
 
 
 float stagedTemperature;
@@ -83,12 +85,15 @@ void setup() {
                                    LORA_PREAMBLE_LENGTH, LORA_FIX_LENGTH_PAYLOAD_ON,
                                    true, 0, 0, LORA_IQ_INVERSION_ON, 3000 );
     startTemperature();
-    startRPM();
+    //startRPM();
     startLevel();
     VextON();
     delay(100);
     factory_display.init();
     factory_display.clear();
+    factory_display.setFont(ArialMT_Plain_16);
+    factory_display.setTextAlignment(TEXT_ALIGN_CENTER);
+    factory_display.drawString(64, 26, "Inicializando...");
     factory_display.display();
 
    }
@@ -97,15 +102,15 @@ void setup() {
 
 void loop()
 {
-    Radio.IrqProcess(); 
-
+    Radio.IrqProcess();
+    
     if (millis() - lastReadTime > readInterval && lora_idle)
     {
         lastReadTime = millis();
 
         currentTemperature = readTemperature();
-        AddReadingRPM(readRPM()); 
-        currentLevelPercentage = readLevel(30);
+        //AddReadingRPM(readRPM()); 
+        currentLevelPercentage = readLevel(tankHeight);
 
         if (currentLevelPercentage <= deadZoneLevel) {
             doc.clear();
@@ -118,12 +123,12 @@ void loop()
             lora_idle = false; 
             Serial.printf("\r\nEnviando PACOTE DE ALERTA: \"%s\"\r\n", txpacket);
           
-            return; 
+            //return; 
         }
 
-        if (rpmReadingCount < rpmReadings.size()) {
-            return; 
-        }
+        //if (rpmReadingCount < rpmReadings.size()) {
+        //    return; 
+        //}
         
         averageRPM = std::accumulate(rpmReadings.begin(), rpmReadings.end(), 0) / (float)rpmReadings.size();
 
@@ -134,7 +139,7 @@ void loop()
         }
 
         if (fabs(currentTemperature - lastSentTemperature) > tempChangeDelta) {
-            doc["temperatura"] = currentTemperature;
+            doc["temp"] = currentTemperature;
         }
 
         if (abs(currentLevelPercentage - lastSentLevelPercentage) > levelChangeDelta) {
@@ -144,12 +149,12 @@ void loop()
         if (doc.size() > 0) 
         {
             doc["count"] = packetCounter;
-            serializeJson(doc, txpacket);
+            serializeJson(doc, txpacket,sizeof(txpacket));
 
             if (doc.containsKey("rpm_avg")) {
                 stagedAverageRPM = averageRPM;
             }
-            if (doc.containsKey("temperatura")) {
+            if (doc.containsKey("temp")) {
                 stagedTemperature = currentTemperature;
             }
             if (doc.containsKey("level")) {
@@ -176,7 +181,7 @@ void OnTxDone( void )
   if (doc.containsKey("rpm_avg")) {
         lastSentAverageRPM = stagedAverageRPM;
   }
-  if (doc.containsKey("temperatura")) {
+  if (doc.containsKey("temp")) {
       lastSentTemperature = stagedTemperature;
   }
   if (doc.containsKey("level")) {

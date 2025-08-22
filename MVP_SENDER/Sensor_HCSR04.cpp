@@ -1,19 +1,21 @@
-#define TRIG = 4
-#define ECHO = 2
+#include "Sensor_HCSR04.h"
+#include "Arduino.h"
+#define TRIG 4
+#define ECHO 5
 
 void startLevel(){
-    PinMode(TRIG, OUTPUT);
-    PinMode(ECHO,INPUT);
+    pinMode(TRIG, OUTPUT);
+    pinMode(ECHO, INPUT);
 }
 
 int readLevel(float tankHeight){
-    digitalWrite(TRIG,LOW);
+    digitalWrite(TRIG, LOW);
     delayMicroseconds(2);
-    digitalWrite(TRIG,HIGH);
+    digitalWrite(TRIG, HIGH);
     delayMicroseconds(10);
-    digitalWrite(TRIG,LOW);
+    digitalWrite(TRIG, LOW);
 
-    long signalDuration = pulseIn(ECHO,HIGH);
+    long signalDuration = pulseIn(ECHO, HIGH);
     float speedSound = 0.0343;
     float emptySpace  = (signalDuration * speedSound) / 2;
     float liquidHeight = tankHeight - emptySpace;

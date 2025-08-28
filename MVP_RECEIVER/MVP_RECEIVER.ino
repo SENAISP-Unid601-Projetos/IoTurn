@@ -2,6 +2,7 @@
 #include "LoRaWan_APP.h"
 #include "Arduino.h"
 #include "Mqtt_Service.h" 
+#include "ArduinoJson.h"
 
 #define RF_FREQUENCY                  915000000 // Frequência em Hz (ex: 915MHz para US915)
 #define TX_OUTPUT_POWER               14        // Potência de transmissão em dBm (não usado no receptor, mas bom para referência)
@@ -13,7 +14,7 @@
 #define LORA_FIX_LENGTH_PAYLOAD_ON    false     // Carga útil de comprimento variável
 #define LORA_IQ_INVERSION_ON          false
 #define RX_TIMEOUT_VALUE              1000
-#define BUFFER_SIZE                   30 // Tamanho máximo da mensagem esperada
+#define BUFFER_SIZE                   64 // Tamanho máximo da mensagem esperada
 
 
 SSD1306Wire  factory_display(0x3c, 500000, SDA_OLED, SCL_OLED, GEOMETRY_128_64, RST_OLED);
@@ -23,12 +24,16 @@ const char* ssid = "Nextron";
 const char* password = "pedro135553";
 const char* broker = "192.168.147.10";
 
+JsonDocument doc;
+DeserializationError error;
+
 static RadioEvents_t RadioEvents;
 int16_t rssi, rxSize;
-bool lora_idle = true; 
+volatile bool lora_idle = true; 
 
 void VextON(void);
 void VextOFF(void);
+void shareJson(void);
 
 void setup() {
     Serial.begin(115200);
@@ -85,10 +90,19 @@ void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi_val, int8_t snr) {
     rxpacket[size] = '\0'; 
 
     Serial.printf("\r\nPacote recebido: \"%s\" | RSSI: %d | Tamanho: %d\r\n", rxpacket, rssi, rxSize);
-
-    mqtt_publish("esp32/sensores", rxpacket);
-    Serial.println("Pacote publicado no MQTT.");
-
+    doc.to<JsonObject>(); // Limpa e prepara o doc para receber um objeto JSON
+    error = deserializeJson(doc, rxpacket);
+    if(error){
+        factory_display.clear();
+        factory_display.setFont(ArialMT_Plain_10);
+        factory_display.setTextAlignment(TEXT_ALIGN_LEFT);
+        String errorMessage = "Falha no JSON: " + String(error.c_str());
+        factory_display.drawString(0, 0, errorMessage);
+        factory_display.display();
+    } else {
+        shareJson();
+        Serial.println("Pacote publicado no MQTT.");
+    }
     factory_display.clear();
     factory_display.setFont(ArialMT_Plain_10);
     factory_display.setTextAlignment(TEXT_ALIGN_LEFT);
@@ -96,8 +110,6 @@ void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi_val, int8_t snr) {
     factory_display.setFont(ArialMT_Plain_16);
     factory_display.drawString(0, 12, String(rxpacket)); 
     factory_display.setFont(ArialMT_Plain_10);
-    factory_display.drawString(0, 35, "RSSI: " + String(rssi) + " dBm");
-    factory_display.drawString(0, 48, "Publicado no MQTT!");
     factory_display.display();
 
     lora_idle = true;
@@ -111,4 +123,16 @@ void VextON(void) {
 void VextOFF(void) {
     pinMode(Vext, OUTPUT);
     digitalWrite(Vext, HIGH); 
+}
+
+void shareJson(){
+    if (doc.containsKey("rpm_avg")) {
+        mqtt_publish("ioturn/rpm_avg", doc["rpm_avg"].as<String>());
+    }
+    if (doc.containsKey("temp")) {
+        mqtt_publish("ioturn/temp", doc["temp"].as<String>());
+    }
+    if (doc.containsKey("level")) {
+        mqtt_publish("ioturn/level", doc["level"].as<String>());
+    }
 }

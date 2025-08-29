@@ -1,24 +1,32 @@
-import React from 'react';
+import React from "react";
+import { Link } from "react-router-dom";
 
-const MachineCard = ({ machine, delay }) => {
+const MachineCard = ({ machine, className }) => {
   return (
-    <a
-      href="/dashboard" // Em um aplicativo React real, você usaria o componente <Link> do React Router
-      className="group machine-card bg-white/20 rounded-2xl shadow-lg overflow-hidden flex flex-col text-decoration-none transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl"
-      style={{ animationDelay: `${delay}s` }}
+    <Link
+      to={`/dashboard`}
+      title="dashboard"
+      className={className}
     >
-      <div className="overflow-hidden">
-        <img
-          src={machine.image}
-          alt={`Torno Mecânico ${machine.name} ${machine.model}`}
-          className="w-full aspect-video object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
-        />
+      <div className="flex flex-row justify-around items-center p-4 w-full h-full text-left">
+        <div className="text-slate-800">
+          <h2 className="text-2xl font-sans">
+            Name: <span className="font-bold">{machine.name}</span>
+          </h2>
+          <p className="text-xl font-sans">
+            model: <span className="font-bold">{machine.model}</span>
+          </p>
+        </div>
+
+        <div className="w-1/2 max-w-[200px]">
+          <img
+            src={machine.image}
+            alt={`Torno Mecânico ${machine.name} ${machine.model}`}
+            className="h-full w-full object-contain"
+          />
+        </div>
       </div>
-      <div className="p-6 flex flex-col flex-grow">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">{machine.name}</h2>
-        <p className="text-gray-600">Visualizar dados do modelo: {machine.model}</p>
-      </div>
-    </a>
+    </Link>
   );
 };
 

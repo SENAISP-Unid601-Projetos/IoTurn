@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
 import ChatMessage from "../../components/ChatMessage";
 import TypingIndicator from "../../components/TypingIndicator";
 import Header from "../../components/Header";
@@ -105,10 +104,10 @@ const Chat = () => {
     <div className="min-h-screen bg-gradient-to-b from-[#1a2a3a] to-[#90b6e4] text-white flex flex-col">
       <Header />
       <Sidebar />
-      <main className="flex-1 ml-20 max-w-3xl w-[90%] mx-auto flex flex-col p-4 overflow-hidden">
+      <main className="flex-1 ml-20 flex flex-col p-8 overflow-hidden">
         <div
           ref={chatContainerRef}
-          className="flex-1 overflow-y-auto flex flex-col gap-6 p-4"
+          className="flex-1 overflow-y-auto flex flex-col gap-6 p-4 max-w-4xl w-full mx-auto"
         >
           {messages.map((msg) => (
             <ChatMessage
@@ -122,7 +121,7 @@ const Chat = () => {
 
         <form
           onSubmit={handleSendMessage}
-          className="flex gap-2 items-end mt-4 p-4"
+          className="flex gap-2 items-end mt-4 p-4 max-w-4xl w-full mx-auto"
         >
           <textarea
             ref={textareaRef}

@@ -34,14 +34,14 @@ const ChatMessage = ({ message, onFeedback }) => {
           <div className="feedback-icons mt-2 flex gap-3">
             <button
               onClick={() => handleFeedbackClick(true)}
-              className={`transition-colors duration-200 ${selection === 'like' ? 'text-blue-400' : 'text-gray-400 hover:text-white'}`}
+              className={`transform transition-all duration-200 active:scale-90 ${selection === 'like' ? 'text-blue-400' : 'text-gray-400 hover:text-white'}`}
               disabled={rated}
             >
               <i className="fa-solid fa-thumbs-up"></i>
             </button>
             <button
               onClick={() => handleFeedbackClick(false)}
-              className={`transition-colors duration-200 ${selection === 'dislike' ? 'text-red-400' : 'text-gray-400 hover:text-white'}`}
+              className={`transform transition-all duration-200 active:scale-90 ${selection === 'dislike' ? 'text-red-400' : 'text-gray-400 hover:text-white'}`}
               disabled={rated}
             >
               <i className="fa-solid fa-thumbs-down"></i>

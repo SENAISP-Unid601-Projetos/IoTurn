@@ -3,7 +3,7 @@
 #include "Arduino.h"
 #include "Mqtt_Service.h" 
 #include "ArduinoJson.h"
-
+#include "HT_SSD1306Wire.h"
 #define RF_FREQUENCY                  915000000 // Frequência em Hz (ex: 915MHz para US915)
 #define TX_OUTPUT_POWER               14        // Potência de transmissão em dBm (não usado no receptor, mas bom para referência)
 #define LORA_BANDWIDTH                0         // 0: 125 kHz, 1: 250 kHz, 2: 500 kHz

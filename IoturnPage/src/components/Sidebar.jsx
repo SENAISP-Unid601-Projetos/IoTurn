@@ -1,4 +1,3 @@
-// senaisp-unid601-projetos/ioturn/IoTurn-PageProjectFront/IoturnPage/src/components/Sidebar.jsx
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FaHome, FaTachometerAlt, FaRobot, FaSignOutAlt } from 'react-icons/fa';
@@ -7,7 +6,7 @@ const Sidebar = () => {
   const location = useLocation();
 
   const navLinks = [
-    { to: "/selecao", icon: <FaHome />, text: "Página Inicial" },
+    // { to: "/selecao", icon: <FaHome />, text: "Página Inicial" },
     { to: "/dashboard", icon: <FaTachometerAlt />, text: "Dashboard" },
     { to: "/chatbot", icon: <FaRobot />, text: "Chatbot" },
   ];
@@ -19,7 +18,7 @@ const Sidebar = () => {
           <Link
             key={link.to}
             to={link.to}
-            title={link.text} // Adiciona um tooltip ao passar o mouse
+            title={link.text}
             className={`flex items-center justify-center p-4 rounded-lg transition-colors duration-200 ${
               location.pathname === link.to
                 ? "bg-white/20 text-[#2d86e5]"

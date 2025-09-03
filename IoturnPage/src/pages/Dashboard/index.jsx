@@ -19,6 +19,7 @@ const MAX_DATA_POINTS = 60;
 
 const createChartOptions = (name, color) => ({
   chart: {
+    background: 'rgba(255, 255, 255, 0.2)',
     type: "area",
     height: 350,
     zoom: { enabled: false },
@@ -225,37 +226,37 @@ const Dashboard = () => {
   }, [correntData]); */
 
   return (
-    <div className="flex bg-gradient-to-b from-[#1a2a3a] to-[#90b6e4] text-white min-h-screen">
+    <div className="flex bg-[#1a2a3a] text-white min-h-screen">
       <Sidebar />
       <div className="flex-1 sm:ml-20 flex flex-col">
         <Header />
         <main className="flex-grow flex flex-col gap-y-4 p-4">
-          <div className="bg-white rounded-2xl p-6 shadow-lg mb-6">
-            <h2 className="text-2xl font-semibold mb-4 text-slate-800">
+          <div className="rounded-2xl p-6 shadow-lg mb-6">
+            <h2 className="text-2xl font-semibold mb-4">
               Informações do Torno
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-slate-600">Nome:</p>
-                <p className="text-lg font-medium text-slate-800">
+                <p className="text-lg font-medium">
                   {machine.name}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-slate-600">Modelo:</p>
-                <p className="text-lg font-medium text-slate-800">
+                <p className="text-lg font-medium">
                   {machine.model}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-slate-600">Fabricante:</p>
-                <p className="text-lg font-medium text-slate-800">
+                <p className="text-lg font-medium">
                   {machine.fabricante}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-slate-600">Numeração:</p>
-                <p className="text-lg font-medium text-slate-800">
+                <p className="text-lg font-medium">
                   {machine.numeracao}
                 </p>
               </div>

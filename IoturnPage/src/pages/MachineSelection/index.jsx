@@ -16,7 +16,7 @@ const machines = [
 
 const MachineSelection = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#1a2a3a] to-[#90b6e4] text-white">
+    <div className="min-h-screen bg-[#1a2a3a] text-white">
       <Header />
       <Sidebar />
       <main className="flex-1 ml-20 p-8 text-center">

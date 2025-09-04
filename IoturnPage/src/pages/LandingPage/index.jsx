@@ -18,7 +18,7 @@ export default function LandingPage() {
       >
         <img src={logo} alt="Logo IoTurn" className="h-16" />
 
-        <Link to="/login" title="Login">
+        <Link to="/dashboard" title="Dah=dashboard">
           <button
           title="Login"
           className="bg-transparent borde-none cursor-pointer mr-12"
@@ -44,14 +44,13 @@ export default function LandingPage() {
       <main className="min-h-screen flex items-center justify-end text-right pr-20">
         <div className="max-w-1/2">
           <p className="font-semibold text-2xl text-[#2d86e5]">
-            IoTurn: Monitoramento Inteligente para Torneamento de Alta Precisão
+            IoTurn: Monitoramento Inteligente
           </p>
           <h1 className="text-6xl font-bold">
             Dados em tempo real para otimizar sua produção
           </h1>
           <p className="text-xl mt-2">
-            A IoTurn utiliza IoT para monitorar tornos mecânicos em tempo real,
-            coletando dados como velocidade, temperatura e eficiência. Aumente a
+            A IoTurn utiliza IoT para monitorar máquinas em tempo real. Aumentando a
             produtividade com decisões baseadas em dados.
           </p>
         </div>

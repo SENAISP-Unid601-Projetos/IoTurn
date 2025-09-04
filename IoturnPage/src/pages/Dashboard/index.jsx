@@ -146,7 +146,7 @@ const Dashboard = () => {
     } */
 
     // Conexão MQTT
-    const client = mqtt.connect("ws://192.168.247.10:8080");
+    const client = mqtt.connect("ws://10.42.0.1:9001");
     client.on("connect", () => {
       console.log("Conectado ao broker MQTT!");
       client.subscribe(`ioturn/temp`);
@@ -165,6 +165,7 @@ const Dashboard = () => {
         if (topic === `ioturn/temp`) {
           let tickAmountChecker = 5;
           const tempValue = Math.round(jsonDATA);
+          if (tempValue == -127) return
 
           if (tempValue > tickAmountChecker) {
             tickAmountChecker = tempValue / 2;

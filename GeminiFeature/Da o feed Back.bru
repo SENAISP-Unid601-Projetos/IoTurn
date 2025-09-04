@@ -1,0 +1,18 @@
+meta {
+  name: Da o feed Back
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:3000/feedbackGemini
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "feedback":1,
+    "keyReturned": "dataInCache:6fe66a385a2169394b7c152abbadb9e19129c44636372db947bd4c22cbf15694"
+  }
+}

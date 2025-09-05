@@ -96,6 +96,20 @@ const Dashboard = () => {
 
     client.on("message", (topic, message) => {
       try {
+      let tickAmountChecker = 5;
+          const tempValue = Math.round(jsonDATA);
+
+          if (tempValue > tickAmountChecker) {
+            tickAmountChecker = tempValue / 2;
+            if (tempChart.current) {
+              tempChart.current.updateOptions({
+                yaxis: {
+                  tickAmount: tickAmountChecker,
+                },
+              });
+            }
+          }
+      
         const value = message.toString();
         const jsonDATA = JSON.parse(value);
         const tempValue = Math.round(jsonDATA.temp);

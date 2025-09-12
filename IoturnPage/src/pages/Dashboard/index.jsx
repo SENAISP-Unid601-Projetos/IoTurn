@@ -88,47 +88,49 @@ const Dashboard = () => {
 
     // Conexão MQTT
     //10.42.0.1:9001
-    const client = mqtt.connect("ws://test.mosquitto.org:8080");
+    const client = mqtt.connect("ws://10.42.0.1:9001");
     client.on("connect", () => {
       console.log("Conectado ao broker MQTT!");
       client.subscribe(`ioturn/temp`);
     });
 
     client.on("message", (topic, message) => {
-      try {
-      let tickAmountChecker = 5;
-          const tempValue = Math.round(jsonDATA);
+  try {
+    let tickAmountChecker = 5;
 
-          if (tempValue > tickAmountChecker) {
-            tickAmountChecker = tempValue / 2;
-            if (tempChart.current) {
-              tempChart.current.updateOptions({
-                yaxis: {
-                  tickAmount: tickAmountChecker,
-                },
-              });
-            }
-          }
-      
-        const value = message.toString();
-        const jsonDATA = JSON.parse(value);
-        const tempValue = Math.round(jsonDATA.temp);
+    const value = message.toString();
+    const jsonDATA = JSON.parse(value);
+    const tempValue = Math.round(jsonDATA.temp);
 
-        if (tempValue !== -127) {
-          const newPoint = {
-            x: new Date().getTime(),
-            y: tempValue,
-          };
-          setTempData((prevData) => [
-            ...prevData.slice(-MAX_DATA_POINTS + 1),
-            newPoint,
-          ]);
-          restartInterval();
+    if (tempValue !== -127) {
+      if (tempValue > tickAmountChecker) {
+        tickAmountChecker = tempValue / 2;
+        if (tempChart.current) {
+          tempChart.current.updateOptions({
+            yaxis: {
+              tickAmount: tickAmountChecker,
+            },
+          });
         }
-      } catch (e) {
-        console.error("Erro ao processar mensagem MQTT:", e);
       }
-    });
+
+      const newPoint = {
+        x: new Date().getTime(),
+        y: tempValue,
+      };
+
+      setTempData((prevData) => [
+        ...prevData.slice(-MAX_DATA_POINTS + 1),
+        newPoint,
+      ]);
+
+      restartInterval();
+    }
+  } catch (e) {
+    console.error("Erro ao processar mensagem MQTT:", e);
+  }
+});
+
 
     restartInterval();
 

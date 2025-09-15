@@ -7,7 +7,7 @@
 #define RF_FREQUENCY                  915000000 // Frequência em Hz (ex: 915MHz para US915)
 #define TX_OUTPUT_POWER               14        // Potência de transmissão em dBm (não usado no receptor, mas bom para referência)
 #define LORA_BANDWIDTH                0         // 0: 125 kHz, 1: 250 kHz, 2: 500 kHz
-#define LORA_SPREADING_FACTOR         7         // Fator de espalhamento [SF7..SF12]
+#define LORA_SPREADING_FACTOR         9        // Fator de espalhamento [SF7..SF12]
 #define LORA_CODINGRATE               1         // Taxa de codificação [1: 4/5, 2: 4/6, 3: 4/7, 4: 4/8]
 #define LORA_PREAMBLE_LENGTH          8         // Comprimento do preâmbulo
 #define LORA_SYMBOL_TIMEOUT           0         // Timeout de símbolo

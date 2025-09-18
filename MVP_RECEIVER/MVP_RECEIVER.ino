@@ -20,9 +20,9 @@
 SSD1306Wire  factory_display(0x3c, 500000, SDA_OLED, SCL_OLED, GEOMETRY_128_64, RST_OLED);
 char rxpacket[BUFFER_SIZE]; 
 
-const char* ssid = "Nextron";
-const char* password = "pedro135553";
-const char* broker = "192.168.147.10";
+const char* ssid = "linksys";
+const char* password = "";
+const char* broker = "10.110.12.71";
 
 JsonDocument doc;
 DeserializationError error;
@@ -48,7 +48,7 @@ void setup() {
     delay(1000);
     
     setup_wifi(ssid, password);
-    mqtt_setup(broker, 1883);
+    mqtt_setup(broker, 32358);
     
     
     RadioEvents.RxDone = OnRxDone; 
@@ -69,11 +69,6 @@ void loop() {
         lora_idle = false; 
         Serial.println("--> Entrando em modo de recepção (RX)");
         
-        factory_display.clear();
-        factory_display.setFont(ArialMT_Plain_10);
-        factory_display.setTextAlignment(TEXT_ALIGN_LEFT);
-        factory_display.drawString(0, 0, "Aguardando dados LoRa...");
-        factory_display.display();
         
         Radio.Rx(0); 
     }
@@ -125,14 +120,28 @@ void VextOFF(void) {
     digitalWrite(Vext, HIGH); 
 }
 
-void shareJson(){
-    if (doc.containsKey("rpm_avg")) {
-        mqtt_publish("ioturn/rpm_avg", doc["rpm_avg"].as<String>());
+void shareJson() {
+    // Verifica e publica o valor de rpm_avg, se existir
+    if (doc.containsKey("rpm_avg") && doc["rpm_avg"].is<float>()) {
+        float rpmAvg = doc["rpm_avg"].as<float>();
+        if (rpmAvg >= 0) {  // Verifica se o valor é válido
+            mqtt_publish("ioturn/rpm_avg", String(rpmAvg).c_str());
+        }
     }
-    if (doc.containsKey("temp")) {
-        mqtt_publish("ioturn/temp", doc["temp"].as<String>());
+
+    // Verifica e publica o valor de temp, se existir
+    if (doc.containsKey("temp") && doc["temp"].is<float>()) {
+        float temp = doc["temp"].as<float>();
+        if (temp >= -50 && temp <= 150) {  // Verifica se o valor de temperatura está em um intervalo razoável
+            mqtt_publish("ioturn/temp", String(temp).c_str());
+        }
     }
-    if (doc.containsKey("level")) {
-        mqtt_publish("ioturn/level", doc["level"].as<String>());
+
+    // Verifica e publica o valor de level, se existir
+    if (doc.containsKey("level") && doc["level"].is<int>()) {
+        int level = doc["level"].as<int>();
+        if (level >= 0 && level <= 100) {  // Verifica se o valor de nível está em um intervalo válido
+            mqtt_publish("ioturn/level", String(level).c_str());
+        }
     }
 }

@@ -169,7 +169,7 @@ void loop()
             
             factory_display.clear();
             factory_display.setFont(ArialMT_Plain_10);
-            factory_display.drawString(0, 0, txpacket);
+            factory_display.drawString(0, 10, txpacket);
             factory_display.display();
         }
     }

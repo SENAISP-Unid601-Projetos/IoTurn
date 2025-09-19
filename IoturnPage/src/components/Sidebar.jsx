@@ -6,9 +6,9 @@ const Sidebar = () => {
   const location = useLocation();
 
   const navLinks = [
-    { to: "/", icon: <FaHome />, text: "Página Inicial" },
+    { to: "/selecao", icon: <FaHome />, text: "Página Inicial" },
     { to: "/dashboard", icon: <FaTachometerAlt />, text: "Dashboard" },
-    // { to: "/chatbot", icon: <FaRobot />, text: "Chatbot" },
+    { to: "/chatbot", icon: <FaRobot />, text: "Chatbot" },
   ];
 
   return (

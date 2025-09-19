@@ -9,12 +9,11 @@ import LoginPage from "./pages/LoginPage"
 function App() {
   return (
     <Routes>
-      {/* <Route path="/" element={<LandingPage />} />
+      <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/selecao" element={<MachineSelection />} />
-      <Route path="/dashboard" element={<Dashboard />} />*/}
+      <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/chatbot" element={<Chat />} /> 
-      <Route path="/" element={<LandingPage />} />
       <Route path="/dashboard" element={<Dashboard />} />
     </Routes>
   );

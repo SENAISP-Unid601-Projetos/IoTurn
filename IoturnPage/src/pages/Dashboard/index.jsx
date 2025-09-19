@@ -19,7 +19,7 @@ const MAX_DATA_POINTS = 60;
 
 const createChartOptions = (name, color) => ({
   chart: {
-    background: "rgba(255, 255, 255, 0.2)",
+    background: "transparent",
     type: "area",
     height: 350,
     zoom: { enabled: false },
@@ -40,7 +40,7 @@ const createChartOptions = (name, color) => ({
     type: "datetime",
     range: 30000,
     labels: {
-      style: { colors: "#555" },
+      style: { colors: "#94a3b8" },
       datetimeUTC: false,
       format: "HH:mm:ss",
     },
@@ -52,7 +52,7 @@ const createChartOptions = (name, color) => ({
     max: 100,
     tickAmount: 10,
     labels: {
-      style: { colors: "#555" },
+      style: { colors: "#94a3b8" },
       formatter: (val) => Math.floor(val),
     },
   },
@@ -88,49 +88,49 @@ const Dashboard = () => {
 
     // Conexão MQTT
     //10.42.0.1:9001
-    const client = mqtt.connect("ws://10.42.0.1:9001");
+    const client = mqtt.connect("ws://10.110.12.82:9001");
     client.on("connect", () => {
       console.log("Conectado ao broker MQTT!");
       client.subscribe(`ioturn/temp`);
     });
 
     client.on("message", (topic, message) => {
-  try {
-    let tickAmountChecker = 5;
+      try {
+        let tickAmountChecker = 5;
 
-    const value = message.toString();
-    const jsonDATA = JSON.parse(value);
-    const tempValue = Math.round(jsonDATA.temp);
+        const value = message.toString();
+        const numberData = parseFloat(value).toFixed(2);
+        const tempValue = Math.round(numberData.temp);
+        console.log(numberData);
 
-    if (tempValue !== -127) {
-      if (tempValue > tickAmountChecker) {
-        tickAmountChecker = tempValue / 2;
-        if (tempChart.current) {
-          tempChart.current.updateOptions({
-            yaxis: {
-              tickAmount: tickAmountChecker,
-            },
-          });
+        if (tempValue !== -127) {
+          if (tempValue > tickAmountChecker) {
+            tickAmountChecker = tempValue / 2;
+            if (tempChart.current) {
+              tempChart.current.updateOptions({
+                yaxis: {
+                  tickAmount: tickAmountChecker,
+                },
+              });
+            }
+          }
+
+          const newPoint = {
+            x: new Date().getTime(),
+            y: tempValue,
+          };
+
+          setTempData((prevData) => [
+            ...prevData.slice(-MAX_DATA_POINTS + 1),
+            newPoint,
+          ]);
+
+          restartInterval();
         }
+      } catch (e) {
+        console.error("Erro ao processar mensagem MQTT:", e);
       }
-
-      const newPoint = {
-        x: new Date().getTime(),
-        y: tempValue,
-      };
-
-      setTempData((prevData) => [
-        ...prevData.slice(-MAX_DATA_POINTS + 1),
-        newPoint,
-      ]);
-
-      restartInterval();
-    }
-  } catch (e) {
-    console.error("Erro ao processar mensagem MQTT:", e);
-  }
-});
-
+    });
 
     restartInterval();
 
@@ -151,39 +151,37 @@ const Dashboard = () => {
   }, [tempData]);
 
   return (
-    <div className="flex bg-[#1a2a3a] text-white min-h-screen">
+    <div className="flex bg-[#1a2a3a] text-slate-300 min-h-screen">
       <Sidebar />
       <div className="flex-1 sm:ml-20 flex flex-col">
         <Header />
         <main className="flex-grow flex flex-col gap-y-4 p-4">
-          <div className="rounded-2xl p-6 shadow-lg mb-6">
+          <div className="rounded-2xl p-6 mb-6 bg-white/10 backdrop-blur-lg shadow-lg">
             <h2 className="text-2xl font-semibold mb-4">
               Informações do Torno
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-slate-600">Nome:</p>
+                <p className="text-sm text-slate-100">Nome:</p>
                 <p className="text-lg font-medium">{machine.name}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-600">Modelo:</p>
+                <p className="text-sm text-slate-100">Modelo:</p>
                 <p className="text-lg font-medium">{machine.model}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-600">Fabricante:</p>
+                <p className="text-sm text-slate-100">Fabricante:</p>
                 <p className="text-lg font-medium">{machine.fabricante}</p>
               </div>
               <div>
-                <p className="text-sm text-slate-600">Numeração:</p>
+                <p className="text-sm text-slate-100">Numeração:</p>
                 <p className="text-lg font-medium">{machine.numeracao}</p>
               </div>
             </div>
           </div>
           <div className="flex flex-col lg:flex-row flex-wrap gap-6 mb-6">
-            <div className="bg-white w-full rounded-2xl p-6 shadow-lg lg:flex-1">
-              <h3 className="text-xl font-semibold mb-4 text-slate-800">
-                Temperatura
-              </h3>
+            <div className="bg-white/10 backdrop-blur-lg w-full rounded-2xl p-6 shadow-lg lg:flex-1">
+              <h3 className="text-xl font-semibold mb-4 p-2">Temperatura</h3>
               <div ref={chartTempRef} className="echart-box"></div>
             </div>
           </div>

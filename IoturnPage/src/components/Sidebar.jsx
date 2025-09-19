@@ -12,7 +12,7 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside className="bg-black/30 backdrop-blur-md text-white w-20 min-h-screen p-4 flex flex-col items-center fixed left-0 top-0">
+    <aside className="bg-[#303030] text-white w-20 min-h-screen p-4 flex flex-col items-center fixed left-0 top-0">
       <nav className="flex flex-col flex-grow gap-4">
         {navLinks.map((link) => (
           <Link

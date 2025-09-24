@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+  output = "./node_modules/@prisma/client"
+}
+//TROCAR PROVIDER: postgresql
+//TROCAR URL: postgresql://admin:sua-senha-aqui@postgres-service:5432/senaizinho
+datasource db {
+  provider = "mysql"
+  url      = "mysql://root:admin@localhost:3306/senaizinho"
+}
+
+model sensorData {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime   @default(now())
+  temperatura Float
+  nivel       Float
+  rpm         Float
+  corrente    Float
+}
+
+model usuarios {
+  id       Int     @id @default(autoincrement())
+  usuario  String  @unique @db.VarChar(50)
+  email    String  @unique @db.VarChar(100)
+  senha    String  @db.VarChar(255) // Armazenar hash, nunca a senha em texto puro
+}
+
+model InteracaoIA {
+  id                  Int               @id @default(autoincrement())
+  perguntaUsuario     String
+  queryMontada        String
+  respostaHumanizada  String            @db.Text
+  feedbackUsuario     Int?
+  criadoEm            DateTime          @default(now())
+  atualizadoEm        DateTime          @updatedAt
+  hyperparameterArmId String
+  hyperparameterArm   HyperparameterArm @relation(fields: [hyperparameterArmId], references: [id])
+}
+
+model HyperparameterArm {
+  id               String   @id @default(uuid())
+  modelName        String?
+  version          String?
+  temperature      Float
+  topP             Float
+  topK             Int
+  maxOutputTokens  Int
+  responseMimeType String
+  successes        Int?      @default(0)
+  failures         Int?     @default(0)
+  interacoes       InteracaoIA[]
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+

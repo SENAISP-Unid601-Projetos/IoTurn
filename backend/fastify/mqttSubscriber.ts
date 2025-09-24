@@ -1,5 +1,5 @@
 
-import mqttClient from '../FASTIFY/src/config/mqttClient'
+import mqttClient from './src/config/mqttClient'
 import { sensorDataRepository } from './src/infrastructure/repository/sensorDataRepository'
 const TOPICS = ['esp32/sensores']; 
 interface sensorData {

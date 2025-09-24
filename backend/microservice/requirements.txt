@@ -3,4 +3,5 @@ opencv-python
 scipy
 matplotlib
 fastapi
+gunicorn
 uvicorn[standard]

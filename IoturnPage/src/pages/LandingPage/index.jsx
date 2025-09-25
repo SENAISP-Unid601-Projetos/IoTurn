@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import logo from "../../assets/LogoSemBorda2.png";
 import backgroundImage from "../../assets/Fundo.jpg";
-import { FaTachometerAlt } from 'react-icons/fa';
+import { LayoutDashboard } from 'lucide-react';
 
 
 export default function LandingPage() {
@@ -25,7 +25,7 @@ export default function LandingPage() {
           title="Dashboard"
           className="bg-transparent borde-none cursor-pointer mr-12"
         >
-          <span className="text-3xl"><FaTachometerAlt /></span>
+          <span className="text-3xl"><LayoutDashboard /></span>
         </button>
         </Link>
       </motion.header>

@@ -1,10 +1,10 @@
 import Fastify from 'fastify'
 import { geminiRoutes } from './src/routes/geminiRoutes'
 import './mqttSubscriber' 
-import { WebSocketServer } from 'ws'
-import { wsHandler } from './src/websocket/wsHandler'
 import cors from '@fastify/cors'
+import dotenv from 'dotenv'
 
+dotenv.config()
 const fastify = Fastify({ logger: true })
 
 fastify.register(cors, {

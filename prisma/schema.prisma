@@ -1,12 +1,11 @@
 generator client {
   provider = "prisma-client-js"
-  output = "./node_modules/@prisma/client"
+  output   = "./node_modules/@prisma/client"
 }
-//TROCAR PROVIDER: postgresql
-//TROCAR URL: postgresql://admin:sua-senha-aqui@postgres-service:5432/senaizinho
+
 datasource db {
-  provider = "mysql"
-  url      = "mysql://root:admin@localhost:3306/senaizinho"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model sensorData {

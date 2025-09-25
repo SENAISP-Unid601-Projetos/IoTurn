@@ -19,7 +19,7 @@ export default async function chooseBestArm() {
         }
         console.log("Arms enviados:", arms);
 
-        const response = await axios.post("http://127.0.0.1:8001/bestArm", { arms:arms });
+        const response = await axios.post("http://172.27.64.1:30007/bestArm", { arms:arms });
 
         if (response.status === 200) {
             const bestArmReturned = response.data;

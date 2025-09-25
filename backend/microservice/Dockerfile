@@ -1,20 +1,25 @@
-# Dockerfile
+# ---- Estágio 1: Builder ----
+FROM python:3.11-slim AS builder
+WORKDIR /app
+RUN pip install --upgrade pip
+COPY requirements.txt .
+RUN pip wheel --no-cache-dir --wheel-dir /wheels -r requirements.txt
 
-# 1. Imagem base
+# ---- Estágio 2: Final ----
 FROM python:3.11-slim
-
-# 2. Diretório de trabalho dentro do container
 WORKDIR /app
 
-# 3. Copia e instala as dependências primeiro para usar o cache do Docker
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Copia as dependências e o código
+COPY --from=builder /wheels /wheels
+COPY ./app ./app
 
-# 4. Copia o código da sua aplicação
-#    Esta linha copia o conteúdo da sua pasta local "app" para o diretório de trabalho "/app" no container.
-COPY ./app .
+# Instala as dependências Python
+RUN pip install --no-cache /wheels/*
 
-# 5. Comando para iniciar a aplicação
-#    Este comando não muda, pois o WORKDIR é /app, e dentro dele teremos o main.py.
-#    O Gunicorn vai procurar pelo objeto "app" dentro do arquivo "main.py".
-CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "main:app", "-b", "0.0.0.0:8000"]
+# Cria e usa o usuário não-root
+RUN useradd --create-home appuser
+RUN chown -R appuser:appuser /app
+USER appuser
+
+EXPOSE 8000
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

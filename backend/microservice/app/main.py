@@ -1,4 +1,4 @@
-from thompsonSampling import ThompsonSampling
+from .thompsonSampling import ThompsonSampling
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi import HTTPException
@@ -12,6 +12,10 @@ class Arm(BaseModel):
 
 class ArmsRequest(BaseModel):
     arms: list[Arm] 
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
 
 @app.post("/bestArm")
 def call_arm(request: ArmsRequest):

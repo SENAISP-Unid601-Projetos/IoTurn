@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "./node_modules/@prisma/client"
 }
 
 datasource db {
@@ -8,21 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model sensorData {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime   @default(now())
-  temperatura Float
-  nivel       Float
-  rpm         Float
-  corrente    Float
-}
 
-model usuarios {
-  id       Int     @id @default(autoincrement())
-  usuario  String  @unique @db.VarChar(50)
-  email    String  @unique @db.VarChar(100)
-  senha    String  @db.VarChar(255) // Armazenar hash, nunca a senha em texto puro
-}
 
 model InteracaoIA {
   id                  Int               @id @default(autoincrement())
@@ -50,5 +35,106 @@ model HyperparameterArm {
   interacoes       InteracaoIA[]
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+}
+
+/// Representa a empresa cliente que contrata o serviço IoTurn.
+model Client {
+  id                Int        @id @default(autoincrement())
+  companyName       String
+  cnpj              String     @unique
+  phone             String?
+  address           String?
+  email             String     @unique
+  contractDate      DateTime   @default(now())
+  status            Status     @default(ACTIVE)
+  
+  // Relações
+  users             User[]
+  machines          Machine[]
+
+  @@map("clients")
+}
+
+/// Usuários que podem acessar a plataforma, associados a um cliente.
+model User {
+  id                Int        @id @default(autoincrement())
+  name              String
+  email             String     @unique
+  password          String
+  userType          UserType
+  status            Status     @default(ACTIVE)
+
+  // Relação: Um usuário pertence a um cliente.
+  clientId          Int
+  client            Client     @relation(fields: [clientId], references: [id])
+
+  // Relação: Um usuário pode ser responsável por várias máquinas.
+  responsibleFor    Machine[]
+
+  // Relação: Um usuário pode estar associado a vários registros de sensores.
+  sensorReadings    SensorReading[]
+
+  @@map("users")
+}
+
+/// Representa uma máquina industrial monitorada.
+model Machine {
+  id                Int        @id @default(autoincrement())
+  name              String
+  model             String?
+  manufacturer      String?
+  serialNumber      String     @unique
+  status            Status     @default(ACTIVE)
+
+  // Relação: A máquina pertence a um cliente.
+  clientId          Int
+  client            Client     @relation(fields: [clientId], references: [id])
+
+  // Relação: A máquina tem um usuário responsável.
+  responsibleUserId Int
+  responsibleUser   User       @relation(fields: [responsibleUserId], references: [id])
+
+  // Relação: Uma máquina possui múltiplos registros de sensores.
+  sensorReadings    SensorReading[]
+
+  @@map("machines")
+}
+
+/// Armazena as leituras dos sensores de uma máquina em um ponto no tempo.
+model SensorReading {
+  id                Int        @id @default(autoincrement())
+  timestamp         DateTime   @default(now())
+  rpm               Int
+  oilTemperature    Float
+  oilLevel          Float
+  current           Float
+  vibration         Float
+  status            String     // Status da leitura, ex: "Normal", "Alerta"
+
+  // Relação: A leitura pertence a uma máquina específica.
+  machineId         Int
+  machine           Machine    @relation(fields: [machineId], references: [id])
+
+  // Relação: A leitura foi registrada por um usuário (opcional, se aplicável).
+  userId            Int
+  user              User       @relation(fields: [userId], references: [id])
+
+  @@map("sensor_readings")
+}
+
+// -- Enums para manter a integridade dos dados --
+
+/// Status geral para clientes, usuários e máquinas.
+enum Status {
+  ACTIVE
+  SUSPENDED
+  CANCELED
+}
+
+/// Tipos de perfil de usuário dentro da plataforma.
+enum UserType {
+  ADMIN
+  TECHNICIAN
+  VIEWER
 }
 

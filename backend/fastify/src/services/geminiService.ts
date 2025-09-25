@@ -1,30 +1,70 @@
 import { GenerationConfig, GoogleGenerativeAI } from "@google/generative-ai";
 import chooseBestArm from "./chooseBestArm";
 
-// Helper para centralizar a obtenção do contexto do schema
 function getSchemaContext(): string {
-  // A melhor forma é fornecer um contexto claro e simples.
-  // Usar sintaxe de CREATE TABLE ou um formato de lista simples funciona muito bem.
   return `
-    Você tem acesso a um banco de dados PostgreSQL com as seguintes tabelas e colunas:
+    Você tem acesso às seguintes tabelas e colunas. Use os nomes exatos das tabelas e colunas ao gerar as queries.
 
-    1. Tabela "sensorData":
-       - id (Int, Chave Primária)
-       - createdAt (DateTime)
-       - temperatura (Float)
-       - nivel (Float)
-       - rpm (Float)
-       - corrente (Float)
+    Contexto do Banco de Dados PostgreSQL:
+    Você tem acesso às seguintes tabelas e colunas. Use os nomes exatos das tabelas e colunas ao gerar as queries.
 
-    2. Tabela "usuarios":
+    REGRA CRÍTICA E OBRIGATÓRIA 
+    Como os nomes das colunas usam camelCase (ex: "companyName"), você DEVE OBRIGATORIAMENTE colocar todos os nomes de tabelas e colunas entre aspas duplas ("") em todas as queries.
+
+    Exemplo de Falha Comum:
+
+      -ERRADO (causa o erro 'column does not exist'): ... JOIN "machines" m ON u.id = m.responsibleuserid
+
+      -CORRETO (use sempre este formato): ... JOIN "machines" m ON u."id" = m."responsibleUserId"
+
+    1. Tabela "clients": Armazena as informações das empresas clientes.
        - id (Int, Chave Primária)
-       - usuario (String, Único)
+       - companyName (String)
+       - cnpj (String, Único)
+       - phone (String)
+       - address (String)
        - email (String, Único)
-       - senha (String, Hash)
+       - contractDate (DateTime)
+       - status (String)
+
+    2. Tabela "users": Armazena os usuários da plataforma.
+       - id (Int, Chave Primária)
+       - name (String)
+       - email (String, Único)
+       - password (String, Hash)
+       - userType (String)
+       - status (String)
+       - clientId (Int)
+
+    3. Tabela "machines": Armazena as informações das máquinas monitoradas.
+       - id (Int, Chave Primária)
+       - name (String)
+       - model (String)
+       - manufacturer (String)
+       - serialNumber (String, Único)
+       - status (String)
+       - clientId (Int)
+       - responsibleUserId (Int)
+
+    4. Tabela "sensor_readings": Armazena as leituras dos sensores das máquinas.
+       - id (Int, Chave Primária)
+       - timestamp (DateTime)
+       - rpm (Int)
+       - oilTemperature (Float)
+       - oilLevel (Float)
+       - current (Float)
+       - vibration (Float)
+       - status (String)
+       - machineId (Int)
+       - userId (Int)
+
+    Relações Importantes:
+    Cada user pertence a um client.
+    Cada machine pertence a um client e tem um user responsável.
+    Cada sensor_reading pertence a uma machine e a um user.
   `;
 }
 
-// Inicialização do Gemini permanece a mesma
 async function initGemini() {
   const bestArm = await chooseBestArm();
   
@@ -37,7 +77,7 @@ async function initGemini() {
   };
   
   console.log("Estou no gemini service:", bestArm);
-  const key = process.env.API_GEMINI_KEY; // Corrigido para corresponder ao seu código
+  const key = process.env.API_GEMINI_KEY; 
 
   if (!key) {
     throw new Error("A variável de ambiente API_GEMINI_KEY não foi definida.");
@@ -46,16 +86,13 @@ async function initGemini() {
   const genAI = new GoogleGenerativeAI(key);
   
   return {
-    model: genAI.getGenerativeModel({ model: "gemini-1.5-flash", generationConfig }),
+    model: genAI.getGenerativeModel({ model: "gemini-2.0-flash-thinking-exp-01-21", generationConfig }),
     generationConfig
   };
 }
 
 export const geminiService = {
-  /**
-   * Gera uma query SQL a partir da pergunta do usuário.
-   * Agora retorna um JSON com 'query' ou 'error'.
-   */
+
   askGeminiSQL: async (userMessage: string): Promise<string> => {
     const { model } = await initGemini();
     const schemaContext = getSchemaContext();
@@ -80,16 +117,12 @@ export const geminiService = {
     return response.text();
   },
 
-  /**
-   * Gera uma resposta humanizada a partir do resultado do banco de dados.
-   * AGORA RECEBE A PERGUNTA ORIGINAL como argumento para evitar o uso de variável global.
-   */
+ 
   askGeminiHuman: async (originalQuestion: string, sqlResult: any): Promise<{dataHuman:string, hiperParamsHuman:GenerationConfig}> => {
     console.log(`Pergunta original: ${originalQuestion}, Resultado da consulta SQL:`, sqlResult);
     
     const { model, generationConfig } = await initGemini();
 
-    // Converte o resultado do banco (que pode ser um array de objetos) em uma string JSON para a IA ler
     const sqlResultString = JSON.stringify(sqlResult, null, 2);
 
     const prompt = `

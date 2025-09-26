@@ -17,14 +17,14 @@ export const geminiController = {
                 moment = helper.catchMoment();
             }
 
-            // 1. Chame o serviço para gerar o SQL. A resposta é uma string JSON.
+            
             const geminiSqlResponseString = await geminiService.askGeminiSQL(message);
             const geminiSqlResponse = JSON.parse(geminiSqlResponseString);
 
-            // 2. VERIFIQUE SE A IA RETORNOU UM ERRO ANTES DE CONTINUAR
+            
             if (geminiSqlResponse.error) {
                 console.error("A IA retornou um erro:", geminiSqlResponse.error);
-                // Retorne o erro da IA para o usuário final
+                
                 return reply.status(400).send({
                     success: false,
                     message: "A IA não conseguiu gerar a query SQL.",
@@ -32,7 +32,6 @@ export const geminiController = {
                 });
             }
 
-            // 3. Extraia a query e valide-a
             const sqlQuery = geminiSqlResponse.query;
             if (!sqlQuery) {
                 throw new Error("Resposta inesperada da IA (não contém 'query' nem 'error').");
@@ -44,16 +43,16 @@ export const geminiController = {
             
             console.log("Query SQL validada:", sqlQuery);
 
-            // 4. Execute a query segura no banco de dados
+           
             const dbResult = await geminiRepository.fetchAllRecords(sqlQuery);
 
-            // 5. Chame o serviço para humanizar a resposta, passando a pergunta original e o resultado do banco
+            
             const { dataHuman, hiperParamsHuman } = await geminiService.askGeminiHuman(message, helper.convertBigInt(dbResult));
 
-            // 6. Salve em cache e retorne a resposta final
+            
             const createCache = await redisService.saveCache(
                 message,
-                sqlQuery, // Usando a variável correta
+                sqlQuery, 
                 dataHuman,
                 helper.createSHA256(moment),
                 hiperParamsHuman.temperature!,

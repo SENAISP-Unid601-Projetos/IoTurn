@@ -3,6 +3,8 @@ import { geminiRoutes } from './src/routes/geminiRoutes'
 import './mqttSubscriber' 
 import cors from '@fastify/cors'
 import dotenv from 'dotenv'
+import { machineRoutes } from './src/routes/machineRoutes'
+import { deviceRoutes } from './src/routes/deviceRoutes'
 
 dotenv.config()
 const fastify = Fastify({ logger: true })
@@ -12,6 +14,8 @@ fastify.register(cors, {
 })
 
 fastify.register(geminiRoutes)
+fastify.register(machineRoutes, {prefix: '/machines'});
+fastify.register(deviceRoutes,{prefix: '/devices'})
 
 
 async function start() {

@@ -1,0 +1,29 @@
+meta {
+  name: postMAchine
+  type: http
+  seq: 5
+}
+
+post {
+  url: http://localhost:3000/machines/createMachine
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Injetora de Plástico S-300",
+    "model": "S-300",
+    "manufacturer": "Indústrias ACME",
+    "serialNumber": "SN-ACME-2025-001",
+    "status": "ACTIVE",
+    "clientId": 1,
+    "responsibleUserId": 1,
+    "nodeId": "207D5CDAB734",
+    "description": "Sensor de pressão e temperatura Heltec V3 instalado na injetora"
+  }
+}
+
+settings {
+  encodeUrl: true
+}

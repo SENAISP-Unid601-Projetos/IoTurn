@@ -5,7 +5,7 @@
 #include "HT_SSD1306Wire.h"
 #include "Sensor_DS18B20.h"
 #include "ArduinoJson.h"
-#include "Sensor_HCSR04.h"
+#include "Sensor_HCSR04.h" 
 #include <cstdlib>
 #include <array>
 #include <numeric>
@@ -31,6 +31,8 @@
 
 #define RX_TIMEOUT_VALUE                            1000
 #define BUFFER_SIZE                                 64 // Define the payload size here
+
+
 
 SSD1306Wire  factory_display(0x3c, 500000, SDA_OLED, SCL_OLED, GEOMETRY_128_64, RST_OLED); // addr , freq , i2c group , resolution , rst
 char txpacket[BUFFER_SIZE];
@@ -66,10 +68,11 @@ unsigned long lastReadTime = 0;
 const int readInterval = 1000;
 
 static RadioEvents_t RadioEvents;
-static int packetCounter = 0;
 void OnTxDone( void );
 void OnTxTimeout( void );
 void AddReadingRPM( int newValue );
+
+String nodeChipID;
 
 void setup() {
     Serial.begin(115200);
@@ -84,6 +87,7 @@ void setup() {
                                    LORA_SPREADING_FACTOR, LORA_CODINGRATE,
                                    LORA_PREAMBLE_LENGTH, LORA_FIX_LENGTH_PAYLOAD_ON,
                                    true, 0, 0, LORA_IQ_INVERSION_ON, 3000 );
+    nodeChipID = getChipId();
     startTemperature();
     //startRPM();
     startLevel();
@@ -147,8 +151,8 @@ void loop()
         }
 
         if (doc.size() > 0) 
-        {
-            doc["count"] = packetCounter;
+        {   
+            doc["nodeID"] = nodeChipID;
             serializeJson(doc, txpacket,sizeof(txpacket));
 
             if (doc.containsKey("rpm_avg")) {
@@ -188,7 +192,6 @@ void OnTxDone( void )
       lastSentLevelPercentage = stagedLevelPercentage;
   }
 
-  packetCounter++;
   lora_idle = true;
 }
 
@@ -221,4 +224,11 @@ void AddReadingRPM(int newValue)
       }
       rpmReadings[rpmReadings.size() - 1] = newValue;
     }
+}
+// Função para ler o Chip ID diretamente do hardware
+String getChipId() {
+  uint64_t chipid = ESP.getEfuseMac();
+  char chipid_str[17];
+  snprintf(chipid_str, sizeof(chipid_str), "%04X%08X", (uint16_t)(chipid >> 32), (uint32_t)chipid);
+  return String(chipid_str);
 }

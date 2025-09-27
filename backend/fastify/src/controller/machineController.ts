@@ -20,7 +20,7 @@ export const machineController = {
             const machineData = createMachineBodySchema.parse(request.body);
 
             const result = await machineService.createMachine(machineData as NewMachineData);
-            refreshMappings();
+            await refreshMappings();
             return reply.status(201).send(result);
         } catch (error) {
             console.error("Erro ao criar máquina:", error);

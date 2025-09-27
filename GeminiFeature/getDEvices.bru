@@ -6,8 +6,22 @@ meta {
 
 get {
   url: http://192.168.71.10:3000/devices/getDeviceMapping
-  body: none
+  body: json
   auth: inherit
+}
+
+body:json {
+  {
+    "name": "Esteira Transportadora ET-200",
+    "model": "ET-200",
+    "manufacturer": "Logisys Soluções",
+    "serialNumber": "SN-LOGI-2023-105",
+    "status": "ERROR",
+    "clientId": 2,
+    "responsibleUserId": 5,
+    "nodeId": "1029384756AF",
+    "description": "Sensor de velocidade e contador de pacotes infravermelho."
+  }
 }
 
 settings {

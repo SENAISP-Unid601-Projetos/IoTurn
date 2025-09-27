@@ -28,9 +28,8 @@ const char* broker = "192.168.71.10";
 JsonDocument doc;
 DeserializationError error;
 
-unsigned long lastTime = 0;
-// Timer set to 10 minutes (600000)
-unsigned long timerDelay = 5000;
+const unsigned long mapUpdateInterval = 600000; // 10 minutos em milissegundos
+unsigned long lastMapUpdateTime = 0;
 
 String devicesJson;
 static RadioEvents_t RadioEvents;
@@ -134,8 +133,8 @@ void VextOFF(void) {
 
 void getMappingDevices() {
     // A lógica do timer continua a mesma, para atualizações periódicas
-    if ((millis() - lastTime) > timerDelay) {
-        lastTime = millis(); // Reseta o timer imediatamente
+    if ((millis() - lastMapUpdateTime) > mapUpdateInterval) {
+        lastMapUpdateTime = millis(); // Reseta o timer imediatamente
 
         // 1. Chama a função para buscar o JSON da API
         // IMPORTANTE: A URL agora deve ser a da sua API de mapeamento!

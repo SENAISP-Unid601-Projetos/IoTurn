@@ -48,3 +48,32 @@ void mqtt_publish(const char* topic, const char* message) {
   Serial.print(": ");
   Serial.println(message);
 }
+
+String httpGETRequest(const char* serverName) {
+  // Cria um objeto WiFiClient para ser gerenciado pelo HTTPClient
+  WiFiClient client;
+  HTTPClient http;
+    
+  // Inicia a requisição
+  http.begin(client, serverName);
+  
+  // Envia a requisição GET
+  int httpResponseCode = http.GET();
+  
+  String payload = "[]"; // Retorna um array JSON vazio em caso de erro
+  
+  if (httpResponseCode > 0) {
+    Serial.print("HTTP Response code: ");
+    Serial.println(httpResponseCode);
+    payload = http.getString();
+  }
+  else {
+    Serial.print("Error code: ");
+    Serial.println(httpResponseCode);
+  }
+  
+  // Libera os recursos
+  http.end();
+
+  return payload;
+}

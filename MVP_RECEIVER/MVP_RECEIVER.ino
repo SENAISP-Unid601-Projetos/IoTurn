@@ -4,6 +4,7 @@
 #include "Mqtt_Service.h" 
 #include "ArduinoJson.h"
 #include "HT_SSD1306Wire.h"
+#include <map>
 #define RF_FREQUENCY                  915000000 // Frequência em Hz (ex: 915MHz para US915)
 #define TX_OUTPUT_POWER               14        // Potência de transmissão em dBm (não usado no receptor, mas bom para referência)
 #define LORA_BANDWIDTH                0         // 0: 125 kHz, 1: 250 kHz, 2: 500 kHz
@@ -20,17 +21,23 @@
 SSD1306Wire  factory_display(0x3c, 500000, SDA_OLED, SCL_OLED, GEOMETRY_128_64, RST_OLED);
 char rxpacket[BUFFER_SIZE]; 
 
-const char* ssid = "linksys";
-const char* password = "";
-const char* broker = "10.110.12.71";
+const char* ssid = "Nextron";
+const char* password = "iot12345";
+const char* broker = "192.168.71.10";
 
 JsonDocument doc;
 DeserializationError error;
 
+unsigned long lastTime = 0;
+// Timer set to 10 minutes (600000)
+unsigned long timerDelay = 5000;
+
+String devicesJson;
 static RadioEvents_t RadioEvents;
 int16_t rssi, rxSize;
 volatile bool lora_idle = true; 
 
+std::map<String, int> nodeMachineMap;
 void VextON(void);
 void VextOFF(void);
 void shareJson(void);
@@ -48,7 +55,7 @@ void setup() {
     delay(1000);
     
     setup_wifi(ssid, password);
-    mqtt_setup(broker, 32358);
+    mqtt_setup(broker, 1883);
     
     
     RadioEvents.RxDone = OnRxDone; 
@@ -63,17 +70,15 @@ void setup() {
 }
 
 void loop() {
-    mqtt_loop(); 
-
+    mqtt_loop();
+    getMappingDevices(); 
     if (lora_idle) {
         lora_idle = false; 
         Serial.println("--> Entrando em modo de recepção (RX)");
         
-        
         Radio.Rx(0); 
     }
-    
-    Radio.IrqProcess(); 
+    Radio.IrqProcess();
 }
 
 void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi_val, int8_t snr) {
@@ -85,31 +90,38 @@ void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi_val, int8_t snr) {
     rxpacket[size] = '\0'; 
 
     Serial.printf("\r\nPacote recebido: \"%s\" | RSSI: %d | Tamanho: %d\r\n", rxpacket, rssi, rxSize);
-    doc.to<JsonObject>(); // Limpa e prepara o doc para receber um objeto JSON
-    error = deserializeJson(doc, rxpacket);
-    if(error){
-        factory_display.clear();
-        factory_display.setFont(ArialMT_Plain_10);
-        factory_display.setTextAlignment(TEXT_ALIGN_LEFT);
-        String errorMessage = "Falha no JSON: " + String(error.c_str());
-        factory_display.drawString(0, 0, errorMessage);
-        factory_display.display();
-    } else {
-        shareJson();
-        Serial.println("Pacote publicado no MQTT.");
+    StaticJsonDocument<256> doc; // Documento para o PACOTE recebido
+    DeserializationError error = deserializeJson(doc, rxpacket);
+    if (error) {
+        Serial.print("Falha ao decodificar JSON do pacote LoRa: ");
+        Serial.println(error.c_str());
+        lora_idle = true; // Libera para a próxima recepção
+        return;
     }
-    factory_display.clear();
-    factory_display.setFont(ArialMT_Plain_10);
-    factory_display.setTextAlignment(TEXT_ALIGN_LEFT);
-    factory_display.drawString(0, 0, "Último Pacote Recebido:");
-    factory_display.setFont(ArialMT_Plain_16);
-    factory_display.drawString(0, 12, String(rxpacket)); 
-    factory_display.setFont(ArialMT_Plain_10);
-    factory_display.display();
+    String nodeId = doc["nodeID"];
+    
+    if (nodeMachineMap.count(nodeId)) {
+        // Encontrou o nodeId no nosso mapa!
+        int machineId = nodeMachineMap[nodeId];
+        Serial.printf("Nó %s pertence à Máquina ID %d.\n", nodeId.c_str(), machineId);
 
-    lora_idle = true;
+        if (doc.containsKey("temp")) {
+            float temp = doc["temp"];
+            String topic = "ioturn/maquinas/" + String(machineId) + "/dt/temperatura";
+            mqtt_publish(topic.c_str(), String(temp).c_str());
+        }
+        if (doc.containsKey("level")) {
+            int level = doc["level"];
+            String topic = "ioturn/maquinas/" + String(machineId) + "/dt/nivel";
+            mqtt_publish(topic.c_str(), String(level).c_str());
+        }
+
+    } else {
+        Serial.printf("AVISO: Nó %s não está mapeado. Pacote descartado.\n", nodeId.c_str());
+    }
+
+    lora_idle = true; 
 }
-
 void VextON(void) {
     pinMode(Vext, OUTPUT);
     digitalWrite(Vext, LOW); 
@@ -120,28 +132,39 @@ void VextOFF(void) {
     digitalWrite(Vext, HIGH); 
 }
 
-void shareJson() {
-    // Verifica e publica o valor de rpm_avg, se existir
-    if (doc.containsKey("rpm_avg") && doc["rpm_avg"].is<float>()) {
-        float rpmAvg = doc["rpm_avg"].as<float>();
-        if (rpmAvg >= 0) {  // Verifica se o valor é válido
-            mqtt_publish("ioturn/rpm_avg", String(rpmAvg).c_str());
-        }
-    }
+void getMappingDevices() {
+    // A lógica do timer continua a mesma, para atualizações periódicas
+    if ((millis() - lastTime) > timerDelay) {
+        lastTime = millis(); // Reseta o timer imediatamente
 
-    // Verifica e publica o valor de temp, se existir
-    if (doc.containsKey("temp") && doc["temp"].is<float>()) {
-        float temp = doc["temp"].as<float>();
-        if (temp >= -50 && temp <= 150) {  // Verifica se o valor de temperatura está em um intervalo razoável
-            mqtt_publish("ioturn/temp", String(temp).c_str());
-        }
-    }
+        // 1. Chama a função para buscar o JSON da API
+        // IMPORTANTE: A URL agora deve ser a da sua API de mapeamento!
+        String jsonResponse = httpGETRequest("http://192.168.71.10:3000/devices/getDeviceMapping");
 
-    // Verifica e publica o valor de level, se existir
-    if (doc.containsKey("level") && doc["level"].is<int>()) {
-        int level = doc["level"].as<int>();
-        if (level >= 0 && level <= 100) {  // Verifica se o valor de nível está em um intervalo válido
-            mqtt_publish("ioturn/level", String(level).c_str());
+        Serial.println("Resposta da API de Mapeamento:");
+        Serial.println(jsonResponse);
+
+        // 2. Usa ArduinoJson para decodificar a resposta
+        StaticJsonDocument<1024> doc; // Use um tamanho adequado para sua lista
+        DeserializationError error = deserializeJson(doc, jsonResponse);
+
+        if (error) {
+            Serial.print("Falha ao decodificar JSON do mapa: ");
+            Serial.println(error.c_str());
+            return;
         }
+        // 3. Limpa o mapa antigo e preenche com os novos dados
+        nodeMachineMap.clear();
+        JsonArray array = doc.as<JsonArray>();
+        for (JsonObject item : array) {
+            String nodeId = item["nodeId"];
+            int machineId = item["machineId"];
+            nodeMachineMap[nodeId] = machineId;
+        }
+        Serial.println("Mapa de dispositivos atualizado com sucesso!");
+        Serial.print("Total de dispositivos mapeados: ");
+        Serial.println(nodeMachineMap.size());
     }
 }
+
+

@@ -52,8 +52,7 @@ void setup() {
     
     setup_wifi(ssid, password);
     mqtt_setup(broker, 1883);
-    
-    
+    getMappingDevices(); // Carrega o mapeamento inicial
     RadioEvents.RxDone = OnRxDone; 
     Radio.Init(&RadioEvents);
     Radio.SetChannel(RF_FREQUENCY);
@@ -89,18 +88,17 @@ void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi_val, int8_t snr) {
     rxpacket[size] = '\0'; 
 
     Serial.printf("\r\nPacote recebido: \"%s\" | RSSI: %d | Tamanho: %d\r\n", rxpacket, rssi, rxSize);
-    StaticJsonDocument<256> doc; // Documento para o PACOTE recebido
+    StaticJsonDocument<256> doc; 
     DeserializationError error = deserializeJson(doc, rxpacket);
     if (error) {
         Serial.print("Falha ao decodificar JSON do pacote LoRa: ");
         Serial.println(error.c_str());
-        lora_idle = true; // Libera para a próxima recepção
+        lora_idle = true; 
         return;
     }
     String nodeId = doc["nodeID"];
     
     if (nodeMachineMap.count(nodeId)) {
-        // Encontrou o nodeId no nosso mapa!
         int machineId = nodeMachineMap[nodeId];
         Serial.printf("Nó %s pertence à Máquina ID %d.\n", nodeId.c_str(), machineId);
 
@@ -132,20 +130,16 @@ void VextOFF(void) {
 }
 
 void getMappingDevices() {
-    // 1. Chama a função para buscar o JSON da API
-    // IMPORTANTE: A URL agora deve ser a da sua API de mapeamento!
     String jsonResponse = httpGETRequest("http://192.168.71.10:3000/devices/getDeviceMapping");
     Serial.println("Resposta da API de Mapeamento:");
     Serial.println(jsonResponse);
-    // 2. Usa ArduinoJson para decodificar a resposta
-    StaticJsonDocument<1024> doc; // Use um tamanho adequado para sua lista
+    StaticJsonDocument<1024> doc; 
     DeserializationError error = deserializeJson(doc, jsonResponse);
     if (error) {
         Serial.print("Falha ao decodificar JSON do mapa: ");
         Serial.println(error.c_str());
         return;
     }
-    // 3. Limpa o mapa antigo e preenche com os novos dados
     nodeMachineMap.clear();
     JsonArray array = doc.as<JsonArray>();
     for (JsonObject item : array) {

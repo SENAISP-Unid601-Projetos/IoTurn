@@ -28,9 +28,6 @@ const char* broker = "192.168.71.10";
 JsonDocument doc;
 DeserializationError error;
 
-const unsigned long mapUpdateInterval = 600000; // 10 minutos em milissegundos
-unsigned long lastMapUpdateTime = 0;
-
 String devicesJson;
 static RadioEvents_t RadioEvents;
 int16_t rssi, rxSize;
@@ -70,7 +67,10 @@ void setup() {
 
 void loop() {
     mqtt_loop();
-    getMappingDevices(); 
+    char messageBuffer[256];
+    if (getNewMqttMessage(messageBuffer, sizeof(messageBuffer))) {
+      processJsonCommand(messageBuffer);
+    }
     if (lora_idle) {
         lora_idle = false; 
         Serial.println("--> Entrando em modo de recepção (RX)");
@@ -132,37 +132,48 @@ void VextOFF(void) {
 }
 
 void getMappingDevices() {
-    // A lógica do timer continua a mesma, para atualizações periódicas
-    if ((millis() - lastMapUpdateTime) > mapUpdateInterval) {
-        lastMapUpdateTime = millis(); // Reseta o timer imediatamente
+    // 1. Chama a função para buscar o JSON da API
+    // IMPORTANTE: A URL agora deve ser a da sua API de mapeamento!
+    String jsonResponse = httpGETRequest("http://192.168.71.10:3000/devices/getDeviceMapping");
+    Serial.println("Resposta da API de Mapeamento:");
+    Serial.println(jsonResponse);
+    // 2. Usa ArduinoJson para decodificar a resposta
+    StaticJsonDocument<1024> doc; // Use um tamanho adequado para sua lista
+    DeserializationError error = deserializeJson(doc, jsonResponse);
+    if (error) {
+        Serial.print("Falha ao decodificar JSON do mapa: ");
+        Serial.println(error.c_str());
+        return;
+    }
+    // 3. Limpa o mapa antigo e preenche com os novos dados
+    nodeMachineMap.clear();
+    JsonArray array = doc.as<JsonArray>();
+    for (JsonObject item : array) {
+        String nodeId = item["nodeId"];
+        int machineId = item["machineId"];
+        nodeMachineMap[nodeId] = machineId;
+    }
+    Serial.println("Mapa de dispositivos atualizado com sucesso!");
+    Serial.print("Total de dispositivos mapeados: ");
+    Serial.println(nodeMachineMap.size());
+}
 
-        // 1. Chama a função para buscar o JSON da API
-        // IMPORTANTE: A URL agora deve ser a da sua API de mapeamento!
-        String jsonResponse = httpGETRequest("http://192.168.71.10:3000/devices/getDeviceMapping");
+void processJsonCommand(const char* jsonMessage) {
+    JsonDocument doc;
+    DeserializationError error = deserializeJson(doc, jsonMessage);
 
-        Serial.println("Resposta da API de Mapeamento:");
-        Serial.println(jsonResponse);
+    if (error) {
+        Serial.print("Falha no parsing do JSON! Erro: ");
+        Serial.println(error.c_str());
+        return;
+    }
 
-        // 2. Usa ArduinoJson para decodificar a resposta
-        StaticJsonDocument<1024> doc; // Use um tamanho adequado para sua lista
-        DeserializationError error = deserializeJson(doc, jsonResponse);
+    const char* command = doc["command"];
 
-        if (error) {
-            Serial.print("Falha ao decodificar JSON do mapa: ");
-            Serial.println(error.c_str());
-            return;
+    if (command) {
+        if (strcmp(command, "refresh_mappings") == 0) {
+            getMappingDevices();
         }
-        // 3. Limpa o mapa antigo e preenche com os novos dados
-        nodeMachineMap.clear();
-        JsonArray array = doc.as<JsonArray>();
-        for (JsonObject item : array) {
-            String nodeId = item["nodeId"];
-            int machineId = item["machineId"];
-            nodeMachineMap[nodeId] = machineId;
-        }
-        Serial.println("Mapa de dispositivos atualizado com sucesso!");
-        Serial.print("Total de dispositivos mapeados: ");
-        Serial.println(nodeMachineMap.size());
     }
 }
 

@@ -1,7 +1,11 @@
 #include "Mqtt_Service.h"
+#define MQTT_MSG_BUFFER_SIZE 256
 
 WiFiClient espClient;
 PubSubClient client(espClient);
+
+static char s_mqttMessage[MQTT_MSG_BUFFER_SIZE];
+static bool s_newMessageAvailable = false;
 
 void setup_wifi(const char* ssid, const char* password) {
   delay(10);
@@ -21,6 +25,8 @@ void reconnect() {
     clientId += String(random(0xffff), HEX);
     if (client.connect(clientId.c_str())) {
       Serial.println("Conectado!");
+      client.subscribe("ioturn/gateways/all/commands");
+      Serial.println("Inscrito no tópico 'ioturn/gateways/all/commands'");
     } else {
       Serial.print("Falhou, rc=");
       Serial.print(client.state());
@@ -32,6 +38,7 @@ void reconnect() {
 
 void mqtt_setup(const char* broker, uint16_t port) {
   client.setServer(broker, port);
+  client.setCallback(callback);
 }
 
 void mqtt_loop() {
@@ -49,6 +56,25 @@ void mqtt_publish(const char* topic, const char* message) {
   Serial.println(message);
 }
 
+void callback(char* topic, byte* payload, unsigned int length) {
+  if (length < MQTT_MSG_BUFFER_SIZE) {
+    memcpy(s_mqttMessage, payload, length);
+    s_mqttMessage[length] = '\0'; // Adiciona o terminador nulo
+    s_newMessageAvailable = true;
+  } else {
+    Serial.println("ERRO: Mensagem MQTT muito grande para o buffer!");
+  }
+}
+bool getNewMqttMessage(char* buffer, size_t bufferSize) {
+  // Esta seção é "atômica": a flag só é baixada depois de copiar a mensagem
+  if (s_newMessageAvailable) {
+    strncpy(buffer, s_mqttMessage, bufferSize - 1);
+    buffer[bufferSize - 1] = '\0'; // Garante terminação nula
+    s_newMessageAvailable = false; // "Consome" a mensagem
+    return true;
+  }
+  return false;
+}
 String httpGETRequest(const char* serverName) {
   // Cria um objeto WiFiClient para ser gerenciado pelo HTTPClient
   WiFiClient client;

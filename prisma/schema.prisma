@@ -113,9 +113,29 @@ model Device {
   lastHeartbeat DateTime @updatedAt
   machine         Machine?
 
+  // Relação N-para-1: Este dispositivo pertence a UM Gateway.
+  gatewayId     Int?
+  gateway       Gateway?  @relation(fields: [gatewayId], references: [id])
+
   @@map("devices")
 }
 
+/// Representa o hardware físico do Gateway (ESP32 com Wi-Fi).
+model Gateway {
+  id             Int        @id @default(autoincrement())
+  
+  // O ID único do hardware do Gateway (o Chip ID dele).
+  gatewayId      String     @unique
+  
+  description    String?    // Ex: "Gateway do Setor A - Próximo à doca 3"
+  status         DeviceStatus @default(OFFLINE)
+  lastHeartbeat  DateTime   @updatedAt
+
+  // Relação 1-para-N: Um Gateway é responsável por muitos dispositivos (Nós Sensores).
+  responsibleFor Device[]
+
+  @@map("gateways")
+}
 /// Armazena as leituras dos sensores de uma máquina em um ponto no tempo.
 model SensorReading {
   id                Int        @id @default(autoincrement())

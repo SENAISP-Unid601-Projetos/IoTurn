@@ -18,7 +18,6 @@ export const machineController = {
     createMachineController: async (request: FastifyRequest, reply: FastifyReply): Promise<void> =>{
         try {
             const machineData = createMachineBodySchema.parse(request.body);
-
             const result = await machineService.createMachine(machineData as NewMachineData);
             await refreshMappings();
             return reply.status(201).send(result);

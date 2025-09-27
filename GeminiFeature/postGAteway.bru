@@ -1,0 +1,22 @@
+meta {
+  name: postGAteway
+  type: http
+  seq: 7
+}
+
+post {
+  url: http://localhost:3000/gateways/createGateway
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "gatewayId": "8C7354DAB734",
+    "description": "Gateway do Almoxarifado - Próximo à porta principal"
+  }
+}
+
+settings {
+  encodeUrl: true
+}

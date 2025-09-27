@@ -1,12 +1,7 @@
 
 import mqttClient from './src/config/mqttClient'
-const TOPICS = ['esp32/sensores']; 
-interface sensorData {
-  temperatura:number,
-  nivel:number,
-  rpm:number,
-  corrente:number
-}
+const TOPICS = ['ioturn/gateways/all/commands']; 
+
 // Subscreve aos tópicos
 mqttClient.subscribe(TOPICS, { qos: 0 }, (err, granted) => {
   if (err) {
@@ -20,11 +15,21 @@ mqttClient.subscribe(TOPICS, { qos: 0 }, (err, granted) => {
 mqttClient.on('message',async (topic, message) => {
   try {
     const payload = message.toString();
-    const {temperatura,nivel,rpm,corrente} = JSON.parse(payload);
-
+    
     console.log(`[MQTT RECEBIDO] Tópico: ${topic} | Mensagem: ${payload}`);
         
   } catch (error) {
     console.error('[ERRO DE PARSE MQTT]:', error)
   }
 })
+
+export default function refreshMappings(){
+  mqttClient.publish('ioturn/gateways/all/commands', JSON.stringify({ command: 'refresh_mappings' }), { qos: 0, retain: false }, (err) => {
+    if (err) {
+      console.error('[MQTT PUBLISH] Erro ao publicar mensagem:', err)
+    } else {
+      console.log('[MQTT PUBLISH] Mensagem publicada com sucesso no tópico ioturn/gateways/all/commands')
+    }
+  })
+}  
+

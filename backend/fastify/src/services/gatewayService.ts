@@ -9,5 +9,5 @@ export const gatewayService = {
         }
 
         return result;
-    }
+    },
 }

@@ -34,17 +34,37 @@ export const deviceRepository = {
             throw new Error("Falha ao acessar o banco de dados para buscar mapeamentos.");
         }
     },
-    assignGatewayToDevice: async(gatewayId: number, deviceId: number): Promise<Device | undefined> =>{
+    assignGatewayToDevice: async(gatewayId: number, deviceId: number): Promise<Device> =>{
         try {
-            const result = await prisma.device.update({
-                where: {
-                    id: deviceId
-                },
-                data: {
-                    gatewayId: gatewayId
-                }
-            });
-            return result as Device | undefined;
+            const result = await prisma.$transaction([
+                prisma.device.update({
+                    where: {
+                        id: deviceId
+                    },
+                    data: {
+                        status: 'ONLINE',
+                        gateway:{
+                            connect: {
+                                id: gatewayId
+                            },
+                        },
+                    },
+                    include: {
+                        gateway: true
+                    }
+                }),
+                prisma.gateway.update({
+                    where: {
+                        id: gatewayId
+                    },
+                    data: {
+                        status:'ONLINE'
+                    }
+                })
+            ]);
+            const updateDevice = result[0];
+
+            return updateDevice;
         } catch (error) {
             console.error("Erro ao atribuir gateway ao dispositivo:", error);
             throw new Error("Falha ao acessar o banco de dados para atribuir gateway ao dispositivo.");

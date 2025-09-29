@@ -2,7 +2,6 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { NewMachineData } from "../infrastructure/repository/machineRepository";
 import { machineService } from "../services/machineService";
 import {z} from 'zod';
-import refreshMappings from "../../mqttSubscriber";
 
 const createMachineBodySchema = z.object({
     name: z.string(),
@@ -23,7 +22,6 @@ export const machineController = {
                 return;
             }
             const result = await machineService.createMachine(machineData.data as NewMachineData);
-            await refreshMappings();
             return reply.status(201).send(result);
         } catch (error) {
             console.error("Erro ao criar máquina:", error);

@@ -19,7 +19,6 @@ fastify.register(machineRoutes, {prefix: '/machines'});
 fastify.register(deviceRoutes,{prefix: '/devices'});
 fastify.register(gatewayRoutes,{prefix: '/gateways'});
 
-
 async function start() {
   try {
     await fastify.listen({ port: 3000,host: '0.0.0.0'})

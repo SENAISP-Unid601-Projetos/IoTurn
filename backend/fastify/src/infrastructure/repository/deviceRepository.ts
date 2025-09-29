@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Device } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -32,6 +32,35 @@ export const deviceRepository = {
         } catch (err) {
             console.error("Erro ao buscar máquinas ativas:", err);
             throw new Error("Falha ao acessar o banco de dados para buscar mapeamentos.");
+        }
+    },
+    assignGatewayToDevice: async(gatewayId: number, deviceId: number): Promise<Device | undefined> =>{
+        try {
+            const result = await prisma.device.update({
+                where: {
+                    id: deviceId
+                },
+                data: {
+                    gatewayId: gatewayId
+                }
+            });
+            return result as Device | undefined;
+        } catch (error) {
+            console.error("Erro ao atribuir gateway ao dispositivo:", error);
+            throw new Error("Falha ao acessar o banco de dados para atribuir gateway ao dispositivo.");
+        }
+    },
+    findDeviceById: async(deviceId: number): Promise<Device | null> =>{
+        try {
+            const result = await prisma.device.findUnique({
+                where: {
+                    id: deviceId
+                }
+            });
+            return result;
+        } catch (error) {
+            console.error("Erro ao buscar dispositivo por ID:", error);
+            throw new Error("Falha ao acessar o banco de dados para buscar dispositivo por ID.");
         }
     }
 }

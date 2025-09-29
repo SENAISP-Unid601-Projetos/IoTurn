@@ -4,6 +4,9 @@ CREATE TYPE "Status" AS ENUM ('ACTIVE', 'SUSPENDED', 'CANCELED');
 -- CreateEnum
 CREATE TYPE "UserType" AS ENUM ('ADMIN', 'TECHNICIAN', 'VIEWER');
 
+-- CreateEnum
+CREATE TYPE "DeviceStatus" AS ENUM ('ONLINE', 'OFFLINE', 'PROVISIONING', 'ERROR');
+
 -- CreateTable
 CREATE TABLE "InteracaoIA" (
     "id" SERIAL NOT NULL,
@@ -73,8 +76,32 @@ CREATE TABLE "machines" (
     "status" "Status" NOT NULL DEFAULT 'ACTIVE',
     "clientId" INTEGER NOT NULL,
     "responsibleUserId" INTEGER NOT NULL,
+    "deviceId" INTEGER NOT NULL,
 
     CONSTRAINT "machines_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "devices" (
+    "id" SERIAL NOT NULL,
+    "nodeId" TEXT NOT NULL,
+    "description" TEXT,
+    "status" "DeviceStatus" NOT NULL DEFAULT 'PROVISIONING',
+    "lastHeartbeat" TIMESTAMP(3) NOT NULL,
+    "gatewayId" INTEGER,
+
+    CONSTRAINT "devices_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "gateways" (
+    "id" SERIAL NOT NULL,
+    "gatewayId" TEXT NOT NULL,
+    "description" TEXT,
+    "status" "DeviceStatus" NOT NULL DEFAULT 'OFFLINE',
+    "lastHeartbeat" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "gateways_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -105,6 +132,15 @@ CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 -- CreateIndex
 CREATE UNIQUE INDEX "machines_serialNumber_key" ON "machines"("serialNumber");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "machines_deviceId_key" ON "machines"("deviceId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "devices_nodeId_key" ON "devices"("nodeId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "gateways_gatewayId_key" ON "gateways"("gatewayId");
+
 -- AddForeignKey
 ALTER TABLE "InteracaoIA" ADD CONSTRAINT "InteracaoIA_hyperparameterArmId_fkey" FOREIGN KEY ("hyperparameterArmId") REFERENCES "HyperparameterArm"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -116,6 +152,12 @@ ALTER TABLE "machines" ADD CONSTRAINT "machines_clientId_fkey" FOREIGN KEY ("cli
 
 -- AddForeignKey
 ALTER TABLE "machines" ADD CONSTRAINT "machines_responsibleUserId_fkey" FOREIGN KEY ("responsibleUserId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "machines" ADD CONSTRAINT "machines_deviceId_fkey" FOREIGN KEY ("deviceId") REFERENCES "devices"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "devices" ADD CONSTRAINT "devices_gatewayId_fkey" FOREIGN KEY ("gatewayId") REFERENCES "gateways"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "sensor_readings" ADD CONSTRAINT "sensor_readings_machineId_fkey" FOREIGN KEY ("machineId") REFERENCES "machines"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -3,4 +3,5 @@ import { deviceController } from "../controller/deviceController";
 
 export async function deviceRoutes(fastify: FastifyInstance) {
     fastify.get('/getDeviceMapping', deviceController.getFormatedMappingController);
+    fastify.post('/assignGatewayToDevice', deviceController.assignGatewayToDeviceController);
 }

@@ -17,8 +17,12 @@ const createMachineBodySchema = z.object({
 export const machineController = {
     createMachineController: async (request: FastifyRequest, reply: FastifyReply): Promise<void> =>{
         try {
-            const machineData = createMachineBodySchema.parse(request.body);
-            const result = await machineService.createMachine(machineData as NewMachineData);
+            const machineData = createMachineBodySchema.safeParse(request.body);
+            if (!machineData.success) {
+                reply.status(400).send({ message: 'Invalid request body', errors: machineData.error.message });
+                return;
+            }
+            const result = await machineService.createMachine(machineData.data as NewMachineData);
             await refreshMappings();
             return reply.status(201).send(result);
         } catch (error) {

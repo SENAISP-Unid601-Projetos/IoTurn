@@ -1,30 +1,47 @@
 #include "Sensor_RPM.h"
 #include <Arduino.h>
-int signalPulse = 2;
-int rpm;
-volatile byte pulses;
-unsigned long timeOld;
-unsigned int pulses_per_turn = 1;
 
- void count(){
+const int signalPulse = 6; 
+volatile unsigned long pulses = 0;
+int currentRpm = 0;
+const unsigned long CALCULATION_INTERVAL = 1000; 
+unsigned long previousMillis = 0;
+
+const unsigned int pulses_per_turn = 20;
+
+void IRAM_ATTR count() {
     pulses++;
 }
 
-void startRPM(){
-    pinMode(signalPulse, INPUT);
+void startRPM() {
+    pinMode(signalPulse, INPUT_PULLUP);
     attachInterrupt(digitalPinToInterrupt(signalPulse), count, FALLING);
-    pulses = 0;
-    rpm = 0;
-    timeOld = 0;
+    previousMillis = millis();
 }
 
-int readRPM(){
-    if(millis() - timeOld >= 1000){
-        detachInterrupt(digitalPinToInterrupt(signalPulse));
-        rpm = (60 * 1000 / pulses_per_turn) / (millis() - timeOld) * pulses;
-        timeOld = millis();
-        pulses = 0;
-        return rpm;
-        attachInterrupt(digitalPinToInterrupt(signalPulse), count, FALLING);
+// Função que deve ser chamada repetidamente no loop principal
+void calculateRPM() {
+    if (millis() - previousMillis >= CALCULATION_INTERVAL) {
+        
+        unsigned long pulses_copy;
+
+        noInterrupts(); 
+        pulses_copy = pulses; // Copia o valor de forma segura
+        pulses = 0;           // Zera a contagem para o próximo intervalo
+        interrupts();         // Fim da Seção Crítica: reabilita interrupções
+        
+        // Calcula o tempo real decorrido
+        unsigned long elapsedTime = millis() - previousMillis;
+        previousMillis = millis();
+
+        // Calcula o RPM
+        // (pulsos / pulsos_por_volta) -> número de voltas
+        // (60000 / tempo_decorrido) -> fator de conversão para minutos
+        currentRpm = (pulses_copy * 60000.0) / (pulses_per_turn * elapsedTime);
     }
+}
+
+// Função para obter o último valor de RPM calculado
+int getRPM() {
+    return currentRpm;
 }

@@ -1,1 +1,26 @@
 @import "tailwindcss";
+
+:root {
+  /* Cores Primárias */
+  --primary-blue: #2979ff; /* Azul vibrante principal para botões e destaques */
+  --primary-blue-hover: #1c64f2; /* Tom mais escuro para efeito hover */
+
+  /* Cores de Fundo (Tema Escuro) */
+  --background-dark: #0d1117; /* Fundo principal, azul muito escuro/quase preto */
+  --background-light: #161b22; /* Um tom mais claro para cards ou seções secundárias */
+
+  /* Cores de Texto */
+  --text-light: #f0f6fc; /* Branco suave para textos principais */
+  --text-secondary: #8b949e; /* Cinza claro para textos secundários e ícones */
+  --text-link: #58a6ff; /* Azul claro para links */
+
+  /* Cores Neutras e de Borda */
+  --border-color: #30363d; /* Cinza para bordas e divisórias */
+  --white: #ffffff;
+  --black: #000000;
+
+  /* Cores de Feedback (Sugestão) */
+  --success: #238636;
+  --warning: #dbab09;
+  --danger: #da3633;
+}

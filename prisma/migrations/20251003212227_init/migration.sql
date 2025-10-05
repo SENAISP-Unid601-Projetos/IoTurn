@@ -105,19 +105,47 @@ CREATE TABLE "gateways" (
 );
 
 -- CreateTable
-CREATE TABLE "sensor_readings" (
+CREATE TABLE "rpm_readings" (
     "id" SERIAL NOT NULL,
     "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "rpm" INTEGER NOT NULL,
-    "oilTemperature" DOUBLE PRECISION NOT NULL,
-    "oilLevel" DOUBLE PRECISION NOT NULL,
-    "current" DOUBLE PRECISION NOT NULL,
-    "vibration" DOUBLE PRECISION NOT NULL,
-    "status" TEXT NOT NULL,
     "machineId" INTEGER NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "userId" INTEGER,
 
-    CONSTRAINT "sensor_readings_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "rpm_readings_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "oil_temperature_readings" (
+    "id" SERIAL NOT NULL,
+    "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "temperature" DOUBLE PRECISION NOT NULL,
+    "machineId" INTEGER NOT NULL,
+    "userId" INTEGER,
+
+    CONSTRAINT "oil_temperature_readings_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "oil_level_readings" (
+    "id" SERIAL NOT NULL,
+    "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "level" DOUBLE PRECISION NOT NULL,
+    "machineId" INTEGER NOT NULL,
+    "userId" INTEGER,
+
+    CONSTRAINT "oil_level_readings_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "current_readings" (
+    "id" SERIAL NOT NULL,
+    "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "current" DOUBLE PRECISION NOT NULL,
+    "machineId" INTEGER NOT NULL,
+    "userId" INTEGER,
+
+    CONSTRAINT "current_readings_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -160,7 +188,25 @@ ALTER TABLE "machines" ADD CONSTRAINT "machines_deviceId_fkey" FOREIGN KEY ("dev
 ALTER TABLE "devices" ADD CONSTRAINT "devices_gatewayId_fkey" FOREIGN KEY ("gatewayId") REFERENCES "gateways"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "sensor_readings" ADD CONSTRAINT "sensor_readings_machineId_fkey" FOREIGN KEY ("machineId") REFERENCES "machines"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "rpm_readings" ADD CONSTRAINT "rpm_readings_machineId_fkey" FOREIGN KEY ("machineId") REFERENCES "machines"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "sensor_readings" ADD CONSTRAINT "sensor_readings_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "rpm_readings" ADD CONSTRAINT "rpm_readings_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "oil_temperature_readings" ADD CONSTRAINT "oil_temperature_readings_machineId_fkey" FOREIGN KEY ("machineId") REFERENCES "machines"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "oil_temperature_readings" ADD CONSTRAINT "oil_temperature_readings_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "oil_level_readings" ADD CONSTRAINT "oil_level_readings_machineId_fkey" FOREIGN KEY ("machineId") REFERENCES "machines"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "oil_level_readings" ADD CONSTRAINT "oil_level_readings_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "current_readings" ADD CONSTRAINT "current_readings_machineId_fkey" FOREIGN KEY ("machineId") REFERENCES "machines"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "current_readings" ADD CONSTRAINT "current_readings_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;

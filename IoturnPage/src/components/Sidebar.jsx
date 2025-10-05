@@ -1,45 +1,72 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { Home, LayoutDashboard, MessageCircle, LogOut } from 'lucide-react';
+import { Drawer, List, ListItemButton, ListItemIcon, Tooltip } from '@mui/material';
+import { styled } from '@mui/material/styles';
+
+const drawerWidth = 80;
+
+const StyledDrawer = styled(Drawer)(({ theme }) => ({
+  width: drawerWidth,
+  flexShrink: 0,
+  '& .MuiDrawer-paper': {
+    width: drawerWidth,
+    boxSizing: 'border-box',
+    backgroundColor: theme.palette.background.paper,
+    borderRight: `1px solid ${theme.palette.divider}`,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: theme.spacing(2, 0),
+  },
+}));
+
+const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  padding: theme.spacing(2),
+  borderRadius: theme.shape.borderRadius,
+  color: theme.palette.text.secondary,
+  '&.active': {
+    backgroundColor: theme.palette.action.hover,
+    color: theme.palette.text.primary,
+  },
+  '&:hover': {
+    backgroundColor: theme.palette.action.hover,
+  },
+}));
+
+const navLinks = [
+  { to: "/", icon: <Home />, text: "Página Inicial" },
+  { to: "/dashboard", icon: <LayoutDashboard />, text: "Dashboard" },
+  { to: "/chatbot", icon: <MessageCircle />, text: "Chatbot" },
+];
 
 const Sidebar = () => {
-  const location = useLocation();
-
-  const navLinks = [
-    { to: "/", icon: <Home />, text: "Página Inicial" },
-    { to: "/dashboard", icon: <LayoutDashboard />, text: "Dashboard" },
-    { to: "/chatbot", icon: <MessageCircle />, text: "Chatbot" },
-  ];
-
   return (
-    <aside className="bg-black text-white w-20 min-h-screen p-4 flex flex-col items-center fixed left-0 top-0">
-      <nav className="flex flex-col flex-grow gap-4">
+    <StyledDrawer variant="permanent">
+      <List>
         {navLinks.map((link) => (
-          <Link
-            key={link.to}
-            to={link.to}
-            title={link.text}
-            className={`flex items-center justify-center p-4 rounded-lg transition-colors duration-200 ${
-              location.pathname === link.to
-                ? "bg-gray-700 text-white"
-                : "hover:bg-gray-800"
-            }`}
-          >
-            <span className="text-2xl">{link.icon}</span>
-          </Link>
+          <Tooltip title={link.text} placement="right" key={link.to}>
+            <StyledListItemButton component={NavLink} to={link.to}>
+              <ListItemIcon sx={{ minWidth: 'auto', color: 'inherit' }}>
+                {link.icon}
+              </ListItemIcon>
+            </StyledListItemButton>
+          </Tooltip>
         ))}
-      </nav>
-
-      <div>
-        <Link
-          to="/"
-          title="Sair"
-          className="flex items-center justify-center p-4 rounded-lg transition-colors duration-200 hover:bg-gray-800"
-        >
-          <span className="text-2xl"><LogOut /></span>
-        </Link>
-      </div>
-    </aside>
+      </List>
+      <List>
+        <Tooltip title="Sair" placement="right">
+          <StyledListItemButton component={NavLink} to="/logout">
+            <ListItemIcon sx={{ minWidth: 'auto', color: 'inherit' }}>
+              <LogOut />
+            </ListItemIcon>
+          </StyledListItemButton>
+        </Tooltip>
+      </List>
+    </StyledDrawer>
   );
 };
 

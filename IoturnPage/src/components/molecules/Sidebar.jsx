@@ -3,6 +3,8 @@ import SidebarButton from "../atoms/SidebarButton";
 import { useNavigate } from "react-router-dom";
 import { Menu } from "lucide-react";
 
+import RetractMenuButton from "../atoms/RetractMenuButton";
+
 function Sidebar() {
     const [showBar, setShowBar] = React.useState(false);
     const [outerDiv, setOuterDiv] = React.useState("h-screen w-15 bg-slate-950 p-4 flex flex-col gap-2 md:flex hidden");
@@ -38,17 +40,25 @@ function Sidebar() {
     }, []);
 
     return (
-        <div ref={sidebarRef} className={outerDiv}>
-            <Menu className="text-white hover:text-blue-600" onClick={toggleVisibility} />
+        <>
+            <div ref={sidebarRef} className={outerDiv}>
+                <Menu className="text-white hover:text-blue-600" onClick={toggleVisibility} />
 
-            {showBar && (
-                <div className={"flex flex-col gap-2 w-40"}>
+                <RetractMenuButton buttonText={"Menu"} className={"text-white hover:text-blue-600"} innerItens={<>
                     <SidebarButton text={"Home"} onClick={() => navigate("/")} />
                     <SidebarButton text="Dashboard" onClick={() => navigate("/dashboard")} />
                     <SidebarButton text="Chat" onClick={() => navigate("/chatbot")} />
-                </div>
-            )}
-        </div>
+                </>} />
+
+                {showBar && (
+                    <div className={"flex flex-col gap-2 w-40"}>
+                        <SidebarButton text={"Home"} onClick={() => navigate("/")} />
+                        <SidebarButton text="Dashboard" onClick={() => navigate("/dashboard")} />
+                        <SidebarButton text="Chat" onClick={() => navigate("/chatbot")} />
+                    </div>
+                )}
+            </div>
+        </>
     );
 }
 

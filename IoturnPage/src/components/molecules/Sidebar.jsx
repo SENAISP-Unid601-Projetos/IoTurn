@@ -3,7 +3,8 @@ import SidebarButton from "../atoms/SidebarButton";
 import { useNavigate } from "react-router-dom";
 import { Menu } from "lucide-react";
 
-import RetractMenuButton from "../atoms/RetractMenuButton";
+// import matryoshka from '../../../matryoshka.png';
+import MatrioskaMenu from "../atoms/MatrioskaMenu";
 
 function Sidebar() {
     const [showBar, setShowBar] = React.useState(false);
@@ -19,7 +20,7 @@ function Sidebar() {
         if (showBar) {
             setOuterDiv("h-screen w-15 bg-slate-950 p-4 flex flex-col gap-2 md:flex transition-all duration-300");
         } else {
-            setOuterDiv("h-screen w-55 bg-slate-950 p-4 flex flex-col gap-2 md:flex trabsition-all duration-300");
+            setOuterDiv("h-screen w-80 bg-slate-950 p-4 flex flex-col gap-2 md:flex trabsition-all duration-300");
         }
     };
 
@@ -44,18 +45,64 @@ function Sidebar() {
             <div ref={sidebarRef} className={outerDiv}>
                 <Menu className="text-white hover:text-blue-600" onClick={toggleVisibility} />
 
-                <RetractMenuButton buttonText={"Menu"} className={"text-white hover:text-blue-600"} innerItens={<>
-                    <SidebarButton text={"Home"} onClick={() => navigate("/")} />
-                    <SidebarButton text="Dashboard" onClick={() => navigate("/dashboard")} />
-                    <SidebarButton text="Chat" onClick={() => navigate("/chatbot")} />
-                </>} />
-
                 {showBar && (
-                    <div className={"flex flex-col gap-2 w-40"}>
-                        <SidebarButton text={"Home"} onClick={() => navigate("/")} />
-                        <SidebarButton text="Dashboard" onClick={() => navigate("/dashboard")} />
-                        <SidebarButton text="Chat" onClick={() => navigate("/chatbot")} />
-                    </div>
+                    <>
+                        <div className={"flex flex-col gap-2 w-40"}>
+
+                            <MatrioskaMenu buttonText={"Monitoramento"} innerItens={
+                                <>
+
+                                    <div className="flex flex-col gap-2 w-40">
+                                        <SidebarButton text={"Máquinas"} onClick={() => navigate("#/maquinas")} />
+                                    </div>
+                                </>
+                            } />
+
+                            <SidebarButton text={"Hermes AI"} onClick={() => navigate("#/relatorios")} />
+
+                            <MatrioskaMenu buttonText={"Gerenciamento"} innerItens={
+                                <>
+                                    <SidebarButton text={"Usuários"} onClick={() => navigate("#/usuarios")} />
+                                    <SidebarButton text={"Máquinas"} onClick={() => navigate("#/maquinas")} />
+                                    <SidebarButton text={"Dispositivos"} onClick={() => navigate("#/dispositivos")} />
+                                    <SidebarButton text={"Gateways"} onClick={() => navigate("#/gateways")} />
+                                </>
+                            } />
+
+                            {/* Matrioshkas */}
+                            <div>
+                                <MatrioskaMenu buttonText={"Boneca Matrioska"} innerItens={
+                                    <>
+                                        <img src="/matryoshka.png" alt="Test" className="text-amber-50 invert-100 w-40 h-40" />
+                                        <MatrioskaMenu buttonText={"Matrioska"} innerItens={
+                                            <>
+                                                <img src="/matryoshka.png" alt="Test" className="text-amber-50 invert-100 w-35 h-35" />
+                                                <MatrioskaMenu buttonText={"Matrioska"} innerItens={
+                                                    <>
+
+                                                        <img src="/matryoshka.png" alt="Test" className="text-amber-50 invert-100 w-30 h-30" />
+                                                        <MatrioskaMenu buttonText={"Matrioska"} innerItens={
+                                                            <>
+                                                                <img src="/matryoshka.png" alt="Test" className="text-amber-50 invert-100 w-20 h-20" />
+                                                                <MatrioskaMenu buttonText={"Matrioska"} innerItens={
+                                                                    <>
+                                                                        <img src="/matryoshka.png" alt="Test" className="text-amber-50 invert-100 w-20 h-20" />
+
+                                                                    </>
+                                                                } />
+                                                            </>
+                                                        } />
+                                                    </>
+                                                } />
+                                            </>
+                                        } />
+                                    </>
+                                } />
+                            </div>
+
+
+                        </div>
+                    </>
                 )}
             </div>
         </>

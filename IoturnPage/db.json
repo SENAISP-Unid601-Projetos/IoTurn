@@ -1,0 +1,63 @@
+{
+  "machines": [
+    {
+      "id": 1,
+      "name": "Torno CNC",
+      "sector": "Setor A",
+      "machineId": "HELTEC-A8F3B2",
+      "company": "Indústria Metalúrgica Silva LTDA",
+      "lastUpdate": "2 min atrás",
+      "status": "online"
+    },
+    {
+      "id": 2,
+      "name": "Fresadora",
+      "sector": "Setor B",
+      "machineId": "HELTEC-C4D9E1",
+      "company": "Fábrica de Componentes Tech SA",
+      "lastUpdate": "1 min atrás",
+      "status": "alert"
+    },
+    {
+      "id": 3,
+      "name": "Prensa Hidráulica",
+      "sector": "Setor C",
+      "machineId": "HELTEC-F7A2C8",
+      "company": "Manufatura Industrial Brasil",
+      "lastUpdate": "15 min atrás",
+      "status": "offline"
+    }
+  ],
+  "metrics": [
+    {
+      "id": 1,
+      "machineId": 1,
+      "metrics": [
+        { "name": "RPM", "value": "1520", "unit": "", "status": "normal" },
+        { "name": "Temp", "value": "72", "unit": "°C", "status": "normal" },
+        { "name": "Óleo", "value": "85", "unit": "%", "status": "normal" },
+        { "name": "Corrente", "value": "12.3", "unit": "A", "status": "normal" }
+      ]
+    },
+    {
+      "id": 2,
+      "machineId": 2,
+      "metrics": [
+        { "name": "RPM", "value": "1680", "unit": "", "status": "normal" },
+        { "name": "Temp", "value": "82", "unit": "°C", "status": "warning" },
+        { "name": "Óleo", "value": "78", "unit": "%", "status": "normal" },
+        { "name": "Corrente", "value": "14.1", "unit": "A", "status": "normal" }
+      ]
+    },
+    {
+      "id": 3,
+      "machineId": 3,
+      "metrics": [
+        { "name": "RPM", "value": "8", "unit": "", "status": "danger" },
+        { "name": "Temp", "value": "45", "unit": "°C", "status": "normal" },
+        { "name": "Óleo", "value": "92", "unit": "%", "status": "normal" },
+        { "name": "Corrente", "value": "0", "unit": "A", "status": "danger" }
+      ]
+    }
+  ]
+}

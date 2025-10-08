@@ -1,18 +1,14 @@
 import React from 'react';
-// Importe os componentes MUI que ainda usamos
 import { Card, CardContent, Typography, Box, Grid, useTheme } from '@mui/material';
-
-// 1. IMPORTE OS ÍCONES DO LUCIDE-REACT
 import { ArrowRight, GaugeCircle, Thermometer, Droplets, Zap } from 'lucide-react';
 
-// Os objetos de cores continuam os mesmos
 const statusColors = {
   online: '#238636',
   alert: '#dbab09',
   offline: '#8b949e',
 };
 
-// 2. ATUALIZE O ICONMAP COM OS ÍCONES DO LUCIDE
+//Itens Lucide
 const iconMap = {
   RPM: GaugeCircle,
   Temp: Thermometer,
@@ -28,7 +24,6 @@ const metricValueColors = {
 
 
 const MachineCard = ({ machine }) => {
-  // 3. PEGUE O TEMA ATUAL DO MUI PARA USAR AS CORES
   const theme = useTheme();
 
   return (
@@ -50,7 +45,6 @@ const MachineCard = ({ machine }) => {
             backgroundColor: statusColors[machine.status] || 'grey.500'
           }} />
           
-          {/* 4. SUBSTITUA O ÍCONE MUI PELO LUCIDE E USE AS PROPS DE ESTILO */}
           <ArrowRight color={theme.palette.text.secondary} size={20} />
         </Box>
 
@@ -66,7 +60,6 @@ const MachineCard = ({ machine }) => {
         <Grid container spacing={2} sx={{ mt: 2 }}>
           {machine.metrics.map((metric) => {
             const IconComponent = iconMap[metric.name];
-            // Resolve a cor do texto da métrica a partir do tema
             let metricColor = theme.palette.text.primary;
             if (metric.status === 'warning') metricColor = theme.palette.warning.main;
             if (metric.status === 'danger') metricColor = theme.palette.error.main;
@@ -75,11 +68,10 @@ const MachineCard = ({ machine }) => {
               <Grid item xs={6} key={metric.name}>
                 <Typography variant="body2" sx={{ color: 'text.secondary', display: 'flex', alignItems: 'center', mb: 0.5 }}>
                   
-                  {/* 5. FAÇA O MESMO PARA OS ÍCONES DAS MÉTRICAS */}
                   <IconComponent
                     color={theme.palette.text.secondary}
                     size={16}
-                    style={{ marginRight: theme.spacing(0.5) }} // use a 'style' prop para margem
+                    style={{ marginRight: theme.spacing(0.5) }} 
                   />
                   {metric.name}
                 </Typography>

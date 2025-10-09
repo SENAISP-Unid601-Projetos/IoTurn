@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from '../../components/Sidebar';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import MachineCard from '../../components/MachineCards';
+import MachineCard from '../../components/MachineCard';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import { fetchAllMachineData } from '../../services/machineService'; 

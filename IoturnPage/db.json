@@ -56,7 +56,7 @@
         { "name": "RPM", "value": "8", "unit": "", "status": "danger" },
         { "name": "Temp", "value": "45", "unit": "°C", "status": "normal" },
         { "name": "Óleo", "value": "92", "unit": "%", "status": "normal" },
-        { "name": "Corrente", "value": "0", "unit": "A", "status": "danger" }
+        { "name": "Corrente", "value": "57", "unit": "A", "status": "danger" }
       ]
     }
   ]

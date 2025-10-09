@@ -15,13 +15,13 @@ function MatrioskaMenu({ buttonText, innerItens, className }) {
                 onClick={() => setIsRetracted(!isRetracted)}
             >
                 <span>{buttonText}</span>
-                <ChevronRight
+                <ChevronRight strokeWidth={5} size={20}
                     className={`transition-transform duration-300 ${!isRetracted ? "rotate-90" : "rotate-0"}`}
                 />
             </button>
 
             {!isRetracted && (
-                <div className="ml-3 mt-1">
+                <div className="ml-6 mt-1">
                     {innerItens}
                 </div>
             )}

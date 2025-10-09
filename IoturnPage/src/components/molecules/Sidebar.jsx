@@ -1,112 +1,136 @@
 import React, { useEffect, useRef } from "react";
 import SidebarButton from "../atoms/SidebarButton";
 import { useNavigate } from "react-router-dom";
-import { Menu } from "lucide-react";
+import { Menu, User, Bot, List, Cpu, WifiCog, Eye, Settings } from "lucide-react";
 
 // import matryoshka from '../../../matryoshka.png';
 import MatrioskaMenu from "../atoms/MatrioskaMenu";
 
 function Sidebar() {
-    const [showBar, setShowBar] = React.useState(false);
-    const [outerDiv, setOuterDiv] = React.useState("h-screen w-15 bg-slate-950 p-4 flex flex-col gap-2 md:flex hidden");
-    const navigate = useNavigate();
+  const [showBar, setShowBar] = React.useState(false);
+  const [outerDiv, setOuterDiv] = React.useState(
+    "h-screen w-15 bg-slate-950 p-4 flex flex-col gap-2 md:flex hidden"
+  );
+  const navigate = useNavigate();
 
-    // Cria ref para a div do sidebar
-    const sidebarRef = useRef(null);
+  // Cria ref para a div do sidebar
+  const sidebarRef = useRef(null);
+  const toggleVisibility = () => {
+    setShowBar(!showBar);
 
-    const toggleVisibility = () => {
-        setShowBar(!showBar);
+    if (showBar) {
+      setOuterDiv(
+        "h-screen w-15 bg-slate-950 p-4 flex flex-col gap-2 md:flex transition-all duration-300"
+      );
+    } else {
+      setOuterDiv(
+        "h-screen w-50 bg-slate-950 p-4 flex flex-col gap-2 md:flex trabsition-all duration-300"
+      );
+    }
+  };
 
-        if (showBar) {
-            setOuterDiv("h-screen w-15 bg-slate-950 p-4 flex flex-col gap-2 md:flex transition-all duration-300");
-        } else {
-            setOuterDiv("h-screen w-80 bg-slate-950 p-4 flex flex-col gap-2 md:flex trabsition-all duration-300");
-        }
+  // Detectar clique fora da sidebar
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+        setShowBar(false);
+        setOuterDiv(
+          "h-screen w-15 bg-slate-950 p-4 flex flex-col gap-2 md:flex transition-all duration-300"
+        );
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
     };
+  }, []);
 
-    // Detectar clique fora da sidebar
-    useEffect(() => {
-        function handleClickOutside(event) {
-            if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
-                setShowBar(false);
-                setOuterDiv("h-screen w-15 bg-slate-950 p-4 flex flex-col gap-2 md:flex transition-all duration-300");
-            }
-        }
+  return (
+    <>
+      <div ref={sidebarRef} className={outerDiv}>
+        <Menu
+          className="text-white hover:text-blue-600"
+          onClick={toggleVisibility}
+        />
 
-        document.addEventListener("mousedown", handleClickOutside);
-
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
-
-    return (
-        <>
-            <div ref={sidebarRef} className={outerDiv}>
-                <Menu className="text-white hover:text-blue-600" onClick={toggleVisibility} />
-
-                {showBar && (
+        {showBar && (
+          <>
+              <div className="flex flex-col gap-2 w-40">
+                <SidebarButton
+                  text={
                     <>
-                        <div className={"flex flex-col gap-2 w-40"}>
-
-                            <MatrioskaMenu buttonText={"Monitoramento"} innerItens={
-                                <>
-
-                                    <div className="flex flex-col gap-2 w-40">
-                                        <SidebarButton text={"Máquinas"} onClick={() => navigate("#/maquinas")} />
-                                    </div>
-                                </>
-                            } />
-
-                            <SidebarButton text={"Hermes AI"} onClick={() => navigate("#/relatorios")} />
-
-                            <MatrioskaMenu buttonText={"Gerenciamento"} innerItens={
-                                <>
-                                    <SidebarButton text={"Usuários"} onClick={() => navigate("#/usuarios")} />
-                                    <SidebarButton text={"Máquinas"} onClick={() => navigate("#/maquinas")} />
-                                    <SidebarButton text={"Dispositivos"} onClick={() => navigate("#/dispositivos")} />
-                                    <SidebarButton text={"Gateways"} onClick={() => navigate("#/gateways")} />
-                                </>
-                            } />
-
-                            {/* Matrioshkas */}
-                            <div>
-                                <MatrioskaMenu buttonText={"Boneca Matrioska"} innerItens={
-                                    <>
-                                        <img src="/matryoshka.png" alt="Test" className="text-amber-50 invert-100 w-40 h-40" />
-                                        <MatrioskaMenu buttonText={"Matrioska"} innerItens={
-                                            <>
-                                                <img src="/matryoshka.png" alt="Test" className="text-amber-50 invert-100 w-35 h-35" />
-                                                <MatrioskaMenu buttonText={"Matrioska"} innerItens={
-                                                    <>
-
-                                                        <img src="/matryoshka.png" alt="Test" className="text-amber-50 invert-100 w-30 h-30" />
-                                                        <MatrioskaMenu buttonText={"Matrioska"} innerItens={
-                                                            <>
-                                                                <img src="/matryoshka.png" alt="Test" className="text-amber-50 invert-100 w-20 h-20" />
-                                                                <MatrioskaMenu buttonText={"Matrioska"} innerItens={
-                                                                    <>
-                                                                        <img src="/matryoshka.png" alt="Test" className="text-amber-50 invert-100 w-20 h-20" />
-
-                                                                    </>
-                                                                } />
-                                                            </>
-                                                        } />
-                                                    </>
-                                                } />
-                                            </>
-                                        } />
-                                    </>
-                                } />
-                            </div>
-
-
-                        </div>
+                      <div className="flex">
+                        <Eye className="pr-2" />
+                        Máquinas
+                      </div>
                     </>
-                )}
+                  }
+                  onClick={() => navigate("#/maquinas")}
+                />
+
+              <SidebarButton
+                text={
+                  <div className="flex">
+                    {" "}
+                    <Bot className="pr-2" /> Hermes AI
+                  </div>
+                }
+                onClick={() => navigate("#/relatorios")}
+              />
+
+              <MatrioskaMenu
+                buttonText={<><div className="flex"><Settings className="pr-2"/>Gerenciamento </div></>}
+                innerItens={
+                  <>
+                    <SidebarButton
+                      text={
+                        <>
+                          <div className="flex">
+                            <User className="pr-2" /> Usuários
+                          </div>{" "}
+                        </>
+                      }
+                      onClick={() => navigate("#/usuarios")}
+                    />
+                    <SidebarButton
+                      text={
+                        <>
+                          <div className="flex">
+                            <List className="pr-2" /> Máquinas
+                          </div>{" "}
+                        </>
+                      }
+                      onClick={() => navigate("#/maquinas")}
+                    />
+                    <SidebarButton
+                      text={
+                        <>
+                          <div className="flex">
+                            <Cpu className="pr-2" /> Dispositivos
+                          </div>{" "}
+                        </>
+                      }
+                      onClick={() => navigate("#/dispositivos")}
+                    />
+                    <SidebarButton
+                      text={
+                        <div className="flex">
+                          <WifiCog className="pr-2" /> Gateways
+                        </div>
+                      }
+                      onClick={() => navigate("#/gateways")}
+                    />
+                  </>
+                }
+              />
             </div>
-        </>
-    );
+          </>
+        )}
+      </div>
+    </>
+  );
 }
 
 export default Sidebar;

@@ -18,34 +18,37 @@ import {
   IconButton,
   List as MUIList,
   Collapse,
-  Button, // Importação adicionada
+  Button,
 } from "@mui/material";
 
 // 1. Componente interno reutilizável para os botões da sidebar
-function SidebarButton({ text, icon, onClick }) {
+function SidebarButton({ text, icon, onClick, pad_ding }) {
   return (
-    <Button
-      variant="text"
-      fullWidth
-      onClick={onClick}
-      // A propriedade startIcon é a forma ideal do MUI para adicionar ícones
-      startIcon={icon}
-      sx={{
-        justifyContent: "flex-start",
-        color: "white",
-        textTransform: "none",
-        borderRadius: "8px",
-        padding: "8px 16px", // Ajuste no padding para alinhar com ListItemButton
-        gap: 2, // Espaçamento entre ícone e texto
-        transition: "0.3s",
-        "&:hover": {
-          color: "#2563eb", // azul-600
-          backgroundColor: "#1e293b", // slate-800
-        },
-      }}
-    >
-      {text}
-    </Button>
+    <>
+      <Button
+        variant="text"
+        fullWidth
+        onClick={onClick}
+        // A propriedade startIcon é a forma ideal do MUI para adicionar ícones
+        startIcon={icon}
+        sx={{
+          justifyContent: "flex-start",
+          color: "white",
+          textTransform: "none",
+          borderRadius: "8px",
+          padding: "8px 16px", // Ajuste no padding para alinhar com ListItemButton
+          paddingTop: pad_ding ? pad_ding : 1,
+          gap: 2, // Espaçamento entre ícone e texto
+          transition: "0.3s",
+          "&:hover": {
+            color: "primary.main", // azul-600
+            bgColor: "background.paper", // slate-800
+          },
+        }}
+      >
+        {text}
+      </Button>
+    </>
   );
 }
 
@@ -84,8 +87,13 @@ function Sidebar() {
           onClick={toggleSidebar}
           sx={{
             color: "white",
-            bgcolor: "#020617",
-            "&:hover": { color: "#2563eb", bgcolor: "#1e293b" },
+            bgcolor: "background.default",
+            marginLeft: open ? 22.5 : 1,
+            "&:hover": {
+              color: "background.default",
+              bgcolor: "background.paper",
+            },
+            transition: "0.3s",
           }}
         >
           <Menu />
@@ -99,7 +107,7 @@ function Sidebar() {
         open={open}
         PaperProps={{
           sx: {
-            bgcolor: "#020617",
+            bgcolor: "background.default",
             color: "white",
             width: 240,
             padding: "16px",
@@ -111,6 +119,7 @@ function Sidebar() {
           <MUIList sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
             {/* Itens do Menu usando o novo componente */}
             <SidebarButton
+              pad_ding={6}
               text="Máquinas"
               icon={<Eye color="white" />}
               onClick={() => navigate("#/maquinas")}
@@ -130,7 +139,9 @@ function Sidebar() {
             />
 
             <Collapse in={showGerenciamento} timeout="auto" unmountOnExit>
-              <MUIList sx={{ pl: 2, display: "flex", flexDirection: "column", gap: 1 }}>
+              <MUIList
+                sx={{ pl: 2, display: "flex", flexDirection: "column", gap: 1 }}
+              >
                 <SidebarButton
                   text="Usuários"
                   icon={<User color="white" />}

@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../../components/Sidebar';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
+import { Box, Typography, CircularProgress, Alert, useTheme,Divider } from '@mui/material';
 import MachineCard from '../../components/MachineCard';
-import CircularProgress from '@mui/material/CircularProgress';
-import Alert from '@mui/material/Alert';
 import { fetchAllMachineData } from '../../services/machineService';
-import Grid from '@mui/material/Grid';
+import { Activity } from 'lucide-react';
+
 
 const DashboardSelectionPage = () => {
   const [machines, setMachines] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedMachineId, setSelectedMachineId] = useState(null); 
+  const theme = useTheme();
 
   useEffect(() => {
     const loadData = async () => {
@@ -82,12 +81,16 @@ const DashboardSelectionPage = () => {
     <Box sx={{ display: 'flex', minHeight: '100vh', backgroundColor: 'background.default' }}>
       <Sidebar selectedMachineId={selectedMachineId} />
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h4">Selecionar Máquina</Typography>
-          <Typography sx={{ color: 'text.secondary' }}>
+         <Box sx={{ mb: 4 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
+            <Activity color={theme.palette.text.primary} size={30} />
+            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Máquinas disponíveis</Typography>
+          </Box>
+          <Typography sx={{ color: 'text.secondary', pl: '48px' }}>
             Escolha uma máquina para monitorar
           </Typography>
         </Box>
+         <Divider sx={{ my: 4 }} /> 
         {renderContent()}
       </Box>
     </Box>

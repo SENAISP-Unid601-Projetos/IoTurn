@@ -34,11 +34,12 @@ const MachineCard = ({ machine, isSelected, onClick }) => {
         borderRadius: 3,
         color: 'text.primary',
         cursor: 'pointer',
-        border: `2px solid ${isSelected ? theme.palette.primary.main : 'transparent'}`,
-        transition: 'border-color 0.2s ease-in-out',
+        border: `1px solid ${isSelected ? theme.palette.primary.main : 'transparent'}`,
+        transition: 'border-color 0.1s ease-in-out',
         '&:hover': {
-          borderColor: isSelected ? theme.palette.primary.main : theme.palette.action.hover,
+          borderColor: isSelected ? theme.palette.primary.main : theme.palette.primary.dark,
         },
+
       }}
     >
       <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>

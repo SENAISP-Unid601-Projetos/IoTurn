@@ -95,7 +95,7 @@ export const sensoresReadingRepository = {
             throw new Error("Falha ao acessar o banco de dados para guardar a CORRENTE.");
         }
     },
-    findLastCurrentData: async (machineId: number, reconstructionTime: Date): Promise<LastReadingResult> => {
+    findLastCurrentData: async (machineId: number, reconstructionTime?: Date): Promise<LastReadingResult> => {
         try {
             const result = await prisma.currentReading.findFirst({
                 select: {
@@ -105,7 +105,7 @@ export const sensoresReadingRepository = {
                 where: {
                     machineId: machineId,
                     timestamp: {
-                        lte: reconstructionTime
+                        lte: reconstructionTime || new Date()
                     }
                 },
                 orderBy: {
@@ -120,7 +120,7 @@ export const sensoresReadingRepository = {
             throw error;
         }
     },
-    findLastRpmData: async (machineId: number, reconstructionTime: Date): Promise<LastReadingResult> => {
+    findLastRpmData: async (machineId: number, reconstructionTime?: Date): Promise<LastReadingResult> => {
         try {
             const result = await prisma.rpmReading.findFirst({
                 select: {
@@ -130,7 +130,7 @@ export const sensoresReadingRepository = {
                 where: {
                     machineId: machineId,
                     timestamp: {
-                        lte: reconstructionTime
+                        lte: reconstructionTime || new Date()
                     }
                 },
                 orderBy: {
@@ -145,7 +145,7 @@ export const sensoresReadingRepository = {
             throw error;
         }
     },
-    findLastOilTemperatureData: async (machineId: number, reconstructionTime: Date): Promise<LastReadingResult> => {
+    findLastOilTemperatureData: async (machineId: number, reconstructionTime?: Date): Promise<LastReadingResult> => {
         try {
             const result = await prisma.oilTemperatureReading.findFirst({
                 select: {
@@ -155,7 +155,7 @@ export const sensoresReadingRepository = {
                 where: {
                     machineId: machineId,
                     timestamp: {
-                        lte: reconstructionTime
+                        lte: reconstructionTime || new Date()
                     }
                 },
                 orderBy: {
@@ -170,7 +170,7 @@ export const sensoresReadingRepository = {
             throw error;
         }
     },
-    findLastOilLevelData: async (machineId: number, reconstructionTime: Date): Promise<LastReadingResult> => {
+    findLastOilLevelData: async (machineId: number, reconstructionTime?: Date): Promise<LastReadingResult> => {
         try {
             const result = await prisma.oilLevelReading.findFirst({
                 select: {
@@ -180,7 +180,7 @@ export const sensoresReadingRepository = {
                 where: {
                     machineId: machineId,
                     timestamp: {
-                        lte: reconstructionTime
+                        lte: reconstructionTime || new Date()
                     }
                 },
                 orderBy: {

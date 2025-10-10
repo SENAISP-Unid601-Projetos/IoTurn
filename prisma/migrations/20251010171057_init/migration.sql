@@ -94,7 +94,6 @@ CREATE TABLE "UnifiedMachineState" (
     "rpmIsMissing" BOOLEAN NOT NULL DEFAULT false,
     "oilTemperatureIsMissing" BOOLEAN NOT NULL DEFAULT false,
     "oilLevelIsMissing" BOOLEAN NOT NULL DEFAULT false,
-    "inferredState" TEXT,
 
     CONSTRAINT "UnifiedMachineState_pkey" PRIMARY KEY ("id")
 );

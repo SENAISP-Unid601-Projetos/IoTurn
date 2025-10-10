@@ -13,6 +13,10 @@ const createMachineBodySchema = z.object({
     clientId: z.number(),
     responsibleUserId: z.number(),
 });
+
+const idParamSchema = z.object({
+    id: z.string().regex(/^\d+$/, { message: "ID must be a number" })
+});
 export const machineController = {
     createMachineController: async (request: FastifyRequest, reply: FastifyReply): Promise<void> =>{
         try {
@@ -39,5 +43,24 @@ export const machineController = {
             return reply.status(500).send({error: "Erro interno do servidor ao criar máquina."});
         }
 
+    },
+    getAllUsersMachineController: async(request: FastifyRequest, reply: FastifyReply): Promise<void> =>{
+        try {
+            const paramsValidation = idParamSchema.safeParse(request.params);
+            if (!paramsValidation.success) {
+                reply.status(400).send({ message: 'Invalid request parameters', errors: paramsValidation.error.message });
+                return;
+            }
+            const userId = parseInt((paramsValidation.data as {id: string}).id, 10);
+            if (isNaN(userId)) {
+                reply.status(400).send({ message: 'Invalid user ID' });
+                return;
+            }
+            const packageData = await machineService.getAllUsersMachine(userId);
+            return reply.status(200).send(packageData);
+        } catch (error) {
+            console.error("Erro ao buscar máquinas do usuário:", error);
+            return reply.status(500).send({error: "Erro interno do servidor ao buscar máquinas do usuário."});
+        }
     }
 }

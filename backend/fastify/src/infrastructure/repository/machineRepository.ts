@@ -1,4 +1,5 @@
 import { Prisma, PrismaClient, Status, Machine } from "@prisma/client";
+import { id } from "zod/v4/locales";
 
 const prisma = new PrismaClient();
 
@@ -57,5 +58,16 @@ export const machineRepository = {
             return -1; 
         }
     },
+    findAllUsersMachine: async(id: number): Promise<Machine[] | null> => {
+        try {
+            const machines = await prisma.machine.findMany({
+                where: { clientId: id },
+            });
+            return machines;
+        } catch (err) {
+            console.error("Erro ao buscar máquinas do usuário:", err);
+            return null; 
+        }
+    }
     
 };

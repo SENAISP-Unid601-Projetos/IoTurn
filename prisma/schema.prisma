@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://usuario:senha123@localhost:5432/ioturn"
+  url      = "postgresql://ioturn601:senaicfp601@10.110.12.12:5432/ioturn"
 }
 
 model InteracaoIA {

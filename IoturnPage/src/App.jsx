@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route } from 'react-router-dom';
 import Chat from "./pages/Chat";
-import Sidebar from "./components/Sidebar";
+import DashboardSelector from "./pages/Dashbord/DashboardSelector";
 
 function App() {
   return (

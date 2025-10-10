@@ -6,7 +6,7 @@ import DashboardSelector from "./pages/Dashbord/DashboardSelector";
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<DashboardSelector/>} /> 
+      <Route path="/" element={<Sidebar />} /> 
     </Routes>
   );
 }

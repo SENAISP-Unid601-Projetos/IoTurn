@@ -1,18 +1,28 @@
 import React from "react";
+import Button from "@mui/material/Button";
 
 function SidebarButton({ text, onClick, className }) {
   return (
-    <button
-      type="button"
+    <Button
+      variant="text"
+      fullWidth
       onClick={onClick}
-      className={
-        className
-          ? className
-          : "text-white hover:text-blue-600 p-2 rounded-md w-full text-left hover:bg-slate-800 transition-colors duration-300"
-      }
+      sx={{
+        justifyContent: "flex-start",
+        color: "white",
+        textTransform: "none",
+        borderRadius: "8px",
+        padding: "8px",
+        transition: "0.3s",
+        "&:hover": {
+          color: "#2563eb", // azul-600 do Tailwind
+          backgroundColor: "#1e293b", // slate-800
+        },
+      }}
+      className={className}
     >
       {text}
-    </button>
+    </Button>
   );
 }
 

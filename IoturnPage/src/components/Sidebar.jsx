@@ -1,73 +1,163 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
-import { Home, LayoutDashboard, MessageCircle, LogOut } from 'lucide-react';
-import { Drawer, List, ListItemButton, ListItemIcon, Tooltip } from '@mui/material';
-import { styled } from '@mui/material/styles';
+// src/components/Sidebar.jsx
 
-const drawerWidth = 80;
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Menu,
+  User,
+  Bot,
+  List,
+  Cpu,
+  WifiCog,
+  Eye,
+  Settings,
+} from "lucide-react";
+import {
+  Box,
+  Drawer,
+  IconButton,
+  List as MUIList,
+  Collapse,
+  Button, // Importação adicionada
+} from "@mui/material";
 
-const StyledDrawer = styled(Drawer)(({ theme }) => ({
-  width: drawerWidth,
-  flexShrink: 0,
-  '& .MuiDrawer-paper': {
-    width: drawerWidth,
-    boxSizing: 'border-box',
-    backgroundColor: theme.palette.background.paper,
-    borderRight: `1px solid ${theme.palette.divider}`,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: theme.spacing(2, 0),
-  },
-}));
-
-const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
-  display: 'flex',
-  justifyContent: 'center',
-  padding: theme.spacing(2),
-  borderRadius: theme.shape.borderRadius,
-  color: theme.palette.text.secondary,
-  '&.active': {
-    backgroundColor: theme.palette.action.hover,
-    color: theme.palette.text.primary,
-  },
-  '&:hover': {
-    backgroundColor: theme.palette.action.hover,
-  },
-}));
-
-const navLinks = [
-  { to: "/", icon: <Home />, text: "Página Inicial" },
-  { to: "/dashboard", icon: <LayoutDashboard />, text: "Dashboard" },
-  { to: "/chatbot", icon: <MessageCircle />, text: "Chatbot" },
-];
-
-const Sidebar = () => {
+// 1. Componente interno reutilizável para os botões da sidebar
+function SidebarButton({ text, icon, onClick }) {
   return (
-    <StyledDrawer variant="permanent">
-      <List>
-        {navLinks.map((link) => (
-          <Tooltip title={link.text} placement="right" key={link.to}>
-            <StyledListItemButton component={NavLink} to={link.to}>
-              <ListItemIcon sx={{ minWidth: 'auto', color: 'inherit' }}>
-                {link.icon}
-              </ListItemIcon>
-            </StyledListItemButton>
-          </Tooltip>
-        ))}
-      </List>
-      <List>
-        <Tooltip title="Sair" placement="right">
-          <StyledListItemButton component={NavLink} to="/logout">
-            <ListItemIcon sx={{ minWidth: 'auto', color: 'inherit' }}>
-              <LogOut />
-            </ListItemIcon>
-          </StyledListItemButton>
-        </Tooltip>
-      </List>
-    </StyledDrawer>
+    <Button
+      variant="text"
+      fullWidth
+      onClick={onClick}
+      // A propriedade startIcon é a forma ideal do MUI para adicionar ícones
+      startIcon={icon}
+      sx={{
+        justifyContent: "flex-start",
+        color: "white",
+        textTransform: "none",
+        borderRadius: "8px",
+        padding: "8px 16px", // Ajuste no padding para alinhar com ListItemButton
+        gap: 2, // Espaçamento entre ícone e texto
+        transition: "0.3s",
+        "&:hover": {
+          color: "#2563eb", // azul-600
+          backgroundColor: "#1e293b", // slate-800
+        },
+      }}
+    >
+      {text}
+    </Button>
   );
-};
+}
+
+// 2. Componente principal da Sidebar
+function Sidebar() {
+  const [open, setOpen] = useState(false);
+  const [showGerenciamento, setShowGerenciamento] = useState(false);
+  const navigate = useNavigate();
+  const sidebarRef = useRef(null);
+
+  const toggleSidebar = () => setOpen((prev) => !prev);
+
+  // Fecha o sidebar ao clicar fora
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <>
+      {/* Botão para abrir/fechar a sidebar */}
+      <Box
+        sx={{
+          position: "fixed",
+          top: "16px",
+          left: "16px",
+          zIndex: 1300,
+        }}
+      >
+        <IconButton
+          onClick={toggleSidebar}
+          sx={{
+            color: "white",
+            bgcolor: "#020617",
+            "&:hover": { color: "#2563eb", bgcolor: "#1e293b" },
+          }}
+        >
+          <Menu />
+        </IconButton>
+      </Box>
+
+      {/* Drawer (a própria sidebar) */}
+      <Drawer
+        variant="persistent"
+        anchor="left"
+        open={open}
+        PaperProps={{
+          sx: {
+            bgcolor: "#020617",
+            color: "white",
+            width: 240,
+            padding: "16px",
+            borderRight: "none", // Opcional: remove a borda padrão
+          },
+        }}
+      >
+        <Box ref={sidebarRef}>
+          <MUIList sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+            {/* Itens do Menu usando o novo componente */}
+            <SidebarButton
+              text="Máquinas"
+              icon={<Eye color="white" />}
+              onClick={() => navigate("#/maquinas")}
+            />
+
+            <SidebarButton
+              text="Hermes AI"
+              icon={<Bot color="white" />}
+              onClick={() => navigate("#/relatorios")}
+            />
+
+            {/* Menu de Gerenciamento (Collapsible) */}
+            <SidebarButton
+              text="Gerenciamento"
+              icon={<Settings color="white" />}
+              onClick={() => setShowGerenciamento(!showGerenciamento)}
+            />
+
+            <Collapse in={showGerenciamento} timeout="auto" unmountOnExit>
+              <MUIList sx={{ pl: 2, display: "flex", flexDirection: "column", gap: 1 }}>
+                <SidebarButton
+                  text="Usuários"
+                  icon={<User color="white" />}
+                  onClick={() => navigate("#/usuarios")}
+                />
+                <SidebarButton
+                  text="Máquinas"
+                  icon={<List color="white" />}
+                  onClick={() => navigate("#/maquinas-gerenciamento")} // Rota ajustada para diferenciar
+                />
+                <SidebarButton
+                  text="Dispositivos"
+                  icon={<Cpu color="white" />}
+                  onClick={() => navigate("#/dispositivos")}
+                />
+                <SidebarButton
+                  text="Gateways"
+                  icon={<WifiCog color="white" />}
+                  onClick={() => navigate("#/gateways")}
+                />
+              </MUIList>
+            </Collapse>
+          </MUIList>
+        </Box>
+      </Drawer>
+    </>
+  );
+}
 
 export default Sidebar;

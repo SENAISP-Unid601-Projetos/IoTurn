@@ -83,7 +83,7 @@ const DashboardSelectionPage = () => {
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
          <Box sx={{ mb: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
-            <Activity color={theme.palette.text.primary} size={30} />
+            <Activity color={theme.palette.primary.dark} size={30}/>
             <Typography variant="h4" sx={{ fontWeight: 'bold' }}>Máquinas disponíveis</Typography>
           </Box>
           <Typography sx={{ color: 'text.secondary', pl: '48px' }}>

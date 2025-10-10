@@ -2,3 +2,5 @@ pandas
 scikit-learn 
 joblib
 requests
+matplotlib
+seaborn

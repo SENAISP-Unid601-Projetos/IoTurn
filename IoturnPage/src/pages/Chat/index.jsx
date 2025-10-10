@@ -1,25 +1,233 @@
 import React, { useState, useEffect, useRef } from "react";
-import ChatMessage from "../../components/ChatMessage";
-import TypingIndicator from "../../components/TypingIndicator";
-import Sidebar from "../../components/Sidebar";
-import { Send, Sparkles } from "lucide-react";
-import "./chat.css";
+import {
+  Send,
+  Sparkles,
+  ThumbsUp,
+  ThumbsDown,
+  User,
+  Omega,
+} from "lucide-react";
+import {
+  Box,
+  Container,
+  TextField,
+  IconButton,
+  Stack,
+  Avatar,
+  Typography,
+  Divider,
+  CssBaseline,
+  Paper,
+  Button,
+} from "@mui/material";
+import { keyframes } from "@mui/system";
+import ApiService from "../../scripts/ApiServices.js";
 
-const API_BASE_URL = "http://10.110.12.12:3000";
+const waveAnimation = keyframes`
+  0%, 60%, 100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-6px);
+  }
+`;
+
+const TypingIndicator = () => (
+  <Stack direction="row" spacing={1.5} alignItems="center">
+    <Avatar
+      variant="rounded"
+      sx={{
+        width: 40,
+        height: 40,
+        bgcolor: "background.paper",
+        border: "1px solid",
+        borderColor: "divider",
+      }}
+    >
+      <Omega size={24} color="#2979ff" />
+    </Avatar>
+    <Paper
+      elevation={0}
+      sx={{
+        p: 1.5,
+        borderRadius: "12px",
+        bgcolor: "background.paper",
+        border: "1px solid",
+        borderColor: "divider",
+      }}
+    >
+      <Stack direction="row" spacing={0.5} alignItems="center">
+        <Box
+          sx={{
+            width: 8,
+            height: 8,
+            bgcolor: "text.secondary",
+            borderRadius: "50%",
+            animation: `${waveAnimation} 1.2s infinite`,
+            animationDelay: "0s",
+          }}
+        />
+        <Box
+          sx={{
+            width: 8,
+            height: 8,
+            bgcolor: "text.secondary",
+            borderRadius: "50%",
+            animation: `${waveAnimation} 1.2s infinite`,
+            animationDelay: "0.2s",
+          }}
+        />
+        <Box
+          sx={{
+            width: 8,
+            height: 8,
+            bgcolor: "text.secondary",
+            borderRadius: "50%",
+            animation: `${waveAnimation} 1.2s infinite`,
+            animationDelay: "0.4s",
+          }}
+        />
+      </Stack>
+    </Paper>
+  </Stack>
+);
+
+const ChatMessage = ({ message, onFeedback }) => {
+  const [feedback, setFeedback] = useState({ rated: false, selection: null });
+
+  const handleFeedbackClick = (isLike) => {
+    setFeedback({ rated: true, selection: isLike ? "like" : "dislike" });
+    if (onFeedback) onFeedback(message.id, isLike);
+  };
+
+  const isUser = message.sender === "user";
+  if (isUser) {
+    return (
+      <Stack
+        direction="row"
+        spacing={1.5}
+        alignItems="flex-start"
+        justifyContent="flex-end"
+      >
+        <Typography
+          sx={{
+            p: 1.5,
+            borderRadius: "12px",
+            bgcolor: "primary.main",
+            color: "primary.contrastText",
+            maxWidth: "75%",
+          }}
+        >
+          {message.text}
+        </Typography>
+      </Stack>
+    );
+  }
+
+  return (
+    <Stack
+      direction="row"
+      spacing={1.5}
+      alignItems="flex-start"
+      sx={{ maxWidth: "75%" }}
+    >
+      <Avatar
+        variant="rounded"
+        sx={{
+          width: 40,
+          height: 40,
+          bgcolor: "background.default",
+          border: "1px solid",
+          borderColor: "divider",
+          mt: 0.5,
+        }}
+      >
+        <Omega size={24} color="#2979ff" />
+      </Avatar>
+      <Paper
+        elevation={0}
+        sx={{
+          p: 2,
+          borderRadius: "12px",
+          bgcolor: "background.paper",
+          border: "1px solid",
+          borderColor: "divider",
+          width: "100%",
+        }}
+      >
+        <Stack spacing={1}>
+          {message.question ? (
+            <Typography variant="body1">
+              Recebi sua pergunta: "{message.question}"
+            </Typography>
+          ) : (
+            <Typography variant="h6">Hermes AI</Typography>
+          )}
+          <Typography variant="body1">{message.text}</Typography>
+          {message.question && (
+            <>
+              <Divider sx={{ pt: 1 }} />
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Typography variant="body2" color="text.secondary">
+                  Esta resposta foi útil?
+                </Typography>
+                <Button
+                  startIcon={<ThumbsUp size={16} />}
+                  onClick={() => handleFeedbackClick(true)}
+                  disabled={feedback.rated}
+                  size="small"
+                  sx={{
+                    color:
+                      feedback.selection === "like"
+                        ? "success.main"
+                        : "text.secondary",
+                    textTransform: "none",
+                    transition: "transform 0.1s ease",
+                    "&:active": { transform: "scale(0.95)" },
+                  }}
+                >
+                  Útil
+                </Button>
+                <Button
+                  startIcon={<ThumbsDown size={16} />}
+                  onClick={() => handleFeedbackClick(false)}
+                  disabled={feedback.rated}
+                  size="small"
+                  sx={{
+                    color:
+                      feedback.selection === "dislike"
+                        ? "error.main"
+                        : "text.secondary",
+                    textTransform: "none",
+                    transition: "transform 0.1s ease",
+                    "&:active": { transform: "scale(0.95)" },
+                  }}
+                >
+                  Não útil
+                </Button>
+              </Stack>
+            </>
+          )}
+        </Stack>
+      </Paper>
+    </Stack>
+  );
+};
+
+const API_BASE_URL = "http://localhost:3000";
 
 const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const chatContainerRef = useRef(null);
-  const textareaRef = useRef(null);
 
   useEffect(() => {
     setTimeout(() => {
       setMessages([
         {
           id: `welcome-${Date.now()}`,
-          text: "Olá! Sou o menssageiro da IoTurn. Me diga o que você precisa que eu vou correndo buscar a informação para você.",
+          text: "Olá! Como posso ajudar com suas máquinas industriais hoje?",
           sender: "bot",
         },
       ]);
@@ -33,104 +241,114 @@ const Chat = () => {
     }
   }, [messages, isTyping]);
 
-  useEffect(() => {
-    const textarea = textareaRef.current;
-    if (textarea) {
-      // Reseta a altura para recalcular o scrollHeight
-      textarea.style.height = "auto";
-      // Define a nova altura com base no conteúdo, sem limite
-      textarea.style.height = `${textarea.scrollHeight}px`;
-    }
-  }, [inputValue]);
-
-  const handleSendMessage = async (e) => {
-    e.preventDefault();
-    const text = inputValue.trim();
+  const handleSendMessage = async (e, messageText) => {
+    if (e) e.preventDefault();
+    const text = messageText || inputValue.trim();
     if (!text) return;
 
     const userMessage = { id: `user-${Date.now()}`, text, sender: "user" };
     setMessages((prev) => [...prev, userMessage]);
-    setInputValue(""); // Limpar o input irá acionar o useEffect para encolher o textarea
+    setInputValue("");
     setIsTyping(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/askGemini`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text }),
+      const data = await ApiService.postRequest(`${API_BASE_URL}/askGemini`, {
+        prompt: text,
       });
-
-      if (!response.ok) {
-        throw new Error(`Erro na rede: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      const botMessage = {
-        id: data.cacheId,
-        text: data.data,
-        sender: "bot",
-      };
-      let messageToProcess;
-
-      if (typeof botMessage === "string") {
-        messageToProcess = botMessage;
+      if (data && data.data) {
+        setMessages((prev) => [
+          ...prev,
+          { id: data.cacheId, text: data.data, sender: "bot", question: text },
+        ]);
       } else {
-        messageToProcess = JSON.stringify(botMessage);
+        throw new Error("Resposta inválida do servidor");
       }
-      const sendMessage = messageToProcess.replace(/["']/g, "");
-      setMessages((prev) => [...prev, sendMessage]);
     } catch (error) {
-      console.error("Falha ao comunicar com a API:", error);
-      const errorMessage = {
-        id: `error-${Date.now()}`,
-        text: "Desculpe, não consegui processar sua solicitação. Tente novamente mais tarde.",
-        sender: "bot",
-      };
-      setMessages((prev) => [...prev, errorMessage]);
+      console.error("Erro ao enviar mensagem:", error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `error-${Date.now()}`,
+          text: "Desculpe, não consegui processar sua solicitação.",
+          sender: "bot",
+          question: text,
+        },
+      ]);
     } finally {
       setIsTyping(false);
     }
   };
 
   const handleFeedback = async (messageId, isLike) => {
-    console.log(
-      `Feedback para ${messageId}: ${isLike ? "Gostei" : "Não gostei"}`
-    );
     try {
-      await fetch(`${API_BASE_URL}/feedbackGemini`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          keyReturned: messageId,
-          feedback: isLike ? 1 : 0,
-        }),
+      await ApiService.postRequest(`${API_BASE_URL}/feedback`, {
+        messageId: messageId,
+        feedback: isLike ? "like" : "dislike",
       });
     } catch (error) {
-      console.error("Falha ao enviar feedback:", error);
+      console.error("Erro ao enviar feedback:", error);
     }
   };
 
   return (
-    <div className="h-screen bg-white text-gray-800 flex font-sans overflow-hidden">
-      <Sidebar />
-      <main className="flex-1 ml-20 flex flex-col overflow-hidden">
-        {/* Cabeçalho de texto como na imagem de referência */}
-        <div className="px-8 pt-8 max-w-4xl w-full mx-auto">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-full bg-black text-white flex items-center justify-center text-lg font-bold flex-shrink-0">
-              <Sparkles />
-            </div>
-            <div>
-              <h1 className="font-bold text-lg text-black">HERMES AI</h1>
-            </div>
-          </div>
-          <hr className="mt-4 border-gray-200" />
-        </div>
+    <Box
+      sx={{
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        bgcolor: "background.default",
+        color: "text.primary",
+      }}
+    >
+      <CssBaseline />
 
-        <div
-          ref={chatContainerRef}
-          className="chat-container-fade flex-1 overflow-y-auto flex flex-col gap-6 p-8 max-w-4xl w-full mx-auto"
-        >
+      <Box component="header" sx={{ borderBottom: 1, borderColor: "divider" }}>
+        <Container maxWidth="md" sx={{ py: 2 }}>
+          <Stack direction="row" spacing={2} alignItems="center">
+            <Avatar
+              variant="rounded"
+              sx={{
+                bgcolor: "background.paper",
+                border: "1px solid",
+                borderColor: "divider",
+              }}
+            >
+              <Omega color="#2979ff" />
+            </Avatar>
+            <Box flexGrow={1}>
+              <Typography
+                variant="h6"
+                component="h1"
+                sx={{ display: "flex", alignItems: "center", gap: 1 }}
+              >
+                Hermes AI <Sparkles size={16} color="#dbab09" />
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                O mensageiro dos deuses trazendo dados do Olimpo digital com
+                asas velozes
+              </Typography>
+            </Box>
+          </Stack>
+        </Container>
+      </Box>
+
+      <Container
+        ref={chatContainerRef}
+        maxWidth="md"
+        sx={{
+          flexGrow: 1,
+          overflowY: "auto",
+          p: 2,
+          "&::-webkit-scrollbar": { width: "8px" },
+          "&::-webkit-scrollbar-track": { bgcolor: "background.paper" },
+          "&::-webkit-scrollbar-thumb": {
+            bgcolor: "text.secondary",
+            borderRadius: "4px",
+          },
+          "&::-webkit-scrollbar-thumb:hover": { bgcolor: "primary.main" },
+        }}
+      >
+        <Stack spacing={2}>
           {messages.map((msg) => (
             <ChatMessage
               key={msg.id}
@@ -139,13 +357,13 @@ const Chat = () => {
             />
           ))}
           {isTyping && <TypingIndicator />}
-        </div>
+        </Stack>
+      </Container>
 
-        <div className="px-8 pb-8 pt-4 max-w-4xl w-full mx-auto">
-          <hr className="mb-4 border-gray-200" />
-          <form onSubmit={handleSendMessage} className="flex gap-3 items-end">
-            <textarea
-              ref={textareaRef}
+      <Box component="footer" sx={{ borderTop: 1, borderColor: "divider" }}>
+        <Container maxWidth="md" sx={{ py: 2 }}>
+          <Stack spacing={1} component="form" onSubmit={handleSendMessage}>
+            <TextField
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => {
@@ -154,20 +372,36 @@ const Chat = () => {
                   handleSendMessage(e);
                 }
               }}
-              placeholder="Digite sua mensagem..."
-              className="flex-1 resize-none p-3 px-4 bg-white border border-gray-200 text-gray-800 rounded-lg text-base outline-none focus:ring-2 focus:ring-gray-300 placeholder:text-gray-400 overflow-y-hidden"
-              rows="1"
-            ></textarea>
-            <button
-              type="submit"
-              className="w-11 h-11 bg-gray-100 rounded-full text-gray-500 flex-shrink-0 flex items-center justify-center text-lg transition-colors hover:bg-gray-200"
-            >
-              <Send className="rotate-45 -translate-x-0.5" />
-            </button>
-          </form>
-        </div>
-      </main>
-    </div>
+              multiline
+              placeholder="Pergunte ao Hermes sobre suas máquinas IoT..."
+              variant="outlined"
+              fullWidth
+              InputProps={{
+                sx: { borderRadius: "12px", bgcolor: "background.paper" },
+                endAdornment: (
+                  <IconButton
+                    type="submit"
+                    sx={{
+                      bgcolor: "primary.main",
+                      color: "primary.contrastText",
+                      "&:hover": { bgcolor: "primary.dark" },
+                    }}
+                  >
+                    <Box
+                      component={Send}
+                      sx={{ transform: "rotate(45deg) translateX(-1px)" }}
+                    />
+                  </IconButton>
+                ),
+              }}
+            />
+            <Typography variant="caption" color="text.secondary" align="center">
+              Pressione Enter para enviar • Shift + Enter para nova linha
+            </Typography>
+          </Stack>
+        </Container>
+      </Box>
+    </Box>
   );
 };
 

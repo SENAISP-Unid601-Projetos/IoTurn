@@ -2,8 +2,21 @@
 import { error } from 'console';
 import mqttClient from './src/config/mqttClient'
 import { sensoresReadingRepository } from './src/infrastructure/repository/sensoresReadingRepository';
+import { string } from 'zod';
+import { unifiedMachineStateService } from './src/services/unifiedMachineStateService';
 const TOPIC = 'ioturn/maquinas/+/dt/+'; 
 
+ export interface NewDataPoint {
+  machineId: number;
+  temperatura?: number;
+  timeStampTemperatura?: Date;
+  corrente?: number;
+  timeStampCorrente?: Date;
+  nivel?: number;
+  timeStampNivel?: Date;
+  rpm?: number;
+  timeStampRpm?: Date;
+}
 // Subscreve aos tópicos
 mqttClient.subscribe(TOPIC, { qos: 0 }, (err, granted) => {
   if (err) {
@@ -23,8 +36,12 @@ mqttClient.on('message',async (topic, message) => {
     const sensorType = topicParts[4];
     
     const numericMachineId = parseInt(machineIdStr);
-    const numericPayload = parseFloat(payload);
-    
+    const payloadJson = JSON.parse(payload)
+    const numericPayload = parseFloat(payloadJson.value);
+
+    let dataPoint: NewDataPoint = {
+      machineId: numericMachineId
+    }
     console.log(`[MQTT RECEBIDO] Tópico: ${topic} | Mensagem: ${payload}`);
 
     if (isNaN(numericMachineId) || isNaN(numericPayload)) {
@@ -38,29 +55,39 @@ mqttClient.on('message',async (topic, message) => {
           temperature: numericPayload,
           machineId: numericMachineId
         });
+        dataPoint.temperatura = numericPayload;
+        dataPoint.timeStampTemperatura = new Date();
         break;
       case 'nivel':
         await sensoresReadingRepository.newOilLevelReading({
           level: numericPayload,
           machineId: numericMachineId
         });
+         dataPoint.nivel = numericPayload;
+         dataPoint.timeStampNivel = new Date();
         break;
       case 'rpm':
         await sensoresReadingRepository.newRpm({
           rpm: numericPayload,
           machineId: numericMachineId
         });
+        dataPoint.rpm = numericPayload;
+        dataPoint.timeStampRpm = new Date();
         break;
       case 'corrente':
         await sensoresReadingRepository.newCurrentReading({
           current: numericPayload,
           machineId: numericMachineId
         })
+        dataPoint.corrente = numericPayload;
+        dataPoint.timeStampCorrente = new Date();
+        break;
       default:
         console.log(`[MQTT AVISO] Nenhum manipulador para o tipo de sensor: ${sensorType}`);
         break;
     }
-        
+    //console.log(dataPoint)
+    unifiedMachineStateService.unifiedState(dataPoint)
   } catch (error) {
     console.error('[ERRO DE PARSE MQTT]:', error)
   }

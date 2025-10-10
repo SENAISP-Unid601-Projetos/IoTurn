@@ -82,6 +82,24 @@ CREATE TABLE "machines" (
 );
 
 -- CreateTable
+CREATE TABLE "UnifiedMachineState" (
+    "id" TEXT NOT NULL,
+    "timestamp" TIMESTAMPTZ(3) NOT NULL,
+    "machineId" INTEGER NOT NULL,
+    "current" DOUBLE PRECISION,
+    "rpm" INTEGER,
+    "oilTemperature" DOUBLE PRECISION,
+    "oilLevel" DOUBLE PRECISION,
+    "currentIsMissing" BOOLEAN NOT NULL DEFAULT false,
+    "rpmIsMissing" BOOLEAN NOT NULL DEFAULT false,
+    "oilTemperatureIsMissing" BOOLEAN NOT NULL DEFAULT false,
+    "oilLevelIsMissing" BOOLEAN NOT NULL DEFAULT false,
+    "inferredState" TEXT,
+
+    CONSTRAINT "UnifiedMachineState_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "devices" (
     "id" SERIAL NOT NULL,
     "nodeId" TEXT NOT NULL,
@@ -164,6 +182,9 @@ CREATE UNIQUE INDEX "machines_serialNumber_key" ON "machines"("serialNumber");
 CREATE UNIQUE INDEX "machines_deviceId_key" ON "machines"("deviceId");
 
 -- CreateIndex
+CREATE INDEX "UnifiedMachineState_machineId_timestamp_idx" ON "UnifiedMachineState"("machineId", "timestamp");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "devices_nodeId_key" ON "devices"("nodeId");
 
 -- CreateIndex
@@ -183,6 +204,9 @@ ALTER TABLE "machines" ADD CONSTRAINT "machines_responsibleUserId_fkey" FOREIGN 
 
 -- AddForeignKey
 ALTER TABLE "machines" ADD CONSTRAINT "machines_deviceId_fkey" FOREIGN KEY ("deviceId") REFERENCES "devices"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UnifiedMachineState" ADD CONSTRAINT "UnifiedMachineState_machineId_fkey" FOREIGN KEY ("machineId") REFERENCES "machines"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "devices" ADD CONSTRAINT "devices_gatewayId_fkey" FOREIGN KEY ("gatewayId") REFERENCES "gateways"("id") ON DELETE SET NULL ON UPDATE CASCADE;

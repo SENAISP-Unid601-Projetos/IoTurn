@@ -4,10 +4,8 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = "postgresql://usuario:senha123@localhost:5432/ioturn"
 }
-
-
 
 model InteracaoIA {
   id                  Int               @id @default(autoincrement())
@@ -22,7 +20,7 @@ model InteracaoIA {
 }
 
 model HyperparameterArm {
-  id               String   @id @default(uuid())
+  id               String        @id @default(uuid())
   modelName        String?
   version          String?
   temperature      Float
@@ -30,167 +28,195 @@ model HyperparameterArm {
   topK             Int
   maxOutputTokens  Int
   responseMimeType String
-  successes        Int?      @default(0)
-  failures         Int?     @default(0)
+  successes        Int?          @default(0)
+  failures         Int?          @default(0)
   interacoes       InteracaoIA[]
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 }
 
 /// Representa a empresa cliente que contrata o serviço IoTurn.
 model Client {
-  id                Int        @id @default(autoincrement())
-  companyName       String
-  cnpj              String     @unique
-  phone             String?
-  address           String?
-  email             String     @unique
-  contractDate      DateTime   @default(now())
-  status            Status     @default(ACTIVE)
-  
+  id           Int      @id @default(autoincrement())
+  companyName  String
+  cnpj         String   @unique
+  phone        String?
+  address      String?
+  email        String   @unique
+  contractDate DateTime @default(now())
+  status       Status   @default(ACTIVE)
+
   // Relações
-  users             User[]
-  machines          Machine[]
+  users    User[]
+  machines Machine[]
 
   @@map("clients")
 }
 
 /// Usuários que podem acessar a plataforma, associados a um cliente.
 model User {
-  id                Int        @id @default(autoincrement())
-  name              String
-  email             String     @unique
-  password          String
-  userType          UserType
-  status            Status     @default(ACTIVE)
+  id       Int      @id @default(autoincrement())
+  name     String
+  email    String   @unique
+  password String
+  userType UserType
+  status   Status   @default(ACTIVE)
 
   // Relação: Um usuário pertence a um cliente.
-  clientId          Int
-  client            Client     @relation(fields: [clientId], references: [id])
+  clientId Int
+  client   Client @relation(fields: [clientId], references: [id])
 
-  responsibleMachines     Machine[]                 @relation("ResponsibleForMachines")
+  responsibleMachines Machine[] @relation("ResponsibleForMachines")
 
   // Relação: Um usuário pode estar associado a vários registros de sensores.
-  rpmReadings             RpmReading[]              @relation("RpmReadings")
-  oilTemperatureReadings  OilTemperatureReading[]   @relation("OilTemperatureReadings")
-  oilLevelReadings        OilLevelReading[]         @relation("OilLevelReadings")
-  currentReadings         CurrentReading[]          @relation("CurrentReadings")
+  rpmReadings            RpmReading[]            @relation("RpmReadings")
+  oilTemperatureReadings OilTemperatureReading[] @relation("OilTemperatureReadings")
+  oilLevelReadings       OilLevelReading[]       @relation("OilLevelReadings")
+  currentReadings        CurrentReading[]        @relation("CurrentReadings")
 
   @@map("users")
 }
 
 /// Representa uma máquina industrial monitorada.
 model Machine {
-  id                Int        @id @default(autoincrement())
-  name              String
-  model             String?
-  manufacturer      String?
-  serialNumber      String     @unique
-  status            Status     @default(ACTIVE)
+  id           Int     @id @default(autoincrement())
+  name         String
+  model        String?
+  manufacturer String?
+  serialNumber String  @unique
+  status       Status  @default(ACTIVE)
 
   // Relação: A máquina pertence a um cliente.
-  clientId          Int
-  client            Client     @relation(fields: [clientId], references: [id])
+  clientId Int
+  client   Client @relation(fields: [clientId], references: [id])
 
   // Relação: A máquina tem um usuário responsável.
   responsibleUserId Int
   responsibleUser   User @relation("ResponsibleForMachines", fields: [responsibleUserId], references: [id])
-  
 
   // Relação: Uma máquina possui múltiplos registros de sensores.
-  rpmReadings             RpmReading[]              @relation("RpmReadings")
-  oilTemperatureReadings  OilTemperatureReading[]   @relation("OilTemperatureReadings")
-  oilLevelReadings        OilLevelReading[]         @relation("OilLevelReadings")
-  currentReadings         CurrentReading[]          @relation("CurrentReadings")
+  rpmReadings            RpmReading[]            @relation("RpmReadings")
+  oilTemperatureReadings OilTemperatureReading[] @relation("OilTemperatureReadings")
+  oilLevelReadings       OilLevelReading[]       @relation("OilLevelReadings")
+  currentReadings        CurrentReading[]        @relation("CurrentReadings")
 
-  deviceId          Int      @unique
-  device            Device   @relation(fields: [deviceId], references: [id])
+  deviceId            Int                   @unique
+  device              Device                @relation(fields: [deviceId], references: [id])
+  UnifiedMachineState UnifiedMachineState[]
+
   @@map("machines")
 }
 
+model UnifiedMachineState {
+  id             String   @id @default(cuid())
+  // O timestamp em que este estado foi reconstruído e salvo
+  timestamp      DateTime @db.Timestamptz(3)
+  machineId      Int
+  machine        Machine  @relation(fields: [machineId], references: [id])
+  // Métricas que compõem o estado. Note que são opcionais (`?`), pois podem estar ausentes.
+  current        Float?
+  rpm            Int?
+  oilTemperature Float?
+  oilLevel       Float?
+
+  // Flags que nos dizem se o dado é real ou foi considerado ausente (devido ao TTL)
+  // Esta é a informação que o modelo de ML usará para ser mais inteligente
+  currentIsMissing        Boolean @default(false)
+  rpmIsMissing            Boolean @default(false)
+  oilTemperatureIsMissing Boolean @default(false)
+  oilLevelIsMissing       Boolean @default(false)
+
+  // Um índice para tornar as buscas por máquina e tempo extremamente rápidas
+  @@index([machineId, timestamp])
+}
+
 model Device {
-  id            Int      @id @default(autoincrement())
-  
+  id Int @id @default(autoincrement())
+
   //Armazena o ID único do hardware.
-  nodeId        String   @unique // 
-  
-  description   String?  // Ex: "Sensor Heltec V2 instalado no setor A"
+  nodeId String @unique // 
+
+  description   String? // Ex: "Sensor Heltec V2 instalado no setor A"
   status        DeviceStatus @default(PROVISIONING)
-  lastHeartbeat DateTime @updatedAt
-  machine         Machine?
+  lastHeartbeat DateTime     @updatedAt
+  machine       Machine?
 
   // Relação N-para-1: Este dispositivo pertence a UM Gateway.
-  gatewayId     Int?
-  gateway       Gateway?  @relation(fields: [gatewayId], references: [id])
+  gatewayId Int?
+  gateway   Gateway? @relation(fields: [gatewayId], references: [id])
 
   @@map("devices")
 }
 
 /// Representa o hardware físico do Gateway (ESP32 com Wi-Fi).
 model Gateway {
-  id             Int        @id @default(autoincrement())
-  
+  id Int @id @default(autoincrement())
+
   // O ID único do hardware do Gateway (o Chip ID dele).
-  gatewayId      String     @unique
-  
-  description    String?    // Ex: "Gateway do Setor A - Próximo à doca 3"
-  status         DeviceStatus @default(OFFLINE)
-  lastHeartbeat  DateTime   @updatedAt
+  gatewayId String @unique
+
+  description   String? // Ex: "Gateway do Setor A - Próximo à doca 3"
+  status        DeviceStatus @default(OFFLINE)
+  lastHeartbeat DateTime     @updatedAt
 
   // Relação 1-para-N: Um Gateway é responsável por muitos dispositivos (Nós Sensores).
   responsibleFor Device[]
 
   @@map("gateways")
 }
+
 /// Armazena as leituras dos sensores de uma máquina em um ponto no tempo.
 model RpmReading {
   id        Int      @id @default(autoincrement())
   timestamp DateTime @default(now())
-  rpm       Int      // Valor da leitura de RPM
+  rpm       Int // Valor da leitura de RPM
 
   // Relações
   machineId Int
-  machine   Machine  @relation("RpmReadings", fields: [machineId], references: [id])
+  machine   Machine @relation("RpmReadings", fields: [machineId], references: [id])
   userId    Int?
-  user      User?     @relation("RpmReadings", fields: [userId], references: [id])
+  user      User?   @relation("RpmReadings", fields: [userId], references: [id])
 
   @@map("rpm_readings")
 }
+
 model OilTemperatureReading {
   id          Int      @id @default(autoincrement())
   timestamp   DateTime @default(now())
-  temperature Float    // Valor da temperatura em graus
+  temperature Float // Valor da temperatura em graus
   // Relações
-  machineId Int
-  machine   Machine  @relation("OilTemperatureReadings", fields: [machineId], references: [id])
-  userId    Int?
-  user      User?     @relation("OilTemperatureReadings", fields: [userId], references: [id])
+  machineId   Int
+  machine     Machine  @relation("OilTemperatureReadings", fields: [machineId], references: [id])
+  userId      Int?
+  user        User?    @relation("OilTemperatureReadings", fields: [userId], references: [id])
 
   @@map("oil_temperature_readings")
 }
+
 model OilLevelReading {
   id        Int      @id @default(autoincrement())
   timestamp DateTime @default(now())
-  level     Float    // Valor do nível do óleo (ex: em porcentagem)
+  level     Float // Valor do nível do óleo (ex: em porcentagem)
 
   // Relações
   machineId Int
-  machine   Machine  @relation("OilLevelReadings", fields: [machineId], references: [id])
+  machine   Machine @relation("OilLevelReadings", fields: [machineId], references: [id])
   userId    Int?
-  user      User?     @relation("OilLevelReadings", fields: [userId], references: [id])
+  user      User?   @relation("OilLevelReadings", fields: [userId], references: [id])
 
   @@map("oil_level_readings")
 }
+
 model CurrentReading {
   id        Int      @id @default(autoincrement())
   timestamp DateTime @default(now())
-  current   Float    // Valor da corrente elétrica (ex: em Amperes)
+  current   Float // Valor da corrente elétrica (ex: em Amperes)
 
   // Relações
   machineId Int
-  machine   Machine  @relation("CurrentReadings", fields: [machineId], references: [id])
+  machine   Machine @relation("CurrentReadings", fields: [machineId], references: [id])
   userId    Int?
-  user      User?     @relation("CurrentReadings", fields: [userId], references: [id])
+  user      User?   @relation("CurrentReadings", fields: [userId], references: [id])
 
   @@map("current_readings")
 }

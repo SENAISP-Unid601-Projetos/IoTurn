@@ -1,7 +1,7 @@
 
 import mqtt, { MqttClient } from 'mqtt'
 
-const MQTT_BROKER_URL = 'mqtt://localhost:1883' 
+const MQTT_BROKER_URL = 'mqtt://broker.hivemq.com:1883' 
 const CLIENT_ID = `mqtt_client_${Math.random().toString(16).slice(2, 8)}`
 
 const options = {

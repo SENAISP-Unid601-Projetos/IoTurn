@@ -25,6 +25,16 @@ export interface NewCurrentReadingData {
     machineId: number;
 }
 
+ export type LastReadingResult = {
+  current?: number;
+  rpm?:number;
+  oilTemperature?: number;
+  oilLevel?: number;
+  timestamp: Date;
+} | null;
+
+
+
 export const sensoresReadingRepository = {
     newRpm: async (data: NewRpmData): Promise<RpmReading> => {
         try {
@@ -85,4 +95,105 @@ export const sensoresReadingRepository = {
             throw new Error("Falha ao acessar o banco de dados para guardar a CORRENTE.");
         }
     },
+    findLastCurrentData: async (machineId: number, reconstructionTime: Date): Promise<LastReadingResult> => {
+        try {
+            const result = await prisma.currentReading.findFirst({
+                select: {
+                    current: true,
+                    timestamp: true
+                },
+                where: {
+                    machineId: machineId,
+                    timestamp: {
+                        lte: reconstructionTime
+                    }
+                },
+                orderBy: {
+                    timestamp: 'desc'
+                }
+            });
+
+            return result;
+
+        } catch (error) {
+            console.error("Error fetching last current data:", error);
+            throw error;
+        }
+    },
+    findLastRpmData: async (machineId: number, reconstructionTime: Date): Promise<LastReadingResult> => {
+        try {
+            const result = await prisma.rpmReading.findFirst({
+                select: {
+                    rpm: true,
+                    timestamp: true
+                },
+                where: {
+                    machineId: machineId,
+                    timestamp: {
+                        lte: reconstructionTime
+                    }
+                },
+                orderBy: {
+                    timestamp: 'desc'
+                }
+            });
+
+            return result;
+
+        } catch (error) {
+            console.error("Error fetching last rpm data:", error);
+            throw error;
+        }
+    },
+    findLastOilTemperatureData: async (machineId: number, reconstructionTime: Date): Promise<LastReadingResult> => {
+        try {
+            const result = await prisma.oilTemperatureReading.findFirst({
+                select: {
+                    temperature: true,
+                    timestamp: true
+                },
+                where: {
+                    machineId: machineId,
+                    timestamp: {
+                        lte: reconstructionTime
+                    }
+                },
+                orderBy: {
+                    timestamp: 'desc'
+                }
+            });
+
+            return result;
+
+        } catch (error) {
+            console.error("Error fetching last temperature data:", error);
+            throw error;
+        }
+    },
+    findLastOilLevelData: async (machineId: number, reconstructionTime: Date): Promise<LastReadingResult> => {
+        try {
+            const result = await prisma.oilLevelReading.findFirst({
+                select: {
+                    level: true,
+                    timestamp: true
+                },
+                where: {
+                    machineId: machineId,
+                    timestamp: {
+                        lte: reconstructionTime
+                    }
+                },
+                orderBy: {
+                    timestamp: 'desc'
+                }
+            });
+
+            return result;
+
+        } catch (error) {
+            console.error("Error fetching last level data:", error);
+            throw error;
+        }
+    }
+
 };

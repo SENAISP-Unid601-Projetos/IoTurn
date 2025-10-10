@@ -6,6 +6,7 @@ import dotenv from 'dotenv'
 import { machineRoutes } from './src/routes/machineRoutes'
 import { deviceRoutes } from './src/routes/deviceRoutes'
 import { gatewayRoutes } from './src/routes/gatewayRoutes'
+import { unifiedMachineRoute } from './src/routes/unifiedMachineRoute'
 
 dotenv.config()
 const fastify = Fastify({ logger: true })
@@ -18,6 +19,7 @@ fastify.register(geminiRoutes)
 fastify.register(machineRoutes, {prefix: '/machines'});
 fastify.register(deviceRoutes,{prefix: '/devices'});
 fastify.register(gatewayRoutes,{prefix: '/gateways'});
+fastify.register(unifiedMachineRoute,{prefix: '/unifiedMachines'});
 
 async function start() {
   try {

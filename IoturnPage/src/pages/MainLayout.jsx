@@ -25,17 +25,14 @@ import {
 } from "lucide-react";
 
 
-//ITENS DO SIDEBAR    
+// ITENS DA SIDEBAR
+
 const sidebarItems = [
   {
     text: "Monitoramento",
     icon: <Eye size={18} />,
     subItems: [
-      {
-        text: "Máquinas",
-        icon: <ListIcon size={17} />,
-        path: "/maquinas",
-      },
+      { text: "Máquinas", icon: <ListIcon size={17} />, path: "/maquinas" },
     ],
   },
   {
@@ -61,19 +58,18 @@ const sidebarItems = [
   },
 ];
 
+
+// COMPONENTE SIDEBAR
 const Sidebar = forwardRef(({ isOpen }, ref) => {
   const navigate = useNavigate();
   const location = useLocation();
-
   const [openSections, setOpenSections] = useState({ Monitoramento: true });
 
-  // ---------- Logout ----------
   const handleLogout = () => {
     console.log("Logout clicado!");
     navigate("/login");
   };
 
-  // ---------- Toggle Seção ----------
   const handleClick = (itemText) => {
     setOpenSections((prev) => ({
       ...prev,
@@ -81,7 +77,8 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
     }));
   };
 
-  // ---------- Estilos ----------
+
+  // ESTILIZAÇÃO
   const mainItemSx = {
     py: 1.5,
     px: 2,
@@ -91,7 +88,7 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
     fontWeight: 500,
     transition: "transform 0.2s ease-in-out, background-color 0.2s ease-in-out",
     "&:hover": {
-      backgroundColor: "rgba(255, 255, 255, 0.08)",
+      backgroundColor: "action.hover",
       color: "text.primary",
       transform: "scale(1.03)",
     },
@@ -106,7 +103,7 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
     transition:
       "transform 0.2s ease-in-out, background-color 0.2s ease-in-out, color 0.2s ease-in-out",
     "&:hover": {
-      backgroundColor: "rgba(255, 255, 255, 0.08)",
+      backgroundColor: "action.hover",
       color: "text.primary",
       transform: "scale(1.05)",
     },
@@ -114,25 +111,27 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
 
   const activeSubItemSx = {
     backgroundColor: "primary.main",
-    color: "white",
-    borderLeft: "3px solid #60a5fa",
+    color: "primary.contrastText",
+    borderLeft: (theme) => `3px solid ${theme.palette.secondary.main}`,
     "&:hover": {
       backgroundColor: "primary.main",
       transform: "none",
     },
     ".MuiListItemIcon-root": {
-      color: "white",
+      color: "primary.contrastText",
     },
   };
 
+
+  // FUNÇÃO DE RENDERIZAÇÃO
   const renderItems = (items, isSubItem = false) => {
     return items.map((item) => {
       const styleToApply = isSubItem ? subItemSx : mainItemSx;
       const activeStyle = isSubItem ? { ...styleToApply, ...activeSubItemSx } : styleToApply;
 
+      // Caso tenha subitens
       if (item.subItems) {
         if (item.subItems.length === 0) return null;
-
         const isOpen = openSections[item.text] || false;
 
         return (
@@ -149,7 +148,13 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
               <List
                 component="div"
                 disablePadding
-                sx={{ pl: 2, display: "flex", flexDirection: "column", gap: 0.5, mt: 0.5 }}
+                sx={{
+                  pl: 2,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 0.5,
+                  mt: 0.5,
+                }}
               >
                 {renderItems(item.subItems, true)}
               </List>
@@ -158,6 +163,7 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
         );
       }
 
+      // Caso seja um item com path (link direto)
       if (item.path) {
         const isActive = location.pathname === item.path;
         return (
@@ -175,17 +181,14 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
       }
 
       if (item.divider) {
-        return (
-          <Divider
-            key="divider"
-            sx={{ my: 2, borderColor: "rgba(255,255,255,0.1)" }}
-          />
-        );
+        return <Divider key="divider" sx={{ my: 2, borderColor: "divider" }} />;
       }
 
       return null;
     });
   };
+
+
 
   return (
     <Drawer
@@ -196,9 +199,9 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
       PaperProps={{
         sx: {
           bgcolor: "background.default",
-          color: "white",
+          color: "text.primary",
           width: 280,
-          borderRight: "1px solid rgba(255, 255, 255, 0.12)",
+          borderRight: (theme) => `1px solid ${theme.palette.divider}`,
           overflow: "hidden",
         },
       }}
@@ -208,9 +211,8 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
           {renderItems(sidebarItems)}
         </List>
 
-        {/* Botão de Logout */}
         <Box sx={{ p: 2, pt: 0 }}>
-          <Divider sx={{ my: 2, borderColor: "rgba(255,255,255,0.1)" }} />
+          <Divider sx={{ my: 2, borderColor: "divider" }} />
           <ListItemButton sx={mainItemSx} onClick={handleLogout}>
             <ListItemIcon sx={{ minWidth: "auto", color: "inherit" }}>
               <LogOut size={18} />

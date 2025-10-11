@@ -61,7 +61,7 @@ const DashboardSelectionPage = () => {
         {machines.map((machine) => (
           <Box
             key={machine.id}
-            sx={{ p: 1, width: { xs: "100%", sm: "50%", md: "33.33%" } }}
+            sx={{ p: 1, width: { xs: "100%", sm: "50%", md: "27%" }, cursor: "pointer" }}
           >
             <MachineCard
               machine={machine}

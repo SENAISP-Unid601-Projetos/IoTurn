@@ -2,8 +2,8 @@
 
 // Dados mock que simulam a resposta da API
 const mockUser = {
-    name: 'João Silva',
-    company: 'Empresa Demo',
+    name: 'João Lindo',
+    company: 'Empresa Sexy',
     status: 'online',
 };
 

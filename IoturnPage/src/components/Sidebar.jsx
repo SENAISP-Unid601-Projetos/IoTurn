@@ -24,10 +24,10 @@ import {
   LogOut,
 } from "lucide-react";
 import UserProfile from './UserProfile';
-import { fetchUserData } from "../scripts/UserService"; // ← serviço de usuário
+import { fetchUserData } from "../scripts/UserService"; 
 import theme from "../theme";
 
-// ITENS DO SIDEBAR (sem alteração)
+//itens da sidebar
 const sidebarItems = [
   {
     text: "Monitoramento",
@@ -60,15 +60,11 @@ const sidebarItems = [
 const Sidebar = forwardRef(({ isOpen }, ref) => {
   const navigate = useNavigate();
   const location = useLocation();
-
-  // Estados para o usuário e loading
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // Estado para seções expandidas
   const [openSections, setOpenSections] = useState({ Monitoramento: true });
 
-  // ---------- Carregar dados do usuário ----------
+  //dados do usuário 
   useEffect(() => {
     const loadUser = async () => {
       try {
@@ -76,8 +72,6 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
         setUser(userData);
       } catch (error) {
         console.error("Erro ao carregar dados do usuário:", error);
-        // Opcional: redirecionar para login em caso de erro crítico
-        // navigate("/login");
       } finally {
         setLoading(false);
       }
@@ -86,13 +80,13 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
     loadUser();
   }, []);
 
-  // ---------- Logout ----------
+  //Logout
   const handleLogout = () => {
     console.log("Logout clicado!");
     navigate("/login");
   };
 
-  // ---------- Toggle Seção ----------
+  //Toggle Seção 
   const handleClick = (itemText) => {
     setOpenSections((prev) => ({
       ...prev,
@@ -100,7 +94,7 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
     }));
   };
 
-  // ---------- Estilos ----------
+  // Estilização 
   const mainItemSx = {
     py: 1.5,
     px: 2,
@@ -134,7 +128,7 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
   const activeSubItemSx = {
     backgroundColor: "primary.main",
     color: "white",
-    borderLeft: `3px solid ${theme.palette.secondary.main}`, // ← corrigido!
+    borderLeft: `3px solid ${theme.palette.secondary.main}`, 
 
     "&:hover": {
       backgroundColor: "primary.main",

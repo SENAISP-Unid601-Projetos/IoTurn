@@ -31,10 +31,9 @@ const UserProfile = ({ user }) => {
                     maxWidth: "100%",
                 }}
             >
-                {/* Avatar com status */}
                 <Box sx={{ position: "relative" }}>
                     <Avatar
-                        aria-label={`Perfil de ${user.name}`} // ← fora do sx
+                        aria-label={`Perfil de ${user.name}`} 
                         sx={{
                             bgcolor: alpha(theme.palette.primary.main, 0.12),
                             border: `1px solid ${alpha(theme.palette.primary.main, 0.5)}`,
@@ -46,8 +45,6 @@ const UserProfile = ({ user }) => {
                         <UserIcon size={22} />
                     </Avatar>
                 </Box>
-
-                {/* Texto */}
                 <Box>
                     <Typography
                         variant="subtitle1"

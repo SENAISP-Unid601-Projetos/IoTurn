@@ -1,12 +1,11 @@
 import React from "react";
 import { Routes, Route } from 'react-router-dom';
-import Chat from "./pages/Chat";
-import Sidebar from "./components/Sidebar";
+import MainLayout from './pages/MainLayout';
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Sidebar />} /> 
+      <Route path="/" element={<MainLayout/>} /> 
     </Routes>
   );
 }

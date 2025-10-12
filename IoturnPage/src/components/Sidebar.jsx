@@ -1,4 +1,4 @@
-import React, { useState, forwardRef } from "react";
+import React, { useState, forwardRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   Box,
@@ -9,11 +9,11 @@ import {
   ListItemText,
   Collapse,
   Divider,
+  Typography,
 } from "@mui/material";
 import {
-  Activity,
-  Bot,
   Eye,
+  Bot,
   Settings,
   User,
   List as ListIcon,
@@ -23,9 +23,11 @@ import {
   ChevronUp,
   LogOut,
 } from "lucide-react";
+import UserProfile from './UserProfile';
+import { fetchUserData } from "../scripts/UserService"; // ← serviço de usuário
+import theme from "../theme";
 
-
-//ITENS DO SIDEBAR    
+// ITENS DO SIDEBAR (sem alteração)
 const sidebarItems = [
   {
     text: "Monitoramento",
@@ -53,19 +55,36 @@ const sidebarItems = [
       { text: "Gateways", icon: <WifiCog size={17} />, path: "/gateways" },
     ],
   },
-  { divider: true },
-  {
-    text: "Status",
-    icon: <Activity size={18} />,
-    path: "/status",
-  },
 ];
 
 const Sidebar = forwardRef(({ isOpen }, ref) => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Estados para o usuário e loading
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Estado para seções expandidas
   const [openSections, setOpenSections] = useState({ Monitoramento: true });
+
+  // ---------- Carregar dados do usuário ----------
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const userData = await fetchUserData();
+        setUser(userData);
+      } catch (error) {
+        console.error("Erro ao carregar dados do usuário:", error);
+        // Opcional: redirecionar para login em caso de erro crítico
+        // navigate("/login");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUser();
+  }, []);
 
   // ---------- Logout ----------
   const handleLogout = () => {
@@ -91,7 +110,7 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
     fontWeight: 500,
     transition: "transform 0.2s ease-in-out, background-color 0.2s ease-in-out",
     "&:hover": {
-      backgroundColor: "rgba(255, 255, 255, 0.08)",
+      backgroundColor: 'action.hover',
       color: "text.primary",
       transform: "scale(1.03)",
     },
@@ -106,7 +125,7 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
     transition:
       "transform 0.2s ease-in-out, background-color 0.2s ease-in-out, color 0.2s ease-in-out",
     "&:hover": {
-      backgroundColor: "rgba(255, 255, 255, 0.08)",
+      backgroundColor: 'action.hover',
       color: "text.primary",
       transform: "scale(1.05)",
     },
@@ -115,7 +134,8 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
   const activeSubItemSx = {
     backgroundColor: "primary.main",
     color: "white",
-    borderLeft: "3px solid #60a5fa",
+    borderLeft: `3px solid ${theme.palette.secondary.main}`, // ← corrigido!
+
     "&:hover": {
       backgroundColor: "primary.main",
       transform: "none",
@@ -204,6 +224,19 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
       }}
     >
       <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+        {/* Perfil do usuário ou loading */}
+        {loading ? (
+          <Box sx={{ p: 2, textAlign: "center" }}>
+            <Typography variant="body2" color="text.secondary">
+              Carregando perfil...
+            </Typography>
+          </Box>
+        ) : (
+          <UserProfile user={user} />
+        )}
+
+        <Divider sx={{ borderColor: 'divider' }} />
+
         <List sx={{ flexGrow: 1, overflowY: "auto", p: 2, pb: 1 }}>
           {renderItems(sidebarItems)}
         </List>

@@ -24,7 +24,7 @@ const MachineCard = ({ machine, onClick }) => {
     machine.metrics?.filter((m) => ["RPM", "Temp"].includes(m.name)) || [];
 
   return (
-    <Card
+    <Box
       onClick={() => onClick(machine.id)}
       sx={{
         flexGrow: 1,
@@ -32,7 +32,7 @@ const MachineCard = ({ machine, onClick }) => {
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        backgroundColor: "background.default",
+        backgroundColor: `${theme.palette.background.default}`,
         borderRadius: 3,
         color: "text.primary",
         cursor: "pointer",
@@ -165,7 +165,7 @@ const MachineCard = ({ machine, onClick }) => {
           </Box>
         </Box>
       </CardContent>
-    </Card>
+    </Box>
   );
 };
 

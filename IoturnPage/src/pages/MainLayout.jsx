@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Box, IconButton } from '@mui/material';
 import Sidebar from '../components/Sidebar';
 import { Menu } from 'lucide-react';
+import { Outlet } from 'react-router-dom';
 
 const sidebar_width = 280;
 
@@ -60,7 +61,7 @@ const MainLayout = () => {
         </IconButton>
 
         <Box sx={{ mt:6}}>
-          <h1>Bem-vindo ao sistema</h1>
+          <Outlet />
         </Box>
 
       </Box>

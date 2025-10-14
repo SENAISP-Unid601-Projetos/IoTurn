@@ -11,8 +11,8 @@
         main: '#58a6ff',       // --text-link
       },
       background: {
-        default: '#00000fff',    // --background-dark
-        paper: '#161b22',      // --background-light
+        default: '#000000ff',    // --background-dark
+        paper: '#006aff31',      // --background-light
       },
       text: {
         primary: '#f0f6fc', 

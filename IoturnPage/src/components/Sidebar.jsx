@@ -24,7 +24,7 @@ import {
   LogOut,
 } from "lucide-react";
 import UserProfile from './UserProfile';
-import { fetchUserData } from "../scripts/UserService"; 
+import { fetchUserData } from "../services/userService"; 
 import theme from "../theme";
 
 //itens da sidebar
@@ -226,7 +226,7 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
             </Typography>
           </Box>
         ) : (
-          <UserProfile user={user} />
+          <UserProfile user={user}/>
         )}
 
         <Divider sx={{ borderColor: 'divider' }} />

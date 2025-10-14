@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Sidebar from "../../components/Sidebar";
 import {
   Box,
   Grid,
@@ -61,7 +60,7 @@ const DashboardSelectionPage = () => {
         {machines.map((machine) => (
           <Box
             key={machine.id}
-            sx={{ p: 1, width: { xs: "100%", sm: "50%", md: "27%" }, cursor: "pointer" }}
+            sx={{ p: 1, width: { xs: "100%", sm: "45%", md: "30%" }, cursor: "pointer" }}
           >
             <MachineCard
               machine={machine}
@@ -75,29 +74,17 @@ const DashboardSelectionPage = () => {
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        minHeight: "100vh",
-        backgroundColor: "background.default",
-      }}
-    >
-      <Sidebar selectedMachineId={selectedMachineId} />
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        <Box sx={{ mb: 4 }}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1 }}>
-            <Activity color={theme.palette.primary.dark} size={30} />
-            <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-              Máquinas disponíveis
-            </Typography>
-          </Box>
-          <Typography sx={{ color: "text.secondary", pl: "48px" }}>
-            Escolha uma máquina para monitorar
+    <Box sx={{paddingLeft: 4}}>
+      <Box sx={{ mb: 4 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, mb: 1 }}>
+          <Activity color={theme.palette.primary.dark} size={30} />
+          <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+            Máquinas disponíveis
           </Typography>
         </Box>
-        <Divider sx={{ my: 4 }} />
-        {renderContent()}
       </Box>
+      <Divider sx={{ my: 4 }} />
+      {renderContent()}
     </Box>
   );
 };

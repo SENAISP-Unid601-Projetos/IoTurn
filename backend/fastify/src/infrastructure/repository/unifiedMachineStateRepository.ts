@@ -16,6 +16,8 @@ export interface NewUnifiedMachineState {
     rpmIsMissing: boolean;
     oilTemperatureIsMissing: boolean;
     oilLevelIsMissing: boolean;
+    clusterPredict: number | null;
+    clusterStrength: number | null;    
 }
 export const unifiedMachineStateRepository = {
     newUnifiedMachine: async (data: NewUnifiedMachineState): Promise<UnifiedMachineState> => {
@@ -32,6 +34,8 @@ export const unifiedMachineStateRepository = {
                     rpmIsMissing: data.rpmIsMissing,
                     oilTemperatureIsMissing: data.oilTemperatureIsMissing,
                     oilLevelIsMissing: data.oilLevelIsMissing,
+                    clusterPredict: data.clusterPredict,
+                    clusterStrength: data.clusterStrength
                 }
             });
 

@@ -1,7 +1,7 @@
 import { NewDataPoint } from "../../mqttSubscriber";
 import { sensoresReadingRepository, LastReadingResult } from "../infrastructure/repository/sensoresReadingRepository";
 import { unifiedMachineStateRepository, NewUnifiedMachineState } from "../infrastructure/repository/unifiedMachineStateRepository";
-
+import axios from "axios";
 const TTLS = {
     current: { milliseconds: 35000 },
     rpm: { milliseconds: 35000 },
@@ -86,28 +86,54 @@ export const unifiedMachineStateService = {
             )
         ]);
 
-        // Montamos o objeto final para salvar no banco.
         const newState: NewUnifiedMachineState = {
             timestamp: reconstructionTime,
             machineId: data.machineId,
-            current: currentResult.value === null ? undefined : currentResult.value,
-            rpm: rpmResult.value === null ? undefined : rpmResult.value,
-            oilTemperature: oilTemperatureResult.value === null ? undefined : oilTemperatureResult.value,
-            oilLevel: oilLevelResult.value === null ? undefined : oilLevelResult.value,
+            current: currentResult.value ?? undefined,
+            rpm: rpmResult.value ?? undefined,
+            oilTemperature: oilTemperatureResult.value ?? undefined,
+            oilLevel: oilLevelResult.value ?? undefined,
             currentIsMissing: currentResult.isMissing,
             rpmIsMissing: rpmResult.isMissing,
             oilTemperatureIsMissing: oilTemperatureResult.isMissing,
-            oilLevelIsMissing: oilLevelResult.isMissing
+            oilLevelIsMissing: oilLevelResult.isMissing,
+            clusterPredict: null,
+            clusterStrength: null
         };
 
-        try {
+         if (newState.currentIsMissing || newState.rpmIsMissing || newState.oilTemperatureIsMissing || newState.oilLevelIsMissing) {
+            console.warn(`[Machine ID: ${newState.machineId}] Dados incompletos para predição. Salvando estado sem cluster.`);
             await unifiedMachineStateRepository.newUnifiedMachine(newState);
-            console.log("Estado unificado salvo com sucesso:", newState);
-            // Aqui você dispararia a chamada para o serviço de análise/ML
+            return; // Encerra a função aqui, evitando a chamada à API
+        }
+
+        try {
+            const predictionPayload = {
+                current: newState.current,
+                rpm: newState.rpm,
+                oilTemperature: newState.oilTemperature,
+                oilLevel: newState.oilLevel
+            };
+            console.log(`[Machine ID: ${newState.machineId}] Enviando dados para predição:`, predictionPayload);
+            const response = await axios.post('http://127.0.0.1:8000/predictCluster', predictionPayload);
+
+            if (response.status === 200) {
+                const { predicted_cluster, prediction_strength } = response.data;
+                
+                newState.clusterPredict = predicted_cluster;
+                newState.clusterStrength = prediction_strength;
+                
+                console.log(`[Machine ID: ${newState.machineId}] Predição recebida: Cluster ${predicted_cluster}`);
+                await unifiedMachineStateRepository.newUnifiedMachine(newState);
+            }
         } catch (error) {
-            console.error("Erro ao salvar estado unificado da máquina:", error);
-            // Re-throw a a exceção para a camada superior tratar
-            throw error;
+            if (axios.isAxiosError(error)) {
+                console.error("Erro na chamada para a API de predição:", error.response?.data || error.message);
+            } else {
+                console.error("Erro desconhecido ao tentar prever o cluster:", error);
+            }
+            console.warn(`[Machine ID: ${newState.machineId}] Predição falhou. Salvando estado sem cluster.`);
+            await unifiedMachineStateRepository.newUnifiedMachine(newState);
         }
     }
 }

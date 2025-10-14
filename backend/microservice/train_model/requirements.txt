@@ -1,7 +1,9 @@
+numpy
+scipy
 pandas
 scikit-learn 
 joblib
 requests
 matplotlib
 seaborn
-cuid
+hdbscan

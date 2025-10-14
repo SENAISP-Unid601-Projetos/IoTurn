@@ -2,4 +2,11 @@ numpy
 scipy
 fastapi
 gunicorn
-uvicorn[standard]
+uvicorn
+pandas
+scikit-learn 
+joblib
+requests
+matplotlib
+seaborn
+cuid

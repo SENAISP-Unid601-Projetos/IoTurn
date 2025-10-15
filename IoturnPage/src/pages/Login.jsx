@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Box,
     Container,
@@ -8,20 +8,61 @@ import {
     Link,
     InputAdornment,
     IconButton,
-    Divider,
     Stack,
     Paper,
 } from "@mui/material";
-import { Zap, Mail, Lock, Eye, EyeOff, Github } from "lucide-react";
-import { transform } from "framer-motion";
+import { Zap, Mail, Lock, Eye, EyeOff, CheckCircle } from "lucide-react";
+import ApiService from "../services/ApiServices";
 import theme from "../theme";
 
 function Login() {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [emailError, setEmailError] = useState("");
+    const [passwordError, setPasswordError] = useState("");
+    const [isEmailValid, setIsEmailValid] = useState(false);
+    const [isPasswordValid, setIsPasswordValid] = useState(false);
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
     const handleMouseDownPassword = (event) => {
         event.preventDefault();
+    };
+
+    useEffect(() => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (emailRegex.test(email)) {
+            setIsEmailValid(true);
+            setEmailError("");
+        } else {
+            setIsEmailValid(false);
+        }
+    }, [email]);
+
+    useEffect(() => {
+        if (password.length >= 8) {
+            setIsPasswordValid(true);
+            setPasswordError("");
+        } else {
+            setIsPasswordValid(false);
+        }
+    }, [password]);
+
+    const handleLogin = () => {
+        if (!isEmailValid) {
+            setEmailError("Por favor, insira um email válido.");
+        }
+        if (!isPasswordValid) {
+            setPasswordError("A senha deve ter no mínimo 8 caracteres.");
+        }
+
+        if (isEmailValid && isPasswordValid) {
+            const data = {email: email, password: password};
+            console.log("Validação OK!");
+            console.log("Email:", email);
+            console.log("Senha:", password);
+            // ApiService.postRequest("/login", { email, data });
+        }
     };
 
     const textFieldStyles = {
@@ -84,10 +125,19 @@ function Login() {
                             label="Email"
                             fullWidth
                             sx={textFieldStyles}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            error={!!emailError}
+                            helperText={emailError}
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
                                         <Mail size={20} color="gray" />
+                                    </InputAdornment>
+                                ),
+                                endAdornment: isEmailValid && (
+                                    <InputAdornment position="end">
+                                        <CheckCircle size={20} color={theme.palette.success.main} />
                                     </InputAdornment>
                                 ),
                             }}
@@ -98,6 +148,10 @@ function Login() {
                             type={showPassword ? "text" : "password"}
                             fullWidth
                             sx={textFieldStyles}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            error={!!passwordError}
+                            helperText={passwordError}
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
@@ -106,6 +160,7 @@ function Login() {
                                 ),
                                 endAdornment: (
                                     <InputAdornment position="end">
+                                        {isPasswordValid && !showPassword && <CheckCircle size={20} color={theme.palette.success.main} />}
                                         <IconButton
                                             aria-label="toggle password visibility"
                                             onClick={handleClickShowPassword}
@@ -127,7 +182,13 @@ function Login() {
                             Esqueceu a senha?
                         </Link>
 
-                        <Button href="/main" variant="contained" size="large" fullWidth sx={{ py: 1.5 }}>
+                        <Button
+                            variant="contained"
+                            size="large"
+                            fullWidth
+                            sx={{ py: 1.5 }}
+                            onClick={handleLogin}
+                        >
                             Acessar Plataforma
                         </Button>
                     </Stack>

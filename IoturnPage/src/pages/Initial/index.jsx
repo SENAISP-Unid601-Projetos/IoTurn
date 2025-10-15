@@ -17,28 +17,39 @@ const PageHeader = () => (
   <AppBar
     position="static"
     elevation={0}
-    sx={{ backgroundColor: "transparent", padding: "1rem 2rem" }}
+    sx={{ backgroundColor: "transparent" }}
   >
-    <Toolbar>
-      <Box sx={{ display: "flex", alignItems: "center" }}>
-        <img
-          src={Logo}
-          alt="IoTurn Logo"
-          style={{ height: "50px", marginRight: "16px", transform: "scale(3)" }}
-        />
-      </Box>
-      <Box sx={{ flexGrow: 1 }} />
-      <Button
-        variant="contained"
-        sx={{
-          borderRadius: "20px",
-          textTransform: "none",
-          px: 3,
-        }}
-      >
-        Acessar
-      </Button>
-    </Toolbar>
+    <Container maxWidth="lg">
+      <Toolbar sx={{ padding: { xs: "0", md: "0 1.5rem" } }}>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Box
+            component="img"
+            src={Logo}
+            alt="IoTurn Logo"
+            sx={{
+              height: "50px",
+              transform: "scale(5)",
+              width: "auto",
+              py: 2,
+            }}
+          />
+        </Box>
+        <Box sx={{ flexGrow: 1 }} />
+        <Button
+          variant="contained"
+          href="#acessar"
+          sx={{
+            borderRadius: "20px",
+            textTransform: "none",
+            px: 3,
+            py: 1,
+            fontSize: "1rem",
+          }}
+        >
+          Acessar
+        </Button>
+      </Toolbar>
+    </Container>
   </AppBar>
 );
 
@@ -53,8 +64,12 @@ const BtnAcess = () => (
       py: 1.5,
       px: 4,
       fontSize: "1rem",
+      transition: "background-color 0.3s ease, transform 0.2s ease",
+      "&:hover": {
+        transform: "translateY(-2px)",
+      },
       "& .MuiButton-endIcon": {
-        transition: "transform 0.2s ease-in-out",
+        transition: "transform 0.3s ease-in-out",
       },
       "&:hover .MuiButton-endIcon": {
         transform: "translateX(5px)",
@@ -69,20 +84,27 @@ const HeroSection = () => (
   <Container
     maxWidth="md"
     sx={{
-      flexGrow: 1,
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
       textAlign: "center",
-      py: 4,
+      py: { xs: 4, md: 8 },
     }}
   >
-    <Typography variant="h1" component="h1" sx={{ fontWeight: "bold", mb: 2 }}>
+    <Typography
+      variant="h1"
+      component="h1"
+      sx={{
+        fontWeight: "bold",
+        mb: 2,
+        fontSize: { xs: "2.5rem", sm: "3.5rem", md: "4rem" },
+      }}
+    >
       Monitoramento <br />
       IoT{" "}
       <Typography
         component="span"
-        variant="h2"
+        variant="inherit"
         color="primary"
         sx={{ fontWeight: "bold" }}
       >
@@ -95,13 +117,21 @@ const HeroSection = () => (
       variant="h5"
       component="p"
       color="text.secondary"
-      sx={{ mb: 4, maxWidth: "600px" }}
+      sx={{
+        mb: 4,
+        maxWidth: "600px",
+        fontSize: { xs: "1rem", md: "1.25rem" },
+      }}
     >
       Conecte, monitore e otimize seus dispositivos industriais em tempo real.
       Uma plataforma completa para transformar dados em decisões.
     </Typography>
     <BtnAcess />
-    <Stack direction="row" spacing={4} sx={{ mt: 6 }}>
+    <Stack
+      direction={{ xs: "column", sm: "row" }}
+      spacing={{ xs: 2, sm: 4 }}
+      sx={{ mt: 4 }}
+    >
       <Stack direction="row" alignItems="center" spacing={1}>
         <CheckCircle2 size={16} color="#2979ff" />
         <Typography variant="body2" color="text.secondary">
@@ -125,20 +155,31 @@ const MoreInfos = () => (
       flexDirection: "column",
       alignItems: "center",
       textAlign: "center",
-      py: 4,
+      py: { xs: 4, md: 8 },
     }}
   >
-    <Typography component="span" variant="h3" sx={{ fontWeight: "bold" }}>
+    <Typography
+      component="h2"
+      variant="h3"
+      sx={{
+        fontWeight: "bold",
+        fontSize: { xs: "2rem", md: "2.5rem" },
+      }}
+    >
       Tudo que você precisa em um só lugar
     </Typography>
     <Typography
-      component="span"
+      component="p"
       variant="h6"
       color="text.secondary"
-      sx={{ maxWidth: "50%" }}
+      sx={{
+        mt: 1,
+        maxWidth: { xs: "90%", md: "60%" },
+        fontSize: { xs: "1rem", md: "1.125rem" },
+      }}
     >
       Ferramentas poderosas para gerenciar sua infraestrutura IoT com eficiência
-      e segurança
+      e segurança.
     </Typography>
     <MoreInfoCards />
   </Container>
@@ -151,13 +192,17 @@ const CallSection = () => (
       flexDirection: "column",
       alignItems: "center",
       textAlign: "center",
-      py: 4,
+      py: { xs: 4, md: 8 },
     }}
   >
     <Typography
-      component="span"
+      component="h2"
       variant="h3"
-      sx={{ fontWeight: "bold", mt: 2 }}
+      sx={{
+        fontWeight: "bold",
+        mt: 2,
+        fontSize: { xs: "2rem", md: "2.5rem" },
+      }}
     >
       Pronto para transformar sua operação?
     </Typography>
@@ -165,13 +210,42 @@ const CallSection = () => (
       variant="h6"
       component="p"
       color="text.secondary"
-      sx={{ mb: 4, mt: 4 }}
+      sx={{ my: 4, fontSize: { xs: "1rem", md: "1.125rem" } }}
     >
       Junte-se a empresas que já confiam na IoTurn para monitorar sua
-      infraestrutura
+      infraestrutura.
     </Typography>
     <BtnAcess />
   </Container>
+);
+
+const PageFooter = () => (
+  <Box sx={{ width: "100%", py: 3 }}>
+    <Container
+      maxWidth="lg"
+      sx={{
+        position: "relative",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        minHeight: { xs: "120px", md: "60px" },
+      }}
+    >
+      <Box
+        component="img"
+        src={Logo}
+        alt="IoTurn Logo"
+        sx={{
+          height: "50px",
+          width: "auto",
+        }}
+      />
+
+      <Typography variant="body2" color="text.secondary">
+        © 2025 IoTurn. Plataforma de Monitoramento Industrial.
+      </Typography>
+    </Container>
+  </Box>
 );
 
 function Home() {
@@ -180,18 +254,21 @@ function Home() {
       sx={{
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center",
-        height: "100%",
+        minHeight: "100vh",
         bgcolor: "background.default",
       }}
     >
-      <PageHeader />
-      <Divider />
-      <HeroSection />
-      <Divider />
-      <MoreInfos />
-      <Divider />
-      <CallSection />
+      <Box component="main" sx={{ flexGrow: 1 }}>
+        <PageHeader />
+        <Divider />
+        <HeroSection />
+        <Divider />
+        <MoreInfos />
+        <Divider />
+        <CallSection />
+        <Divider />
+        <PageFooter />
+      </Box>
     </Box>
   );
 }

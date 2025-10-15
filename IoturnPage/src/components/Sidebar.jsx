@@ -36,7 +36,7 @@ const sidebarItems = [
       {
         text: "Máquinas",
         icon: <ListIcon size={17} />,
-        path: "/maquinas",
+        path: "/main/maquinas",
       },
     ],
   },
@@ -235,7 +235,6 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
           {renderItems(sidebarItems)}
         </List>
 
-        {/* Botão de Logout */}
         <Box sx={{ p: 2, pt: 0 }}>
           <Divider sx={{ my: 2, borderColor: "rgba(255,255,255,0.1)" }} />
           <ListItemButton sx={mainItemSx} onClick={handleLogout}>

@@ -24,7 +24,7 @@ import {
   LogOut,
 } from "lucide-react";
 import UserProfile from './UserProfile';
-import { fetchUserData } from "../services/userService"; 
+import { fetchUserData } from "../services/UserService"; 
 import theme from "../theme";
 
 //itens da sidebar

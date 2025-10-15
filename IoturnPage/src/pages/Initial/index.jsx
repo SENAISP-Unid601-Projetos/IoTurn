@@ -37,7 +37,7 @@ const PageHeader = () => (
         <Box sx={{ flexGrow: 1 }} />
         <Button
           variant="contained"
-          href="#acessar"
+          href="/login"
           sx={{
             borderRadius: "20px",
             textTransform: "none",

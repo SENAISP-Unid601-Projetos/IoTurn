@@ -186,6 +186,7 @@ function Login() {
                             variant="contained"
                             size="large"
                             fullWidth
+                            href="/main/maquinas"
                             sx={{ py: 1.5 }}
                             onClick={handleLogin}
                         >

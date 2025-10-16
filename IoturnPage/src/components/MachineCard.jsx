@@ -8,6 +8,7 @@ import {
   Zap,
 } from "lucide-react";
 
+
 const iconMap = {
   RPM: GaugeCircle,
   Temp: Thermometer,
@@ -37,7 +38,7 @@ const MachineCard = ({ machine, onClick }) => {
         color: "text.primary",
         cursor: "pointer",
         border: `0.1px solid ${theme.palette.text.tertiary}`,
-        transition: "border-color 0.1s ease-in-out",
+        transition: "border-color 0.3s ease-in-out",
         "&:hover": {
           borderColor: theme.palette.primary.main,
           ".card-arrow-icon": {

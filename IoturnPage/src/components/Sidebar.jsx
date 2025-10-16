@@ -50,7 +50,7 @@ const sidebarItems = [
     icon: <Settings size={18} />,
     subItems: [
       { text: "Usuários", icon: <User size={17} />, path: "/usuarios" },
-      { text: "Máquinas", icon: <ListIcon size={17} />, path: "/maquinas-gerenciamento" },
+      { text: "Máquinas", icon: <ListIcon size={17} />, path: "/main/gerenciamento/maquinas" },
       { text: "Dispositivos", icon: <Cpu size={17} />, path: "/dispositivos" },
       { text: "Gateways", icon: <WifiCog size={17} />, path: "/gateways" },
     ],

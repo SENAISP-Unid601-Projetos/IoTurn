@@ -1,4 +1,4 @@
-import Fastify from 'fastify'
+import Fastify, { FastifyRequest, FastifyReply } from 'fastify'
 import { geminiRoutes } from './src/routes/geminiRoutes'
 import './mqttSubscriber' 
 import cors from '@fastify/cors'
@@ -8,6 +8,17 @@ import { deviceRoutes } from './src/routes/deviceRoutes'
 import { gatewayRoutes } from './src/routes/gatewayRoutes'
 import { unifiedMachineRoute } from './src/routes/unifiedMachineRoute'
 import { clientsRoutes } from './src/routes/clientsRoutes'
+import fastifyJwt, { JWT } from '@fastify/jwt'
+import '@fastify/cookie';
+
+declare module 'fastify' {
+  interface FastifyRequest {
+    jwt: JWT
+  }
+  interface FastifyInstance {
+    authenticate(request: FastifyRequest, reply: FastifyReply): Promise<void>
+  }
+}
 
 dotenv.config()
 const fastify = Fastify({ logger: true })
@@ -15,8 +26,28 @@ const fastify = Fastify({ logger: true })
 fastify.register(cors, {
   origin: true, 
 })
+//Registro plugin de cookies
+fastify.register(require('@fastify/cookie'));
+//Registro do plugin JWT
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is not set')
+}
+fastify.register(fastifyJwt, {
+  secret: process.env.JWT_SECRET,
+  cookie: {
+    cookieName: 'token',
+    signed: false,
+  }
+})
 
-fastify.register(geminiRoutes)
+fastify.decorate("authenticate", async (request: FastifyRequest, reply: FastifyReply) => {
+  try{
+    await request.jwtVerify();
+  } catch (err) {
+    reply.status(401).send({ message: 'Unauthorized' });
+  }
+})
+fastify.register(geminiRoutes, {prefix:'/hermes'})
 fastify.register(machineRoutes, {prefix: '/machines'});
 fastify.register(deviceRoutes,{prefix: '/devices'});
 fastify.register(gatewayRoutes,{prefix: '/gateways'});

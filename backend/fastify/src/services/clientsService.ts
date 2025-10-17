@@ -1,14 +1,35 @@
-import { clientsRepository } from "../infrastructure/repository/clientsRepository";
-export interface Client {
-    id: number;
-    companyName: string;
-    email: string;
-    cnpj: string;
-}
+
+import { clientsRepository, NewClientData } from "../infrastructure/repository/clientsRepository";
+import { Client } from "@prisma/client";
 
 export const clientsService = {
-    loginTemp: async (email: string, cnpj: string): Promise<Client | null> => {
-        const client = await clientsRepository.loginTemp(email, cnpj);
-        return client;
+    
+    newClientService: async (data: NewClientData): Promise<Client | undefined> =>{
+        try {
+            const result = await clientsRepository.newClient(data);
+
+            if(!result){
+                throw new Error("Erro ao cadastrar cliente")
+            }
+
+            return result;
+        } catch (err) {
+            console.error("Error:", err)
+        }
+    },
+    loginService: async (email: string, password: string ): Promise<Client | undefined> =>{
+        try {
+            const result = await clientsRepository.login(email,password);
+
+            if(!result){
+                throw new Error("Erro ao logal cliente")
+            }
+
+            return result;
+
+        }catch (err) {
+            console.error("Error:", err)
+        }
     }
+
 };

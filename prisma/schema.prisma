@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://usuario:senha123@localhost:5432/ioturn"
+  url      = "postgresql://ioturn601:senaicfp601@172.27.64.1:30432/ioturn"
 }
 
 model InteracaoIA {
@@ -43,6 +43,7 @@ model Client {
   phone        String?
   address      String?
   email        String    @unique
+  password     String
   contractDate DateTime  @default(now())
   status       Status    @default(ACTIVE)
   machines     Machine[]

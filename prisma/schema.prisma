@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://ioturn601:senaicfp601@172.27.64.1:30432/ioturn"
+  url      = "postgresql://usuario:senha123@172.28.96.1:5432/ioturn"
 }
 
 model InteracaoIA {
@@ -61,6 +61,7 @@ model User {
   userType               UserType
   status                 Status                  @default(ACTIVE)
   clientId               Int
+  createdAt              DateTime                @default(now())
   currentReadings        CurrentReading[]        @relation("CurrentReadings")
   responsibleMachines    Machine[]               @relation("ResponsibleForMachines")
   oilLevelReadings       OilLevelReading[]       @relation("OilLevelReadings")

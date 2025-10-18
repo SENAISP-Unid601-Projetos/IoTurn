@@ -10,6 +10,7 @@ import { unifiedMachineRoute } from './src/routes/unifiedMachineRoute'
 import { clientsRoutes } from './src/routes/clientsRoutes'
 import fastifyJwt, { JWT } from '@fastify/jwt'
 import '@fastify/cookie';
+import { userRoutes } from './src/routes/userRoutes'
 
 declare module 'fastify' {
   interface FastifyRequest {
@@ -53,6 +54,7 @@ fastify.register(deviceRoutes,{prefix: '/devices'});
 fastify.register(gatewayRoutes,{prefix: '/gateways'});
 fastify.register(unifiedMachineRoute,{prefix: '/unifiedMachines'});
 fastify.register(clientsRoutes,{prefix: '/clients'});
+fastify.register(userRoutes,{prefix:'/users'})
 
 async function start() {
   try {

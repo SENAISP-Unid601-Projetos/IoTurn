@@ -1,5 +1,4 @@
 import { Client, PrismaClient } from "@prisma/client";
-import { string } from "zod";
 
 const prisma = new PrismaClient();
 export interface NewClientData {
@@ -11,7 +10,7 @@ export interface NewClientData {
     password: string;
 }
 export const clientsRepository = {
-    newClient: async (data: NewClientData): Promise<Client | undefined> =>{
+    newClient: async (data: NewClientData): Promise<Client> =>{
         try {
             const client = await prisma.client.create({
                 data: {
@@ -21,15 +20,16 @@ export const clientsRepository = {
                     address: data.address,
                     email: data.email,
                     password: data.password
-                }
+                },
             });
 
             return client
-        } catch (error) {
-            
+        } catch (err) {
+            console.error("Erro ao criar cliente:", err);
+            throw new Error("Falha ao acessar o banco de dados para criar o cliente.");
         }
     },
-    login: async (email: string, password: string): Promise<Client | undefined> => {
+    login: async (email: string, password: string): Promise<Client> => {
         try {
             const client = await prisma.client.findFirst({
                 where: {
@@ -40,10 +40,11 @@ export const clientsRepository = {
             });
             return client as Client
         } catch (err) {
-            console.error("Erro ao buscar cliente:", err);
+            console.error("Erro ao fazer login:", err);
+            throw new Error("Falha ao acessar o banco de dados para fazer login.");
         }
     },
-    findByEmail: async (email: string): Promise<Client | undefined> =>{
+    findByEmail: async (email: string): Promise<Client> =>{
         try {
             const isExists = await prisma.client.findFirst({
                 where: {
@@ -54,6 +55,7 @@ export const clientsRepository = {
             return isExists as Client
         } catch (err) {
             console.error("Erro ao buscar email do cliente:", err);
+            throw new Error("Falha ao acessar o banco de dados para buscar email.");
         }
     }
 };

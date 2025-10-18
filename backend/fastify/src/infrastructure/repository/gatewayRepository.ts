@@ -1,10 +1,11 @@
-import { PrismaClient, Gateway, } from "@prisma/client";
+import { PrismaClient, Gateway, DeviceStatus, } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 export interface NewGatewayData {
     gatewayId: string;
-    description?: string;
+    description: string;
+    status: DeviceStatus
 }
 export const gatewayRepository = {
     newGateway: async (data: NewGatewayData): Promise<Gateway | undefined> => {
@@ -12,7 +13,8 @@ export const gatewayRepository = {
             const result = await prisma.gateway.create({
                 data: {
                     gatewayId: data.gatewayId,
-                    description: data.description
+                    description: data.description,
+                    status: data.status
                 }
             });
 
@@ -35,5 +37,5 @@ export const gatewayRepository = {
             console.error("Erro ao buscar gateway pelo id:", err);
             throw new Error("Falha ao acessar o banco de dados para buscar gateway por ID.");
         }
-    }
+    },
 }

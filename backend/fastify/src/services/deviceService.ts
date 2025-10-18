@@ -1,6 +1,7 @@
-import { deviceRepository, RawMapping } from "../infrastructure/repository/deviceRepository";
+import { CreateDeviceData, deviceRepository, RawMapping } from "../infrastructure/repository/deviceRepository";
 import { gatewayRepository } from "../infrastructure/repository/gatewayRepository";
 import refreshMappings from "../../mqttSubscriber";
+import { Device } from "@prisma/client";
 export type MappingResponse = {
     nodeId: string,
     machineId: number
@@ -29,5 +30,13 @@ export const deviceService = {
             throw new Error(`Inconsistência de dados: Gateway com ID ${result.gatewayId} não encontrado.`); 
         }
         refreshMappings(gatewayToNotify.gatewayId)
-    }
+    },
+    createDevice: async (data: CreateDeviceData): Promise<Device> =>{
+        const result = await deviceRepository.createDevice(data);
+        if(!result){
+            throw new Error("Erro ao crir dispositivo")
+        }
+
+        return result as Device
+    } 
 }

@@ -5,7 +5,7 @@ import { clientsRepository } from "../infrastructure/repository/clientsRepositor
 import bcrypt from 'bcrypt';
 
 const loginBodySchema = z.object({
-    email: z.string(),
+    email: z.email(),
     password: z.string().min(8, "A senha deve ter no mínimo 8 caracteres.")
 });
 const newClientBodySchema = z.object({
@@ -13,7 +13,7 @@ const newClientBodySchema = z.object({
     cnpj: z.string().min(14, "O cnpj deve ter pelo menos 14 caracteres"),
     phone: z.string(),
     address: z.string(),
-    email: z.string(),
+    email: z.email(),
     password: z.string().min(8, "A senha deve ter no mínimo 8 caracteres.")
 })
 

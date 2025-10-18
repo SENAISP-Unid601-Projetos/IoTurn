@@ -2,11 +2,13 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import {z} from 'zod';
 import { gatewayService } from '../services/gatewayService';
 import { NewGatewayData } from '../infrastructure/repository/gatewayRepository';
+import { DeviceStatus } from '@prisma/client';
 
 
 const createGatewayBodySchema = z.object({
     gatewayId: z.string(),
-    description: z.string()
+    description: z.string(),
+    status:z.enum(DeviceStatus)
 })
 
 export const gatewayController = {

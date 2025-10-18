@@ -1,4 +1,5 @@
-import { PrismaClient, Device } from "@prisma/client";
+import { PrismaClient, Device, Status, DeviceStatus } from "@prisma/client";
+import { error } from "console";
 
 const prisma = new PrismaClient();
 
@@ -8,7 +9,11 @@ export interface RawMapping {
         id: number
     }
 }
-
+export interface CreateDeviceData {
+    nodeId: string,
+    description: string,
+    status: DeviceStatus
+}
 export const deviceRepository = {
 
         findActiveMappings: async(): Promise<RawMapping[]> =>{
@@ -81,6 +86,18 @@ export const deviceRepository = {
         } catch (error) {
             console.error("Erro ao buscar dispositivo por ID:", error);
             throw new Error("Falha ao acessar o banco de dados para buscar dispositivo por ID.");
+        }
+    },
+    createDevice: async(data: CreateDeviceData): Promise<Device> =>{
+        try{
+            const result = await prisma.device.create({
+                data: data
+            })
+
+            return data as Device;
+        } catch(error) {
+            console.error("Erro ao criar dispositivo:", error);
+            throw new Error("Falha ao acessar o banco de dados para criar dispositivo.");
         }
     }
 }

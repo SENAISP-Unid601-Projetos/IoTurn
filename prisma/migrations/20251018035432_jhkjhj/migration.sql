@@ -47,6 +47,7 @@ CREATE TABLE "clients" (
     "phone" TEXT,
     "address" TEXT,
     "email" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
     "contractDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "status" "Status" NOT NULL DEFAULT 'ACTIVE',
 
@@ -90,6 +91,8 @@ CREATE TABLE "UnifiedMachineState" (
     "rpm" INTEGER,
     "oilTemperature" DOUBLE PRECISION,
     "oilLevel" DOUBLE PRECISION,
+    "clusterPredict" INTEGER,
+    "clusterStrength" DOUBLE PRECISION,
     "currentIsMissing" BOOLEAN NOT NULL DEFAULT false,
     "rpmIsMissing" BOOLEAN NOT NULL DEFAULT false,
     "oilTemperatureIsMissing" BOOLEAN NOT NULL DEFAULT false,

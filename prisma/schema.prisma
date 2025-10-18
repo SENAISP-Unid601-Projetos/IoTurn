@@ -82,11 +82,11 @@ model Machine {
   status                 Status                  @default(ACTIVE)
   clientId               Int
   responsibleUserId      Int
-  deviceId               Int                     @unique
+  deviceId               Int?                     @unique
   UnifiedMachineState    UnifiedMachineState[]
   currentReadings        CurrentReading[]        @relation("CurrentReadings")
   client                 Client                  @relation(fields: [clientId], references: [id])
-  device                 Device                  @relation(fields: [deviceId], references: [id])
+  device                 Device?                  @relation(fields: [deviceId], references: [id])
   responsibleUser        User                    @relation("ResponsibleForMachines", fields: [responsibleUserId], references: [id])
   oilLevelReadings       OilLevelReading[]       @relation("OilLevelReadings")
   oilTemperatureReadings OilTemperatureReading[] @relation("OilTemperatureReadings")

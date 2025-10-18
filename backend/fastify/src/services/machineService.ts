@@ -1,4 +1,4 @@
-import { Machine } from "@prisma/client";
+import { Device, Gateway, Machine } from "@prisma/client";
 import { machineRepository, NewMachineData, RawMachine, UpdateMachineData } from "../infrastructure/repository/machineRepository";
 import { sensoresReadingRepository } from "../infrastructure/repository/sensoresReadingRepository";
 import { deviceRepository } from "../infrastructure/repository/deviceRepository";
@@ -14,7 +14,7 @@ export const machineService = {
 
         const machine = await machineRepository.newMachine(data);
 
-        if (isPresentGateway) {
+        if (isPresentGateway && machine.deviceId) {
             await deviceRepository.assignGatewayToDevice(isPresentGateway.id, machine.deviceId);
         }
 
@@ -38,14 +38,31 @@ export const machineService = {
             lastOilLevel: lastOilLevel || null
         })) || null;
     },
-    updateMachine: async(machineId:number,data: UpdateMachineData): Promise<Machine> =>{
-        const isPresent = await machineRepository.findById(machineId);
-        if(!isPresent){
-            throw new Error("Máquina não encontrada")
+    updateMachine: async(machineId:number, data: UpdateMachineData): Promise<Machine> =>{
+        const isPresentMachine = await machineRepository.findById(machineId);
+        if(!isPresentMachine){
+            throw new Error("Máquina não encontrada");
         }
-        const result = await machineRepository.updateMachine(machineId,data);
 
-        return result;
+        const { gatewayId, ...machineData } = data;
+
+        if (machineData.deviceId) {
+            const isPresentDevice = await deviceRepository.findDeviceById(machineData.deviceId);
+            if (!isPresentDevice) {
+                throw new Error("O novo dispositivo (deviceId) não foi encontrado.");
+            }
+        }
+       
+        const updatedMachine = await machineRepository.updateMachine(machineId, machineData);
+
+        if (gatewayId && updatedMachine.deviceId) {
+            const isPresentGateway = await gatewayRepository.findGatewayById(gatewayId);
+            if (!isPresentGateway) {
+                throw new Error("O novo gateway (gatewayId) não foi encontrado.");
+            }
+            await deviceRepository.assignGatewayToDevice(isPresentGateway.id, updatedMachine.deviceId);
+        }
+        return updatedMachine;
     },
     deleteMachine: async(machineId: number): Promise<Machine> =>{
         const isExists = await machineRepository.findById(machineId);

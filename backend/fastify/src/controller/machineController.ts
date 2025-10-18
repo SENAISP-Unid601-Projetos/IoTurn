@@ -13,7 +13,7 @@ const createMachineBodySchema = z.object({
     responsibleUserId: z.number().positive("O ID do responsavel deve ser um número positivo."),
     status:z.enum(Status),
     gatewayId: z.number().positive().optional(),
-    deviceId: z.number().positive().nonoptional("É necessário um ID para fazer o vinculo")
+    deviceId: z.number().positive().optional()
 });
 const updateMachineBodySchema = z.object({
     name: z.string().optional(),
@@ -22,6 +22,8 @@ const updateMachineBodySchema = z.object({
     serialNumber: z.string().optional(),
     status: z.enum(Status),
     responsibleUserId: z.int().positive().optional(),
+    gatewayId: z.number().positive().optional(),
+    deviceId: z.number().positive().optional()
 })
 
 const idParamSchema = z.object({

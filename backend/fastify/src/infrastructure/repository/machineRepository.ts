@@ -11,7 +11,7 @@ export interface NewMachineData {
     clientId: number;
     responsibleUserId: number;
     gatewayId?: number;
-    deviceId: number
+    deviceId?: number
 }
 
 export interface RawMachine{
@@ -57,9 +57,11 @@ export const machineRepository = {
                     responsibleUser: {
                         connect: { id: data.responsibleUserId }
                     },
-                    device: {
-                        connect: {id: data.deviceId}
-                    }
+                    ...(data.deviceId &&{
+                        device: {
+                            connect: {id: data.deviceId}
+                        }
+                    }),
                 }
             });
             return result;
@@ -68,8 +70,7 @@ export const machineRepository = {
             console.error("Erro ao criar máquina:", err);
             throw new Error("Falha ao acessar o banco de dados para criar máquina."); 
         }
-    },
-    findBySerialNumber: async (serialNumber: string): Promise<Machine> => {
+    },findBySerialNumber: async (serialNumber: string): Promise<Machine> => {
         try {
             const isExists = await prisma.machine.findFirst({
                 where: { serialNumber }
@@ -125,13 +126,15 @@ export const machineRepository = {
             throw new Error("Falha ao acessar o banco de dados para listar as máquinas."); 
         }
     },
-    updateMachine: async (machineId:number,data: UpdateMachineData ): Promise<Machine> => {
+    updateMachine: async (machineId:number, data: UpdateMachineData ): Promise<Machine> => {
             try {
+                const { gatewayId, ...machineUpdateData } = data;
+
                 const updateMachine = await prisma.machine.update({
                     where: {
                         id: machineId
                     },
-                    data: data
+                    data: machineUpdateData 
                 })
                 return updateMachine;
             } catch (error) {

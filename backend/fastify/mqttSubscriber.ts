@@ -2,7 +2,6 @@
 import { error } from 'console';
 import mqttClient from './src/config/mqttClient'
 import { sensoresReadingRepository } from './src/infrastructure/repository/sensoresReadingRepository';
-import { string } from 'zod';
 import { unifiedMachineStateService } from './src/services/unifiedMachineStateService';
 const TOPIC = 'ioturn/maquinas/+/dt/+'; 
 
@@ -28,6 +27,7 @@ mqttClient.subscribe(TOPIC, { qos: 0 }, (err, granted) => {
 
 // Ouvinte de mensagens
 mqttClient.on('message',async (topic, message) => {
+  const receptionTime = new Date();
   try {
     const payload = message.toString();
     const topicParts = topic.split('/');
@@ -55,7 +55,7 @@ mqttClient.on('message',async (topic, message) => {
           machineId: numericMachineId
         });
         dataPoint.temperatura = numericPayload;
-        dataPoint.timeStampTemperatura = new Date();
+        dataPoint.timeStampTemperatura = receptionTime;
         break;
       case 'nivel':
         await sensoresReadingRepository.newOilLevelReading({
@@ -63,7 +63,7 @@ mqttClient.on('message',async (topic, message) => {
           machineId: numericMachineId
         });
          dataPoint.nivel = numericPayload;
-         dataPoint.timeStampNivel = new Date();
+         dataPoint.timeStampNivel = receptionTime;
         break;
       case 'rpm':
         await sensoresReadingRepository.newRpm({
@@ -71,7 +71,8 @@ mqttClient.on('message',async (topic, message) => {
           machineId: numericMachineId
         });
         dataPoint.rpm = numericPayload;
-        dataPoint.timeStampRpm = new Date();
+        dataPoint.timeStampRpm = receptionTime;
+        
         break;
       case 'corrente':
         await sensoresReadingRepository.newCurrentReading({
@@ -79,7 +80,7 @@ mqttClient.on('message',async (topic, message) => {
           machineId: numericMachineId
         })
         dataPoint.corrente = numericPayload;
-        dataPoint.timeStampCorrente = new Date();
+        dataPoint.timeStampCorrente = receptionTime;
         break;
       default:
         console.log(`[MQTT AVISO] Nenhum manipulador para o tipo de sensor: ${sensorType}`);

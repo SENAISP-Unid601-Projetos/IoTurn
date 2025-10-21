@@ -145,7 +145,7 @@ export const sensoresReadingRepository = {
             throw error;
         }
     },
-    findLastOilTemperatureData: async (machineId: number, reconstructionTime?: Date): Promise<LastReadingResult> => {
+    findLastOilTemperatureData: async (machineId: number, reconstructionTime?: Date): Promise<LastReadingResult | null> => {
         try {
             const result = await prisma.oilTemperatureReading.findFirst({
                 select: {
@@ -163,18 +163,25 @@ export const sensoresReadingRepository = {
                 }
             });
 
-            return result;
+            if (!result) {
+                return null;
+            }
+            return {
+                oilTemperature: result.temperature,
+                timestamp: result.timestamp
+            };
 
         } catch (error) {
             console.error("Error fetching last temperature data:", error);
             throw error;
         }
     },
-    findLastOilLevelData: async (machineId: number, reconstructionTime?: Date): Promise<LastReadingResult> => {
+
+    findLastOilLevelData: async (machineId: number, reconstructionTime?: Date): Promise<LastReadingResult | null> => {
         try {
             const result = await prisma.oilLevelReading.findFirst({
                 select: {
-                    level: true,
+                    level: true, 
                     timestamp: true
                 },
                 where: {
@@ -188,7 +195,13 @@ export const sensoresReadingRepository = {
                 }
             });
 
-            return result;
+            if (!result) {
+                return null;
+            }
+            return {
+                oilLevel: result.level,
+                timestamp: result.timestamp
+            };
 
         } catch (error) {
             console.error("Error fetching last level data:", error);

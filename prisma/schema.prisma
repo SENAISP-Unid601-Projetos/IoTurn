@@ -208,4 +208,5 @@ enum DeviceStatus {
   OFFLINE
   PROVISIONING
   ERROR
+  CANCELED
 }

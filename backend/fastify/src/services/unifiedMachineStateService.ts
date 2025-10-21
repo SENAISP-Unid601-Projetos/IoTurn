@@ -9,8 +9,7 @@ const TTLS = {
     oilLevel: { milliseconds: 3600000 } // 1 hora
 };
 
-// --- FUNÇÃO AUXILIAR PARA VALIDAR UMA MÉTRICA ---
-// Esta função encapsula toda a lógica para uma única métrica.
+
 async function getAndValidateMetric<T extends keyof typeof TTLS>(
     metricName: T,
     reconstructionTime: Date,
@@ -18,27 +17,21 @@ async function getAndValidateMetric<T extends keyof typeof TTLS>(
     fetchFunction: () => Promise<LastReadingResult | null>
 ): Promise<{ value: number | null; isMissing: boolean }> {
     
-    // Caso 1: O dado já veio no pacote de entrada. Usamos ele.
     if (newData.value !== null && newData.value !== undefined) {
         return { value: newData.value, isMissing: false };
     }
 
-    // Caso 2: O dado não veio. Precisamos buscar no histórico.
     const lastKnownData = await fetchFunction();
 
-    // Se não há histórico, o dado está ausente.
     if (!lastKnownData || !lastKnownData.timestamp) {
         return { value: null, isMissing: true };
     }
 
-    // Caso 3: Encontramos um dado histórico. Precisamos validar seu TTL.
     const dataAge = reconstructionTime.getTime() - lastKnownData.timestamp.getTime();
     
     if (dataAge > TTLS[metricName].milliseconds) {
-        // O dado é muito antigo (obsoleto).
         return { value: null, isMissing: true };
     } else {
-        // O dado é recente o suficiente. Usamos ele.
         return { value: lastKnownData[metricName] !== undefined ? lastKnownData[metricName] : null, isMissing: false };
     }
 }
@@ -46,10 +39,13 @@ async function getAndValidateMetric<T extends keyof typeof TTLS>(
 
 export const unifiedMachineStateService = {
     unifiedState: async (data: NewDataPoint): Promise<void> => {
-        // O timestamp do evento que disparou a reconstrução é a nossa referência.
-        const reconstructionTime = new Date();
+        
+        const reconstructionTime = data.timeStampCorrente || 
+                                 data.timeStampRpm || 
+                                 data.timeStampNivel || 
+                                 data.timeStampTemperatura || 
+                                 new Date();
 
-        // Executamos todas as buscas e validações em PARALELO para performance.
         const [
             currentResult,
             rpmResult,
@@ -104,7 +100,7 @@ export const unifiedMachineStateService = {
          if (newState.currentIsMissing || newState.rpmIsMissing || newState.oilTemperatureIsMissing || newState.oilLevelIsMissing) {
             console.warn(`[Machine ID: ${newState.machineId}] Dados incompletos para predição. Salvando estado sem cluster.`);
             await unifiedMachineStateRepository.newUnifiedMachine(newState);
-            return; // Encerra a função aqui, evitando a chamada à API
+            return; 
         }
 
         try {

@@ -106,8 +106,8 @@ def analyze_results(df, model):
 
 def main():
     """Executa o pipeline completo."""
-    end_date = datetime.now().strftime("%Y-%m-%d")
-    start_date = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
+    end_date = datetime.utcnow().strftime("%Y-%m-%d")
+    start_date = (datetime.utcnow() - timedelta(days=7)).strftime("%Y-%m-%d")
 
     df = fetch_data_from_api(MACHINE_ID, start_date, end_date)
     if df is None:

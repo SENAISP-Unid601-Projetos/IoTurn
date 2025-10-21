@@ -146,5 +146,6 @@ export const geminiService = {
     const response = await result.response;
 
     return { dataHuman: response.text(), hiperParamsHuman: generationConfig };
-  }
+  },
+ 
 };

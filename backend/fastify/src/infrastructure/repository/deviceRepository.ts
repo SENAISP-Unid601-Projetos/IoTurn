@@ -14,6 +14,10 @@ export interface CreateDeviceData {
     description: string,
     status: DeviceStatus
 }
+export interface UpdateDeviceData {
+    description?: string;
+    status?: DeviceStatus;
+}
 export const deviceRepository = {
 
         findActiveMappings: async(): Promise<RawMapping[]> =>{
@@ -99,5 +103,77 @@ export const deviceRepository = {
             console.error("Erro ao criar dispositivo:", error);
             throw new Error("Falha ao acessar o banco de dados para criar dispositivo.");
         }
-    }
+    },
+    updateDevice: async (deviceId: number, data: UpdateDeviceData): Promise<Device> => {
+        try {
+            const updatedDevice = await prisma.device.update({
+                where: {
+                    id: deviceId
+                },
+                data: data 
+            });
+            return updatedDevice;
+        } catch (error) {
+            
+            console.error(`Erro ao atualizar dispositivo ${deviceId}:`, error);
+            throw new Error("Falha ao acessar o banco de dados para atualizar dispositivo.");
+        }
+    },
+    deleteDevice: async (deviceId: number): Promise<Device> => {
+        try {
+            const deletedDevice = await prisma.device.update({
+                where: {
+                    id: deviceId
+                },
+                data: {
+                    status: 'CANCELED'
+                }
+            });
+            return deletedDevice;
+        } catch (error) {
+            console.error(`Erro ao (soft) deletar dispositivo ${deviceId}:`, error);
+            throw new Error("Falha ao acessar o banco de dados para deletar dispositivo.");
+        }
+    },
+    findAllDevices: async (userId: number): Promise<Device[]> => {
+        try {
+            const user = await prisma.user.findUnique({
+                where: {
+                    id: userId
+                },
+                select: {
+                    clientId: true 
+                }
+            });
+
+            if (!user) {
+                console.warn(`Usuário ${userId} não encontrado para buscar dispositivos.`);
+                return []; 
+            }
+
+            const devices = await prisma.device.findMany({
+                where: {
+                    machine: {
+                        clientId: user.clientId 
+                    },
+                    status: {
+                        not: 'CANCELED'
+                    }
+                },
+                include: {
+                    machine: true,
+                    gateway: true
+                },
+                orderBy: {
+                    id: 'asc'
+                }
+            });
+            
+            return devices;
+
+        } catch (error) {
+            console.error("Erro ao buscar todos os dispositivos por usuário:", error);
+            throw new Error("Falha ao acessar o banco de dados para buscar dispositivos.");
+        }
+    },
 }

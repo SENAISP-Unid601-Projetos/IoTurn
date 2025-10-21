@@ -13,6 +13,16 @@ const createDeviceBodySchema = z.object({
     description:z.string().nonempty(),
     status: z.enum(DeviceStatus).nonoptional()
 })
+const deviceParamsSchema = z.object({
+    id: z.coerce.number().int().min(1, "O ID do dispositivo é obrigatório.")
+});
+const UserIdParamsSchema = z.object({
+    id: z.coerce.number().int().min(1, "O ID do usuario é obrigatório.")
+});
+const updateDeviceBodySchema = z.object({
+    description: z.string().optional(),
+    status: z.enum(DeviceStatus).optional()
+}).strip();
 
 export const deviceController = {
     getFormatedMappingController: async(request: FastifyRequest, reply: FastifyReply): Promise<void> =>{
@@ -57,5 +67,84 @@ export const deviceController = {
             reply.status(500).send({ message: 'Internal Server Error' });
         }
 
+    },
+    findAllDevicesController: async(request:FastifyRequest,reply: FastifyReply): Promise<void> => {
+        try {
+            const userId = UserIdParamsSchema.safeParse(request.params)
+
+            if (!userId.success) {
+                reply.status(400).send({ message: 'Invalid request body', errors: userId.error.message });
+                return;
+            }
+            const devices = await deviceService.findAllDevices(userId.data.id);
+
+            reply.status(200).send(devices);
+
+        } catch (error) {
+            console.error("Erro no controller ao buscar dispositivos:", error);
+            reply.status(500).send({ message: 'Internal Server Error' });
+        }
+    },
+
+    updateDeviceController: async(request: FastifyRequest, reply: FastifyReply): Promise<void> => {
+        try {
+            const paramsParse = deviceParamsSchema.safeParse(request.params);
+            if (!paramsParse.success) {
+                reply.status(400).send({ message: 'ID do dispositivo inválido.', errors: paramsParse.error.message });
+                return;
+            }
+            const { id: deviceId } = paramsParse.data;
+
+            const bodyParse = updateDeviceBodySchema.safeParse(request.body);
+            if (!bodyParse.success) {
+                reply.status(400).send({ message: 'Corpo da requisição inválido.', errors: bodyParse.error.message });
+                return;
+            }
+            const updateData = bodyParse.data;
+
+            const updatedDevice = await deviceService.updateDevice(deviceId, updateData);
+
+            reply.status(200).send(updatedDevice);
+
+        } catch (error) {
+            if (error instanceof Error) {
+                if (error.message.includes("não encontrado")) {
+                    reply.status(404).send({ message: error.message }); 
+                    return;
+                }
+                if (error.message.includes("cancelado") || error.message.includes("Nenhum dado")) {
+                    reply.status(400).send({ message: error.message });
+                    return;
+                }
+            }
+            // Erro genérico (500)
+            console.error("Erro no controller ao atualizar dispositivo:", error);
+            reply.status(500).send({ message: 'Internal Server Error' });
+        }
+    },
+    deleteDeviceController: async(request: FastifyRequest, reply: FastifyReply): Promise<void> => {
+        try {
+            const paramsParse = deviceParamsSchema.safeParse(request.params);
+            if (!paramsParse.success) {
+                reply.status(400).send({ message: 'ID do dispositivo inválido.', errors: paramsParse.error.message });
+                return;
+            }
+            const deviceId = paramsParse.data;
+
+            const deletedDevice = await deviceService.deleteDevice(deviceId.id);
+
+            reply.status(200).send(deletedDevice);
+
+        } catch (error) {
+            if (error instanceof Error) {
+                if (error.message.includes("não encontrado")) {
+                    reply.status(404).send({ message: error.message }); 
+                    return;
+                }
+            }
+            // Erro genérico (500)
+            console.error("Erro no controller ao deletar dispositivo:", error);
+            reply.status(500).send({ message: 'Internal Server Error' });
+        }
     }
 }

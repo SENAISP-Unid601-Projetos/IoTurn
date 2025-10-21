@@ -1,4 +1,3 @@
-// src/pages/Gerenciamento/GerenciamentoMaquinas.jsx
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -20,7 +19,7 @@ import { Search as SearchIcon, Edit, Delete, AlertCircle } from "lucide-react";
 import { alpha } from '@mui/material/styles';
 import theme from "../../theme";
 import { fetchAllMachineData } from "../../services/machineService";
-import { yellow } from "@mui/material/colors";
+import { Activity } from "lucide-react";
 
 const GerenciamentoMaquinas = () => {
   const [machines, setMachines] = useState([]);
@@ -97,17 +96,17 @@ const renderStatusChip = (metrics) => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          mb: 3,
-          pb: 2,
-          borderBottom: `1px solid ${theme.palette.divider}`,
+          mb: 2,
         }}
       >
-        <Box>
+        <Box
+        sx={{
+          display: "flex",
+          gap: "10px"
+        }}>
+        <Activity color={theme.palette.primary.dark} size={30} />
           <Typography variant="h4" component="h1" fontWeight="bold">
-            Máquinas
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Gerenciar equipamentos industriais
+            Máquinas Disponiveis
           </Typography>
         </Box>
         <Button
@@ -124,10 +123,8 @@ const renderStatusChip = (metrics) => {
         </Button>
       </Box>
 
-      {/* ✅ TUDO ABAIXO SÓ APARECE SE NÃO HOUVER ERRO */}
       {!error && (
         <>
-          {/* Total e busca */}
           <Box
             sx={{
               display: "flex",
@@ -149,7 +146,7 @@ const renderStatusChip = (metrics) => {
               </Typography>
             </Box>
             <TextField
-              placeholder="Buscar por nome, número de série ou fabricante"
+              placeholder="Buscar"
               variant="outlined"
               size="small"
               value={searchTerm}

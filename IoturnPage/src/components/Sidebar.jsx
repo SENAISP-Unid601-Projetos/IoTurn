@@ -51,7 +51,7 @@ const sidebarItems = [
     subItems: [
       { text: "Usuários", icon: <User size={17} />, path: "/usuarios" },
       { text: "Máquinas", icon: <ListIcon size={17} />, path: "/main/gerenciamento/maquinas" },
-      { text: "Dispositivos", icon: <Cpu size={17} />, path: "/dispositivos" },
+      { text: "Dispositivos", icon: <Cpu size={17} />, path: "/main/gerenciamento/dispositivos" },
       { text: "Gateways", icon: <WifiCog size={17} />, path: "/gateways" },
     ],
   },

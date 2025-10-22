@@ -38,8 +38,9 @@ const GerenciamentoGateways = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const data = await fetchAllGatewayData(); real
+        const data = await fetchAllGatewayData(); 
         setGateways(data);
+      
         setError(null);
       } catch (err) {
         console.error("Erro ao carregar gateways:", err);

@@ -38,7 +38,7 @@ const GerenciamentoGateways = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const data = await fetchAllGatewayData(); // ← chamada ao serviço real
+        const data = await fetchAllGatewayData(); real
         setGateways(data);
         setError(null);
       } catch (err) {
@@ -47,7 +47,7 @@ const GerenciamentoGateways = () => {
       } finally {
         setLoading(false);
       }
-    };
+    }; 
 
     loadData();
   }, []);
@@ -164,7 +164,7 @@ const GerenciamentoGateways = () => {
               </Typography>
             </Box>
             <TextField
-              placeholder="Buscar por Gateway ID ou descrição..."
+              placeholder="Buscar por Gateway ID"
               variant="outlined"
               size="small"
               value={searchTerm}

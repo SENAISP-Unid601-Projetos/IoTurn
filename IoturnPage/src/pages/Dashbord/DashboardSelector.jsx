@@ -51,7 +51,7 @@ const DashboardSelectionPage = () => {
 
     if (error) {
       return (
-        <Alert severity="error">Falha ao carregar os dados: {error}</Alert>
+        <Alert severity="error">Falha ao carregar os dados</Alert>
       );
     }
 

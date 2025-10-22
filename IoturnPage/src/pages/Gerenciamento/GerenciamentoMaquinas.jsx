@@ -35,7 +35,7 @@ const GerenciamentoMaquinas = () => {
         setError(null);
       } catch (err) {
         console.error("Erro ao carregar máquinas:", err);
-        setError("Failed to fetch");
+        setError("Falha ao carregar as máquina");
       } finally {
         setLoading(false);
       }

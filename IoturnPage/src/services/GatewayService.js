@@ -1,4 +1,5 @@
-const GATEWAYS_API_URL = 'http://localhost:3001'
+//const GATEWAYS_API_URL = 'http://localhost:3001'
+const GATEWAYS_API_URL = 'http://localhost:3000/gateways';
 
 const formatTimestamp = (timestamp) => {
   if (!timestamp) return 'N/A'; 

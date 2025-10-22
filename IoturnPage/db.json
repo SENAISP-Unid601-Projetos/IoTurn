@@ -1,74 +1,61 @@
-[
-  {
-    "id": 1,
-    "name": "Torno CNC TX1000",
-    "serialNumber": "TX1000-SN-8892",
-    "manufacturer": "Makino",
-    "model": "TX1000",
-    "status": "ACTIVE",
-    "lastRpm": {
-      "rpm": 1250,
-      "timestamp": "2025-10-23T14:32:10.000Z"
-    },
-    "lastOilTemperature": {
-      "temperature": 68.5,
-      "timestamp": "2025-10-23T14:32:10.000Z"
-    },
-    "lastOilLevel": {
-      "level": 82,
-      "timestamp": "2025-10-23T14:30:00.000Z"
-    },
-    "lastCurrent": {
-      "current": 14.2,
-      "timestamp": "2025-10-23T14:32:10.000Z"
-    },
-    "client": {
-      "companyName": "Indústria Metalúrgica ABC Ltda"
-    },
-    "device": {
+{
+  "machines": [
+    {
+      "id": 1,
+      "name": "Torno CNC TX1000",
+      "serialNumber": "TX1000-SN-8892",
+      "manufacturer": "Makino",
+      "model": "TX1000",
+      "status": "ACTIVE",
+      "lastRpm": {
+        "rpm": 1250,
+        "timestamp": "2025-10-23T14:32:10.000Z"
+      },
+      "lastOilTemperature": {
+        "temperature": 68.5,
+        "timestamp": "2025-10-23T14:32:10.000Z"
+      },
+      "lastOilLevel": {
+        "level": 82,
+        "timestamp": "2025-10-23T14:30:00.000Z"
+      },
+      "lastCurrent": {
+        "current": 14.2,
+        "timestamp": "2025-10-23T14:32:10.000Z"
+      },
+      "client": {
+        "companyName": "Indústria Metalúrgica ABC Ltda"
+      },
+      "device": {
+        "nodeId": "NODE-001"
+      }
+    }
+  ],
+  "devices": [
+    {
       "id": 1,
       "nodeId": "NODE-001",
-      "description": "Sensor de Vibração da Máquina 1",
+      "description": "Sensor de Vibração da Máquina ",
       "status": "ONLINE",
       "lastHeartbeat": "2025-10-23T14:32:06.844Z",
-      "gatewayId": 1,
       "machine": {
         "name": "Torno CNC TX1000"
       },
       "gateway": {
-        "id": 1,
         "gatewayId": "GW-ESP32-001",
-        "description": "Gateway principal da planta 1",
         "status": "ONLINE",
         "lastHeartbeat": "2025-10-23T14:31:32.017Z"
       }
     }
-  },
-  {
-    "id": 2,
-    "name": "Fresadora FX200",
-    "serialNumber": "FX200-SN-4411",
-    "manufacturer": "Haas",
-    "model": "FX200",
-    "status": "SUSPENDED",
-    "lastRpm": null,
-    "lastOilTemperature": null,
-    "lastOilLevel": null,
-    "lastCurrent": null,
-    "client": {
-      "companyName": "Fábrica de Peças XYZ S.A."
-    },
-    "device": {
-      "id": 4,
-      "nodeId": "NODE-OFFLINE-001",
-      "description": "Dispositivo offline para máquina 2",
-      "status": "OFFLINE",
-      "lastHeartbeat": "2025-10-22T17:27:12.164Z",
-      "gatewayId": null,
-      "machine": {
-        "name": "Fresadora FX200"
-      },
-      "gateway": null
+  ],
+  "gateways": [
+    {
+      "id": 1,
+      "gatewayId": "GW-ESP32-001",
+      "description": "Gateway principal da planta 1",
+      "status": "ONLINE",
+      "lastHeartbeat": "2025-10-23T14:31:32.017Z",
+      "connectedDevices": 3
     }
-  }
-]
+  ]
+}

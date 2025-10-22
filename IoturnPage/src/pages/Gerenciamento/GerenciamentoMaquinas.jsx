@@ -16,10 +16,10 @@ import {
   IconButton,
 } from "@mui/material";
 import { Search as SearchIcon, Edit, Delete, AlertCircle } from "lucide-react";
-import { alpha } from '@mui/material/styles';
+import { alpha } from "@mui/material/styles";
 import theme from "../../theme";
 import { fetchAllMachineData } from "../../services/machineService";
-import { Activity } from "lucide-react";
+import { Activity, Trash2 } from "lucide-react";
 
 const GerenciamentoMaquinas = () => {
   const [machines, setMachines] = useState([]);
@@ -43,41 +43,72 @@ const GerenciamentoMaquinas = () => {
     loadData();
   }, []);
 
-  const filteredMachines = machines.filter((machine) =>
-    machine.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    machine.serialNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    machine.manufacturer?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredMachines = machines.filter(
+    (machine) =>
+      machine.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      machine.serialNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      machine.manufacturer?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-const renderStatusChip = (metrics) => {
-  if (!metrics || metrics.length === 0) {
-    return (
-      <Chip
-        label="Inativo"
-        size="small"
-        sx={{
-          bgcolor: alpha(theme.palette.error.main, 0.1),
-          color: theme.palette.error.main,
-          border: `1px solid ${theme.palette.error.main}`,
-          fontWeight: 600,
-          fontSize: "0.75rem",
-        }}
-      />
-    );
+const renderStatusChip = (machineStatus) => {
+  switch (machineStatus) {
+    case 'ACTIVE':
+      return (
+        <Chip
+          label="Ativo"
+          size="small"
+          sx={{
+            bgcolor: alpha(theme.palette.success.main, 0.1),
+            color: theme.palette.success.main,
+            border: `1px solid ${theme.palette.success.main}`,
+            fontWeight: 600,
+            fontSize: "0.75rem",
+          }}
+        />
+      );
+    case 'SUSPENDED':
+      return (
+        <Chip
+          label="Suspenso"
+          size="small"
+          sx={{
+            bgcolor: alpha(theme.palette.warning.main, 0.1),
+            color: theme.palette.warning.main,
+            border: `1px solid ${theme.palette.warning.main}`,
+            fontWeight: 600,
+            fontSize: "0.75rem",
+          }}
+        />
+      );
+    case 'CANCELED':
+      return (
+        <Chip
+          label="Cancelado"
+          size="small"
+          sx={{
+            bgcolor: alpha(theme.palette.error.main, 0.1),
+            color: theme.palette.error.main,
+            border: `1px solid ${theme.palette.error.main}`,
+            fontWeight: 600,
+            fontSize: "0.75rem",
+          }}
+        />
+      );
+    default:
+      return (
+        <Chip
+          label="Desconhecido"
+          size="small"
+          sx={{
+            bgcolor: alpha(theme.palette.text.secondary, 0.1),
+            color: theme.palette.text.secondary,
+            border: `1px solid ${theme.palette.text.secondary}`,
+            fontWeight: 600,
+            fontSize: "0.75rem",
+          }}
+        />
+      );
   }
-  return (
-    <Chip
-      label="Ativo"
-      size="small"
-      sx={{
-        bgcolor: alpha(theme.palette.success.main, 0.1),
-        color: theme.palette.success.main,
-        border: `1px solid ${theme.palette.success.main}`,
-        fontWeight: 600,
-        fontSize: "0.75rem",
-      }}
-    />
-  );
 };
 
   return (
@@ -100,18 +131,18 @@ const renderStatusChip = (metrics) => {
         }}
       >
         <Box
-        sx={{
-          display: "flex",
-          gap: "10px"
-        }}>
-        <Activity color={theme.palette.primary.dark} size={30} />
+          sx={{
+            display: "flex",
+            gap: "10px",
+          }}
+        >
+          <Activity color={theme.palette.primary.dark} size={30} />
           <Typography variant="h4" component="h1" fontWeight="bold">
             Máquinas Disponiveis
           </Typography>
         </Box>
         <Button
           variant="contained"
-          startIcon={<Edit />}
           sx={{
             borderRadius: "20px",
             textTransform: "none",
@@ -142,7 +173,8 @@ const renderStatusChip = (metrics) => {
                 Total de Máquinas: {filteredMachines.length}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                Lista completa de equipamentos industriais cadastrados no sistema
+                Lista completa de equipamentos industriais cadastrados no
+                sistema
               </Typography>
             </Box>
             <TextField
@@ -161,7 +193,10 @@ const renderStatusChip = (metrics) => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon size={16} color={theme.palette.text.secondary} />
+                    <SearchIcon
+                      size={16}
+                      color={theme.palette.text.secondary}
+                    />
                   </InputAdornment>
                 ),
               }}
@@ -172,7 +207,7 @@ const renderStatusChip = (metrics) => {
           <TableContainer
             component={Paper}
             sx={{
-              bgcolor: "background.default", 
+              bgcolor: "background.default",
               borderRadius: 2,
               border: `1px solid ${theme.palette.divider}`,
               overflow: "hidden",
@@ -211,28 +246,32 @@ const renderStatusChip = (metrics) => {
                       <TableCell>
                         {machine.manufacturer || "–"} - {machine.model || "–"}
                       </TableCell>
-                      <TableCell>{renderStatusChip(machine.metrics)}</TableCell>
-                      <TableCell>{machine.company || "–"}</TableCell>
-                      <TableCell>{machine.iotDevice || "–"}</TableCell>
+                      <TableCell>{renderStatusChip(machine.status)}</TableCell>
+                      <TableCell>{machine.company || "–"}</TableCell>{" "}
+                      <TableCell>{machine.iotDevice || "–"}</TableCell>{" "}
                       <TableCell>
                         <Box sx={{ display: "flex", gap: 1 }}>
                           <IconButton
                             size="small"
                             sx={{
                               color: "primary.main",
-                              "&:hover": { bgcolor: alpha(theme.palette.primary.main, 0.1) },
+                              "&:hover": {
+                                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                              },
                             }}
                           >
-                            <Edit size={16} />
+                            <Edit size={18} />
                           </IconButton>
                           <IconButton
                             size="small"
                             sx={{
                               color: "error.main",
-                              "&:hover": { bgcolor: alpha(theme.palette.error.main, 0.1) },
+                              "&:hover": {
+                                bgcolor: alpha(theme.palette.error.main, 0.1),
+                              },
                             }}
                           >
-                            <Delete size={16} />
+                            <Trash2 size={18} />
                           </IconButton>
                         </Box>
                       </TableCell>

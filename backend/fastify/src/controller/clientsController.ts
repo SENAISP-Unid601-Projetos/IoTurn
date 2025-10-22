@@ -96,5 +96,16 @@ export const clientsController = {
                 message: 'An internal server error occurred'
             });
         }
+    },
+    logoutController: async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
+        try {
+            return reply
+                .clearCookie('token', { path: '/' })
+                .status(200)
+                .send({ message: 'Logout realizado com sucesso.' });
+        } catch (error) {
+            console.error("Error in logoutController:", error);
+            reply.status(500).send({ message: 'Internal Server Error' });
+        }
     }
 };

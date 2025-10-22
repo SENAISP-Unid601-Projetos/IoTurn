@@ -5,7 +5,7 @@ CREATE TYPE "Status" AS ENUM ('ACTIVE', 'SUSPENDED', 'CANCELED');
 CREATE TYPE "UserType" AS ENUM ('ADMIN', 'TECHNICIAN', 'VIEWER');
 
 -- CreateEnum
-CREATE TYPE "DeviceStatus" AS ENUM ('ONLINE', 'OFFLINE', 'PROVISIONING', 'ERROR');
+CREATE TYPE "DeviceStatus" AS ENUM ('ONLINE', 'OFFLINE', 'PROVISIONING', 'ERROR', 'CANCELED');
 
 -- CreateTable
 CREATE TABLE "InteracaoIA" (
@@ -63,6 +63,7 @@ CREATE TABLE "users" (
     "userType" "UserType" NOT NULL,
     "status" "Status" NOT NULL DEFAULT 'ACTIVE',
     "clientId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
@@ -77,7 +78,7 @@ CREATE TABLE "machines" (
     "status" "Status" NOT NULL DEFAULT 'ACTIVE',
     "clientId" INTEGER NOT NULL,
     "responsibleUserId" INTEGER NOT NULL,
-    "deviceId" INTEGER NOT NULL,
+    "deviceId" INTEGER,
 
     CONSTRAINT "machines_pkey" PRIMARY KEY ("id")
 );
@@ -202,7 +203,7 @@ ALTER TABLE "users" ADD CONSTRAINT "users_clientId_fkey" FOREIGN KEY ("clientId"
 ALTER TABLE "machines" ADD CONSTRAINT "machines_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "clients"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "machines" ADD CONSTRAINT "machines_deviceId_fkey" FOREIGN KEY ("deviceId") REFERENCES "devices"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "machines" ADD CONSTRAINT "machines_deviceId_fkey" FOREIGN KEY ("deviceId") REFERENCES "devices"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "machines" ADD CONSTRAINT "machines_responsibleUserId_fkey" FOREIGN KEY ("responsibleUserId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

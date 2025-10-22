@@ -23,8 +23,8 @@ import {
   ChevronUp,
   LogOut,
 } from "lucide-react";
-import UserProfile from './UserProfile';
-import { fetchUserData } from "../services/UserService"; 
+import UserProfile from "./UserProfile";
+import { fetchUserData } from "../services/UserService";
 import theme from "../theme";
 
 //itens da sidebar
@@ -50,9 +50,21 @@ const sidebarItems = [
     icon: <Settings size={18} />,
     subItems: [
       { text: "Usuários", icon: <User size={17} />, path: "/usuarios" },
-      { text: "Máquinas", icon: <ListIcon size={17} />, path: "/main/gerenciamento/maquinas" },
-      { text: "Dispositivos", icon: <Cpu size={17} />, path: "/main/gerenciamento/dispositivos" },
-      { text: "Gateways", icon: <WifiCog size={17} />, path: "/gateways" },
+      {
+        text: "Máquinas",
+        icon: <ListIcon size={17} />,
+        path: "/main/gerenciamento/maquinas",
+      },
+      {
+        text: "Dispositivos",
+        icon: <Cpu size={17} />,
+        path: "/main/gerenciamento/dispositivos",
+      },
+      {
+        text: "Gateways",
+        icon: <WifiCog size={17} />,
+        path: "/main/gerenciamento/gateways",
+      },
     ],
   },
 ];
@@ -64,7 +76,7 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
   const [loading, setLoading] = useState(true);
   const [openSections, setOpenSections] = useState({ Monitoramento: true });
 
-  //dados do usuário 
+  //dados do usuário
   useEffect(() => {
     const loadUser = async () => {
       try {
@@ -86,7 +98,7 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
     navigate("/login");
   };
 
-  //Toggle Seção 
+  //Toggle Seção
   const handleClick = (itemText) => {
     setOpenSections((prev) => ({
       ...prev,
@@ -94,7 +106,7 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
     }));
   };
 
-  // Estilização 
+  // Estilização
   const mainItemSx = {
     py: 1.5,
     px: 2,
@@ -104,7 +116,7 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
     fontWeight: 500,
     transition: "transform 0.2s ease-in-out, background-color 0.2s ease-in-out",
     "&:hover": {
-      backgroundColor: 'action.hover',
+      backgroundColor: "action.hover",
       color: "text.primary",
       transform: "scale(1.03)",
     },
@@ -119,7 +131,7 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
     transition:
       "transform 0.2s ease-in-out, background-color 0.2s ease-in-out, color 0.2s ease-in-out",
     "&:hover": {
-      backgroundColor: 'action.hover',
+      backgroundColor: "action.hover",
       color: "text.primary",
       transform: "scale(1.05)",
     },
@@ -128,7 +140,7 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
   const activeSubItemSx = {
     backgroundColor: "primary.main",
     color: "white",
-    borderLeft: `3px solid ${theme.palette.secondary.main}`, 
+    borderLeft: `3px solid ${theme.palette.secondary.main}`,
 
     "&:hover": {
       backgroundColor: "primary.main",
@@ -142,7 +154,9 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
   const renderItems = (items, isSubItem = false) => {
     return items.map((item) => {
       const styleToApply = isSubItem ? subItemSx : mainItemSx;
-      const activeStyle = isSubItem ? { ...styleToApply, ...activeSubItemSx } : styleToApply;
+      const activeStyle = isSubItem
+        ? { ...styleToApply, ...activeSubItemSx }
+        : styleToApply;
 
       if (item.subItems) {
         if (item.subItems.length === 0) return null;
@@ -151,7 +165,10 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
 
         return (
           <React.Fragment key={item.text}>
-            <ListItemButton sx={styleToApply} onClick={() => handleClick(item.text)}>
+            <ListItemButton
+              sx={styleToApply}
+              onClick={() => handleClick(item.text)}
+            >
               <ListItemIcon sx={{ minWidth: "auto", color: "inherit" }}>
                 {item.icon}
               </ListItemIcon>
@@ -163,7 +180,13 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
               <List
                 component="div"
                 disablePadding
-                sx={{ pl: 2, display: "flex", flexDirection: "column", gap: 0.5, mt: 0.5 }}
+                sx={{
+                  pl: 2,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 0.5,
+                  mt: 0.5,
+                }}
               >
                 {renderItems(item.subItems, true)}
               </List>
@@ -226,10 +249,10 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
             </Typography>
           </Box>
         ) : (
-          <UserProfile user={user}/>
+          <UserProfile user={user} />
         )}
 
-        <Divider sx={{ borderColor: 'divider' }} />
+        <Divider sx={{ borderColor: "divider" }} />
 
         <List sx={{ flexGrow: 1, overflowY: "auto", p: 2, pb: 1 }}>
           {renderItems(sidebarItems)}

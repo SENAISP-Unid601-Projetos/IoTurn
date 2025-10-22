@@ -5,7 +5,8 @@ import Home from "./pages/Initial";
 import Login from "./pages/Login";
 import MainLayout from './pages/MainLayout';
 import MaquinasGerenciamentoPage from "./pages/Gerenciamento/GerenciamentoMaquinas";
-import DispostivosGerenciamentoPage from "./pages/Gerenciamento/GerenciamentoDispositivos";
+import DispositivosGerenciamentoPage from "./pages/Gerenciamento/GerenciamentoDispositivos";
+import GatewaysGerencimentoPage from "./pages/Gerenciamento/GerenciamentoGateways"
 
 function App() {
   return (
@@ -16,7 +17,8 @@ function App() {
         <Route index element={<MainLayout />} />
         <Route path="/main/maquinas" element={<DashboardSelector />} />
         <Route path="gerenciamento/maquinas" element={<MaquinasGerenciamentoPage />} />
-        <Route path="gerenciamento/Dispositivos" element={<DispostivosGerenciamentoPage />} />
+        <Route path="gerenciamento/dispositivos" element={<DispositivosGerenciamentoPage />} />
+        <Route path="gerenciamento/gateways" element={<GatewaysGerencimentoPage/>} />
       </Route>
     </Routes>
   );

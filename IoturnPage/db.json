@@ -1,123 +1,74 @@
-{
-  "machines": [
-    {
+[
+  {
+    "id": 1,
+    "name": "Torno CNC TX1000",
+    "serialNumber": "TX1000-SN-8892",
+    "manufacturer": "Makino",
+    "model": "TX1000",
+    "status": "ACTIVE",
+    "lastRpm": {
+      "rpm": 1250,
+      "timestamp": "2025-10-23T14:32:10.000Z"
+    },
+    "lastOilTemperature": {
+      "temperature": 68.5,
+      "timestamp": "2025-10-23T14:32:10.000Z"
+    },
+    "lastOilLevel": {
+      "level": 82,
+      "timestamp": "2025-10-23T14:30:00.000Z"
+    },
+    "lastCurrent": {
+      "current": 14.2,
+      "timestamp": "2025-10-23T14:32:10.000Z"
+    },
+    "client": {
+      "companyName": "Indústria Metalúrgica ABC Ltda"
+    },
+    "device": {
       "id": 1,
-      "name": "Torno CNC",
-      "sector": "Setor A",
-      "machineId": "HELTEC-A8F3B2",
-      "company": "Indústria Metalúrgica Silva LTDA",
-      "lastUpdate": "2 min atrás",
-      "status": "online"
-    },
-    {
-      "id": 2,
-      "name": "Fresadora",
-      "sector": "Setor B",
-      "machineId": "HELTEC-C4D9E1",
-      "company": "Fábrica de Componentes Tech SA",
-      "lastUpdate": "1 min atrás",
-      "status": "alert"
-    },
-    {
-      "id": 3,
-      "name": "Prensa",
-      "sector": "Setor C",
-      "machineId": "HELTEC-C4D9E1",
-      "company": "Fábrica de Componentes Tech SA",
-      "lastUpdate": "1 min atrás",
-      "status": "alert"
+      "nodeId": "NODE-001",
+      "description": "Sensor de Vibração da Máquina 1",
+      "status": "ONLINE",
+      "lastHeartbeat": "2025-10-23T14:32:06.844Z",
+      "gatewayId": 1,
+      "machine": {
+        "name": "Torno CNC TX1000"
+      },
+      "gateway": {
+        "id": 1,
+        "gatewayId": "GW-ESP32-001",
+        "description": "Gateway principal da planta 1",
+        "status": "ONLINE",
+        "lastHeartbeat": "2025-10-23T14:31:32.017Z"
+      }
     }
-  ],
-  "metrics": [
-    {
-      "id": 1,
-      "machineId": 1,
-      "metrics": [
-        {
-          "name": "RPM",
-          "value": "1520",
-          "unit": "",
-          "status": "normal"
-        },
-        {
-          "name": "Temp",
-          "value": "72",
-          "unit": "°C",
-          "status": "normal"
-        },
-        {
-          "name": "Óleo",
-          "value": "85",
-          "unit": "%",
-          "status": "normal"
-        },
-        {
-          "name": "Corrente",
-          "value": "12.3",
-          "unit": "A",
-          "status": "normal"
-        }
-      ]
+  },
+  {
+    "id": 2,
+    "name": "Fresadora FX200",
+    "serialNumber": "FX200-SN-4411",
+    "manufacturer": "Haas",
+    "model": "FX200",
+    "status": "SUSPENDED",
+    "lastRpm": null,
+    "lastOilTemperature": null,
+    "lastOilLevel": null,
+    "lastCurrent": null,
+    "client": {
+      "companyName": "Fábrica de Peças XYZ S.A."
     },
-    {
-      "id": 2,
-      "machineId": 2,
-      "metrics": [
-        {
-          "name": "RPM",
-          "value": "1680",
-          "unit": "",
-          "status": "normal"
-        },
-        {
-          "name": "Temp",
-          "value": "82",
-          "unit": "°C",
-          "status": "warning"
-        },
-        {
-          "name": "Óleo",
-          "value": "78",
-          "unit": "%",
-          "status": "normal"
-        },
-        {
-          "name": "Corrente",
-          "value": "14.1",
-          "unit": "A",
-          "status": "normal"
-        }
-      ]
-    },
-    {
-      "id": 3,
-      "machineId": 3,
-      "metrics": [
-        {
-          "name": "RPM",
-          "value": "8",
-          "unit": "",
-          "status": "danger"
-        },
-        {
-          "name": "Temp",
-          "value": "45",
-          "unit": "°C",
-          "status": "normal"
-        },
-        {
-          "name": "Óleo",
-          "value": "92",
-          "unit": "%",
-          "status": "normal"
-        },
-        {
-          "name": "Corrente",
-          "value": "57",
-          "unit": "A",
-          "status": "danger"
-        }
-      ]
+    "device": {
+      "id": 4,
+      "nodeId": "NODE-OFFLINE-001",
+      "description": "Dispositivo offline para máquina 2",
+      "status": "OFFLINE",
+      "lastHeartbeat": "2025-10-22T17:27:12.164Z",
+      "gatewayId": null,
+      "machine": {
+        "name": "Fresadora FX200"
+      },
+      "gateway": null
     }
-  ]
-}
+  }
+]

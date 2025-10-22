@@ -24,7 +24,7 @@ import {
   LogOut,
 } from "lucide-react";
 import UserProfile from "./UserProfile";
-import { fetchUserData } from "../services/UserService";
+import { fetchAllUserData } from "../services/usersService";
 import theme from "../theme";
 
 //itens da sidebar
@@ -43,13 +43,13 @@ const sidebarItems = [
   {
     text: "Hermes AI",
     icon: <Bot size={18} />,
-    path: "/relatorios",
+    path: "/chatbot",
   },
   {
     text: "Gerenciamento",
     icon: <Settings size={18} />,
     subItems: [
-      { text: "Usuários", icon: <User size={17} />, path: "/usuarios" },
+      { text: "Usuários", icon: <User size={17} />, path: "gerenciamento/usuarios" },
       {
         text: "Máquinas",
         icon: <ListIcon size={17} />,
@@ -80,7 +80,7 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const userData = await fetchUserData();
+        const userData = await fetchAllUserData();
         setUser(userData);
       } catch (error) {
         console.error("Erro ao carregar dados do usuário:", error);

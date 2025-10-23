@@ -11,11 +11,11 @@ import {
     Stack,
     Paper,
 } from "@mui/material";
-import { Zap, Mail, Lock, Eye, EyeOff, CheckCircle } from "lucide-react";
+import { Zap, Mail, Lock, Eye, EyeOff, CheckCircle, User } from "lucide-react";
 import theme from "../theme";
 import ApiService from "../services/ApiServices";
 
-function Login() {
+function Register() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
@@ -23,8 +23,16 @@ function Login() {
     const [passwordError, setPasswordError] = useState("");
     const [isEmailValid, setIsEmailValid] = useState(false);
     const [isPasswordValid, setIsPasswordValid] = useState(false);
-
+    
     // Usar bcrypt para rashear senha antes de enviar para o back-end
+
+    // Envio deverá ser:
+    // name: z.string().nonempty("O nome é obrigatório."), 
+    // email: z.email(), 
+    // password: z.string().min(8, "A senha deve ter no mínimo 8 caracteres."),
+    // userType: z.enum(UserType), 
+    // status: z.enum(Status),
+    // clientId: z.number().int().positive("O ID do cliente deve ser um número positivo."), 
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
     const handleMouseDownPassword = (event) => {
@@ -125,6 +133,28 @@ function Login() {
                 >
                     <Stack spacing={2.5}>
                         <TextField
+                            label="Usuário"
+                            fullWidth
+                            sx={textFieldStyles}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            error={!!emailError}
+                            helperText={emailError}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <User size={20} color="gray" />
+                                    </InputAdornment>
+                                ),
+                                endAdornment: isEmailValid && (
+                                    <InputAdornment position="end">
+                                        <CheckCircle size={20} color={theme.palette.success.main} />
+                                    </InputAdornment>
+                                ),
+                            }}
+                        />
+
+                        <TextField
                             label="Email"
                             fullWidth
                             sx={textFieldStyles}
@@ -147,7 +177,7 @@ function Login() {
                         />
 
                         <TextField
-                            label="Senha"
+                            label="Digite uma Senha"
                             type={showPassword ? "text" : "password"}
                             fullWidth
                             sx={textFieldStyles}
@@ -176,13 +206,43 @@ function Login() {
                                 ),
                             }}
                         />
+                        <TextField
+                            label="Confirme sua Senha"
+                            type={showPassword ? "text" : "password"}
+                            fullWidth
+                            sx={textFieldStyles}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            error={!!passwordError}
+                            helperText={passwordError}
+                            InputProps={{
+                                startAdornment: (
+                                     <InputAdornment position="start">
+                                        <Lock size={20} color="gray" />
+                                    </InputAdornment>
+                                ),
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        {isPasswordValid && !showPassword && <CheckCircle size={20} color={theme.palette.success.main} />}
+                                        <IconButton
+                                            aria-label="toggle password visibility"
+                                            onClick={handleClickShowPassword}
+                                            onMouseDown={handleMouseDownPassword}
+                                            edge="end"
+                                        >
+                                            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                ),
+                            }}
+                        />
 
                         <Link
-                            href="#"
+                            href="login"
                             variant="body2"
                             sx={{ alignSelf: "flex-end", textDecoration: "none" }}
                         >
-                            Esqueceu a senha?
+                            Já possuí conta?
                         </Link>
 
                         <Button
@@ -193,7 +253,7 @@ function Login() {
                             sx={{ py: 1.5 }}
                             onClick={handleLogin}
                         >
-                            Acessar Plataforma
+                            Registrar
                         </Button>
                     </Stack>
                 </Paper>
@@ -202,4 +262,4 @@ function Login() {
     );
 }
 
-export default Login;
+export default Register;

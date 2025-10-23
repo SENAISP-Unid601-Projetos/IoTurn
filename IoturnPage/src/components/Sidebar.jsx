@@ -43,7 +43,7 @@ const sidebarItems = [
   {
     text: "Hermes AI",
     icon: <Bot size={18} />,
-    path: "/chatbot",
+    path: "/main/hermes",
   },
   {
     text: "Gerenciamento",

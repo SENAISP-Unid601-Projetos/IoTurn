@@ -1,5 +1,5 @@
-//const DEVICES_API_URL = 'http://10.110.12.48:3000/devices/allDevices/1';
-const DEVICES_API_URL = 'http://localhost:3000/devices';
+const DEVICES_API_URL = 'http://10.110.12.24:3000/devices/allDevices/1';
+//const DEVICES_API_URL = 'http://localhost:3000/devices';
 
 const formatTimestamp = (timestamp) => {
   if (!timestamp) return 'N/A';

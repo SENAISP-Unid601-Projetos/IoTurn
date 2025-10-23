@@ -1,5 +1,5 @@
-//const API_URL = 'http://10.110.12.48:3000/machines/getAll/1';
-const API_URL = 'http://localhost:3000/machines';
+const API_URL = 'http://10.110.12.24:3000/machines/getAll/1';
+//const API_URL = 'http://localhost:3000/machines';
 
 const formatTimestamp = (timestamp) => {
   if (!timestamp) return 'N/A';

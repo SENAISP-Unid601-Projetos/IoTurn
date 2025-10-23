@@ -30,18 +30,7 @@ const GerenciamentoUsers = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // const data = (await fetchAllUserData())
-        const data = [
-          {
-            id: "1",
-            name: "João da Silva",
-            email: "joao.silva@example.com",
-            userType: "ADMIN",
-            status: "ACTIVE",
-            createdAt: "2025-10-22T16:56:25.922Z",
-            client: { companyName: "Nome da Empresa LTDA" },
-          },
-        ];
+        const data = (await fetchAllUserData())
         setMachines(data);
         setError(null);
       } catch (err) {

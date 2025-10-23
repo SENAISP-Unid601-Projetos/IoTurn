@@ -8,7 +8,8 @@ import { DeviceStatus } from '@prisma/client';
 const createGatewayBodySchema = z.object({
     gatewayId: z.string().nonempty("O 'gatewayId' (identificador) é obrigatório."),
     description: z.string().nonempty("A 'description' (descrição) é obrigatória."),
-    status: z.enum(DeviceStatus) // Correção: usar 'nativeEnum'
+    status: z.enum(DeviceStatus),
+    clientId: z.coerce.number().int().min(1, "O ID do cliente é obrigatório.")
 });
 
 const gatewayParamsSchema = z.object({

@@ -10,7 +10,7 @@ const createMachineBodySchema = z.object({
     model: z.string().nonempty("O modelo não pode ser vazio"),
     manufacturer: z.string().nonempty("O Fabricante não pode ser vazio"),
     clientId: z.number().positive("O ID do cliente deve ser um número positivo."),
-    responsibleUserId: z.number().positive("O ID do responsavel deve ser um número positivo."),
+    responsibleUserId: z.number().positive("O ID do responsavel deve ser um número positivo.").optional(),
     status:z.enum(Status),
     gatewayId: z.number().positive().optional(),
     deviceId: z.number().positive().optional()

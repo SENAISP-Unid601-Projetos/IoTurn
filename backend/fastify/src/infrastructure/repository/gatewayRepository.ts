@@ -3,13 +3,14 @@ import { PrismaClient, Gateway, DeviceStatus, Prisma } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export interface NewGatewayData {
-    gatewayId: string;
-    description: string;
-    status: DeviceStatus
+    gatewayId: string,
+    description: string,
+    status: DeviceStatus,
+    clientId: number
 }
 export interface UpdateGatewayData {
-    description?: string;
-    status?: DeviceStatus;
+    description?: string,
+    status?: DeviceStatus,
 }
 
 export const gatewayRepository = {
@@ -17,11 +18,7 @@ export const gatewayRepository = {
     newGateway: async (data: NewGatewayData): Promise<Gateway | undefined> => {
         try {
             const result = await prisma.gateway.create({
-                data: {
-                    gatewayId: data.gatewayId,
-                    description: data.description,
-                    status: data.status
-                }
+                data: data
             });
 
             return result;
@@ -51,7 +48,7 @@ export const gatewayRepository = {
                 where: {
                     id: gatewayId
                 },
-                data: data // Atualiza apenas os campos fornecidos
+                data: data 
             });
             return updatedGateway;
         } catch (error) {
@@ -77,10 +74,9 @@ export const gatewayRepository = {
     },
     findAllGateways: async (userId: number): Promise<Gateway[]> => {
         try {
-            // Passo 1: Descobrir o clientId do usuário
-            const user = await prisma.user.findUnique({
+            const user = await prisma.client.findUnique({
                 where: { id: userId },
-                select: { clientId: true }
+                select: { id: true }
             });
 
             if (!user) {
@@ -88,27 +84,16 @@ export const gatewayRepository = {
                 return [];
             }
 
-            // Passo 2: Buscar gateways baseados no clientId
             const gateways = await prisma.gateway.findMany({
                 where: {
-                    // 'responsibleFor' é a lista de 'Device' no modelo 'Gateway'
-                    responsibleFor: {
-                        // 'some' significa "pelo menos um" dispositivo na lista
-                        some: {
-                            // O dispositivo deve estar ligado a uma 'machine'
-                            machine: {
-                                // A máquina deve pertencer ao 'clientId' do usuário
-                                clientId: user.clientId
-                            }
-                        }
-                    },
-                    // Opcional: Não mostrar gateways já cancelados
-                    status: {
-                        not: 'CANCELED'
-                    }
+                    clientId: user.id
                 },
-                orderBy: {
-                    id: 'asc'
+                include:{
+                    _count:{
+                        select:{
+                            responsibleFor: true
+                        }
+                    }
                 }
             });
 

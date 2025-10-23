@@ -11,7 +11,8 @@ const assignGatewaySchema = z.object({
 const createDeviceBodySchema = z.object({
     nodeId: z.string().nonempty(),
     description:z.string().nonempty(),
-    status: z.enum(DeviceStatus).nonoptional()
+    status: z.enum(DeviceStatus).nonoptional(),
+    clientId: z.coerce.number().int().min(1, "O ID do cliente é obrigatório.")
 })
 const deviceParamsSchema = z.object({
     id: z.coerce.number().int().min(1, "O ID do dispositivo é obrigatório.")

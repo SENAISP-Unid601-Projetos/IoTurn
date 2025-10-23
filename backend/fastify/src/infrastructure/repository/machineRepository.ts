@@ -9,7 +9,7 @@ export interface NewMachineData {
     serialNumber: string;
     status: Status;
     clientId: number;
-    responsibleUserId: number;
+    responsibleUserId?: number;
     gatewayId?: number;
     deviceId?: number
 }
@@ -54,9 +54,11 @@ export const machineRepository = {
                     client: {
                         connect: { id: data.clientId }
                     },
-                    responsibleUser: {
+                    ...(data.responsibleUserId && {
+                        responsibleUser: {
                         connect: { id: data.responsibleUserId }
-                    },
+                    }
+                    }),
                     ...(data.deviceId &&{
                         device: {
                             connect: {id: data.deviceId}

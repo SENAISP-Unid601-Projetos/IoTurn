@@ -12,11 +12,12 @@ export interface RawMapping {
 export interface CreateDeviceData {
     nodeId: string,
     description: string,
-    status: DeviceStatus
+    status: DeviceStatus,
+    clientId: number
 }
 export interface UpdateDeviceData {
-    description?: string;
-    status?: DeviceStatus;
+    description?: string,
+    status?: DeviceStatus,
 }
 export const deviceRepository = {
 
@@ -137,12 +138,12 @@ export const deviceRepository = {
     },
     findAllDevices: async (userId: number): Promise<Device[]> => {
         try {
-            const user = await prisma.user.findUnique({
+            const user = await prisma.client.findUnique({
                 where: {
                     id: userId
                 },
                 select: {
-                    clientId: true 
+                    id: true 
                 }
             });
 
@@ -153,20 +154,15 @@ export const deviceRepository = {
 
             const devices = await prisma.device.findMany({
                 where: {
-                    machine: {
-                        clientId: user.clientId 
-                    },
-                    status: {
-                        not: 'CANCELED'
-                    }
+                    clientId: user.id
                 },
                 include: {
-                    machine: true,
-                    gateway: true
+                    machine:{
+                        select: {
+                            name: true
+                        }
+                    },
                 },
-                orderBy: {
-                    id: 'asc'
-                }
             });
             
             return devices;

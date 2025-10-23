@@ -2,6 +2,7 @@ import { NewDataPoint } from "../../mqttSubscriber";
 import { sensoresReadingRepository, LastReadingResult } from "../infrastructure/repository/sensoresReadingRepository";
 import { unifiedMachineStateRepository, NewUnifiedMachineState } from "../infrastructure/repository/unifiedMachineStateRepository";
 import axios from "axios";
+import { InputPredictionLog, logDiagnosis } from "./logDiagnosis";
 const TTLS = {
     current: { milliseconds: 35000 },
     rpm: { milliseconds: 35000 },
@@ -120,7 +121,18 @@ export const unifiedMachineStateService = {
                 newState.clusterStrength = prediction_strength;
                 
                 console.log(`[Machine ID: ${newState.machineId}] Predição recebida: Cluster ${predicted_cluster}`);
-                await unifiedMachineStateRepository.newUnifiedMachine(newState);
+                const createState = await unifiedMachineStateRepository.newUnifiedMachine(newState);
+                
+                const getState = {
+                    corrente: createState.current!,
+                    rpm: createState.rpm!,
+                    temperatura: createState.oilTemperature!,
+                    nivel: createState.oilLevel!,
+                    timestamp: createState.timestamp!
+                }
+
+                logDiagnosis.logGeneration(getState,createState.clusterPredict!, createState.clusterStrength!);
+                //RabbitMQ
             }
         } catch (error) {
             if (axios.isAxiosError(error)) {

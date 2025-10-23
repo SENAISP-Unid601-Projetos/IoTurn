@@ -48,7 +48,8 @@ model Client {
   status       Status    @default(ACTIVE)
   machines     Machine[]
   users        User[]
-
+  devices      Device[]
+  gateways     Gateway[]
   @@map("clients")
 }
 
@@ -81,13 +82,13 @@ model Machine {
   serialNumber           String                  @unique
   status                 Status                  @default(ACTIVE)
   clientId               Int
-  responsibleUserId      Int
+  responsibleUserId      Int?
   deviceId               Int?                     @unique
   UnifiedMachineState    UnifiedMachineState[]
   currentReadings        CurrentReading[]        @relation("CurrentReadings")
   client                 Client                  @relation(fields: [clientId], references: [id])
   device                 Device?                  @relation(fields: [deviceId], references: [id])
-  responsibleUser        User                    @relation("ResponsibleForMachines", fields: [responsibleUserId], references: [id])
+  responsibleUser        User?                    @relation("ResponsibleForMachines", fields: [responsibleUserId], references: [id])
   oilLevelReadings       OilLevelReading[]       @relation("OilLevelReadings")
   oilTemperatureReadings OilTemperatureReading[] @relation("OilTemperatureReadings")
   rpmReadings            RpmReading[]            @relation("RpmReadings")
@@ -123,7 +124,8 @@ model Device {
   gatewayId     Int?
   gateway       Gateway?     @relation(fields: [gatewayId], references: [id])
   machine       Machine?
-
+  clientId      Int
+  client        Client       @relation(fields: [clientId], references: [id])
   @@map("devices")
 }
 
@@ -135,7 +137,8 @@ model Gateway {
   status         DeviceStatus @default(OFFLINE)
   lastHeartbeat  DateTime     @updatedAt
   responsibleFor Device[]
-
+  clientId       Int
+  client         Client       @relation(fields: [clientId], references: [id])
   @@map("gateways")
 }
 

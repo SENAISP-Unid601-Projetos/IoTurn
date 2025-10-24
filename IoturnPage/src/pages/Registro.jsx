@@ -27,18 +27,6 @@ import ApiService from "../services/ApiServices";
 import theme from "../theme";
 
 //Aqui vai se fazer o registro dos clientes isso é empresas.
-// O back possuí este código:
-
-// const newClientBodySchema = z.object({
-//     cnpj: z.string().min(14, "O cnpj deve ter pelo menos 14 caracteres"),
-//     phone: z.string(),
-//     address: z.string(),
-// })
-
-// Funcionais
-//  Post para o back-end
-// Também será necessário o registro do primeiro usuário.
-//  Nome
 
 // Não Funcionais
 
@@ -49,18 +37,27 @@ import theme from "../theme";
 // Formatação - Confirmar Senha
 
 function Registro() {
+  // Constantes de envio Fetch Post
   const [empresa, setEmpresa] = useState("");
   const [cnpj, setCnpj] = useState("");
   const [phone, setPhone] = useState("");
   const [adress, setAddress] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  // Constantes de validação
   const [extraPassword, setExtraPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState("");
+
+  // Constantes de Feedback visual
+  const [showPassword, setShowPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [isPasswordValid, setIsPasswordValid] = useState(false);
+
+  // WIP feedback visual
+  const [isCnpjValid, setIsCnpjValid] = useState(false);
+  const [isPhoneValid, setIsPhoneValid] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event) => {
@@ -170,6 +167,7 @@ function Registro() {
           }}
         >
           {/*WIP Fazer validação para nome da empresa */}
+          {/* Campo Empresa */}
           <Stack spacing={2.5}>
             <TextField
               label="Empresa"
@@ -187,6 +185,7 @@ function Registro() {
             />
 
             {/* WIP especificar CNPJ trocando função isEmailValid*/}
+            {/* Campo CNPJ */}
             <TextField
               label="CNPJ"
               fullWidth
@@ -202,6 +201,7 @@ function Registro() {
               }}
             />
 
+            {/* Campo Telefone */}
             <TextField
               label="Telefone"
               fullWidth
@@ -217,6 +217,7 @@ function Registro() {
               }}
             />
 
+            {/* Campo Endereço */}
             <TextField
               label="Endereço"
               fullWidth
@@ -232,6 +233,7 @@ function Registro() {
               }}
             />
 
+            {/* Campo Email */}
             <TextField
               label="Email"
               fullWidth
@@ -254,6 +256,7 @@ function Registro() {
               }}
             />
 
+            {/* Campo Senha */}
             <TextField
               label="Senha"
               type={showPassword ? "text" : "password"}
@@ -290,6 +293,7 @@ function Registro() {
               }}
             />
 
+            {/* Campo ConfirmaSenha */}
             <TextField
               label="Confirmar Senha"
               type={showPassword ? "text" : "password"}

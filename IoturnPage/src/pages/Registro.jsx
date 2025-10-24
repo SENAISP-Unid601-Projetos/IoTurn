@@ -48,6 +48,7 @@ function Registro() {
   // Constantes de validação
   const [extraPassword, setExtraPassword] = useState("");
   const [emailError, setEmailError] = useState("");
+  const [cnpjError, setCnpjError] = useState("");
 
   // Constantes de Feedback visual
   const [showPassword, setShowPassword] = useState(false);
@@ -64,6 +65,7 @@ function Registro() {
     event.preventDefault();
   };
 
+  //EMAIL validation
   useEffect(() => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (emailRegex.test(email)) {
@@ -74,6 +76,7 @@ function Registro() {
     }
   }, [email]);
 
+  //PASSWORD validation
   useEffect(() => {
     if (password.length >= 8) {
       setIsPasswordValid(true);
@@ -83,6 +86,20 @@ function Registro() {
     }
   }, [password]);
 
+  //CNPJ validation
+  useEffect(() => {
+    const regex =
+      /([0-9]{2}[\.]?[0-9]{3}[\.]?[0-9]{3}[\/]?[0-9]{4}[-]?[0-9]{2})|([0-9]{3}[\.]?[0-9]{3}[\.]?[0-9]{3}[-]?[0-9]{2})/;
+    if (regex.test(cnpj)) {
+      setIsCnpjValid(true);
+      setCnpjError("Campo CNPJ Incorreto");
+    } else {
+      setIsCnpjValid(false);
+      setCnpjError("");
+    }
+  }, [cnpj]);
+
+  // PostRequest
   const handleLogin = () => {
     if (!isEmailValid) {
       setEmailError("Por favor, insira um email válido.");
@@ -90,24 +107,19 @@ function Registro() {
     if (!isPasswordValid) {
       setPasswordError("A senha deve ter no mínimo 8 caracteres.");
     }
-
-    if (isEmailValid && isPasswordValid) {
-      const data = { email: email, password: password };
-      console.log("Validação OK!");
-      console.log("Email:", email);
-      console.log("Senha:", password);
+    if (isEmailValid && isPasswordValid && isCnpjValid) {
+      const registrationData = {
+        companyName: empresa,
+        cnpj: cnpj,
+        phone: phone,
+        address: adress,
+        email: email,
+        password: password,
+      };
+      ApiService.postRequest("/clients/create", registrationData);
     }
 
     // WIP fazer post para clientes em clients/create
-    const registrationData = {
-      companyName: empresa,
-      cnpj: cnpj,
-      phone: phone,
-      address: adress,
-      email: email,
-      password: password,
-    };
-    ApiService.postRequest("/clients/create", registrationData);
   };
 
   const textFieldStyles = {

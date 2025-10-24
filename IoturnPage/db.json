@@ -57,5 +57,40 @@
       "lastHeartbeat": "2025-10-23T14:31:32.017Z",
       "connectedDevices": 3
     }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "name": "João Silva",
+      "email": "joao.silva@empresaabc.com",
+      "userType": "Admin",
+      "status": "ACTIVE",
+      "createdAt": "2025-01-15T09:30:00.000Z",
+      "client": {
+        "companyName": "Indústria Metalúrgica ABC Ltda"
+      }
+    },
+    {
+      "id": 2,
+      "name": "Maria Oliveira",
+      "email": "maria.oliveira@empresaabc.com",
+      "userType": "Manager",
+      "status": "ACTIVE",
+      "createdAt": "2025-02-20T11:00:00.000Z",
+      "client": {
+        "companyName": "Indústria Metalúrgica ABC Ltda"
+      }
+    },
+    {
+      "id": 3,
+      "name": "Carlos Pereira",
+      "email": "carlos.pereira@empresaabc.com",
+      "userType": "Operator",
+      "status": "SUSPENDED",
+      "createdAt": "2025-03-10T16:45:00.000Z",
+      "client": {
+        "companyName": "Indústria Metalúrgica ABC Ltda"
+      }
+    }
   ]
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Box,
   Typography,
@@ -12,104 +12,29 @@ import {
   Button,
   TextField,
   InputAdornment,
-  Chip,
   IconButton,
 } from "@mui/material";
-import { Search as SearchIcon, Edit, Delete, AlertCircle } from "lucide-react";
+import { Search as SearchIcon, Edit, AlertCircle, Activity, Trash2 } from "lucide-react";
 import { alpha } from "@mui/material/styles";
 import theme from "../../theme";
 import { fetchAllMachineData } from "../../services/machineService";
-import { Activity, Trash2 } from "lucide-react";
+import StatusChip from "../../components/StatusChip";
+import { useDataManagement } from "../../hooks/useDataManagement";
+
+// Função de filtro específica para máquinas
+const filterCallback = (machine, term) =>
+  machine.name?.toLowerCase().includes(term) ||
+  machine.serialNumber?.toLowerCase().includes(term) ||
+  machine.manufacturer?.toLowerCase().includes(term);
 
 const GerenciamentoMaquinas = () => {
-  const [machines, setMachines] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const data = await fetchAllMachineData();
-        setMachines(data);
-        setError(null);
-      } catch (err) {
-        console.error("Erro ao carregar máquinas:", err);
-        setError("Falha ao carregar as máquina");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadData();
-  }, []);
-
-  const filteredMachines = machines.filter(
-    (machine) =>
-      machine.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      machine.serialNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      machine.manufacturer?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-const renderStatusChip = (machineStatus) => {
-  switch (machineStatus) {
-    case 'ACTIVE':
-      return (
-        <Chip
-          label="Ativo"
-          size="small"
-          sx={{
-            bgcolor: alpha(theme.palette.success.main, 0.1),
-            color: theme.palette.success.main,
-            border: `1px solid ${theme.palette.success.main}`,
-            fontWeight: 600,
-            fontSize: "0.75rem",
-          }}
-        />
-      );
-    case 'SUSPENDED':
-      return (
-        <Chip
-          label="Suspenso"
-          size="small"
-          sx={{
-            bgcolor: alpha(theme.palette.warning.main, 0.1),
-            color: theme.palette.warning.main,
-            border: `1px solid ${theme.palette.warning.main}`,
-            fontWeight: 600,
-            fontSize: "0.75rem",
-          }}
-        />
-      );
-    case 'CANCELED':
-      return (
-        <Chip
-          label="Cancelado"
-          size="small"
-          sx={{
-            bgcolor: alpha(theme.palette.error.main, 0.1),
-            color: theme.palette.error.main,
-            border: `1px solid ${theme.palette.error.main}`,
-            fontWeight: 600,
-            fontSize: "0.75rem",
-          }}
-        />
-      );
-    default:
-      return (
-        <Chip
-          label="Desconhecido"
-          size="small"
-          sx={{
-            bgcolor: alpha(theme.palette.text.secondary, 0.1),
-            color: theme.palette.text.secondary,
-            border: `1px solid ${theme.palette.text.secondary}`,
-            fontWeight: 600,
-            fontSize: "0.75rem",
-          }}
-        />
-      );
-  }
-};
+  const {
+    filteredData: filteredMachines,
+    loading,
+    error,
+    searchTerm,
+    setSearchTerm,
+  } = useDataManagement(fetchAllMachineData, filterCallback);
 
   return (
     <Box
@@ -246,7 +171,7 @@ const renderStatusChip = (machineStatus) => {
                       <TableCell>
                         {machine.manufacturer || "–"} - {machine.model || "–"}
                       </TableCell>
-                      <TableCell>{renderStatusChip(machine.status)}</TableCell>
+                      <TableCell><StatusChip status={machine.status} /></TableCell>
                       <TableCell>{machine.company || "–"}</TableCell>{" "}
                       <TableCell>{machine.iotDevice || "–"}</TableCell>{" "}
                       <TableCell>
@@ -284,7 +209,7 @@ const renderStatusChip = (machineStatus) => {
         </>
       )}
 
-      {/* ✅ Mensagem de erro (só aparece se houver erro) */}
+      {/* Mensagem de erro */}
       {error && (
         <Box
           sx={{
@@ -301,7 +226,7 @@ const renderStatusChip = (machineStatus) => {
         >
           <AlertCircle size={18} color="#ff6b6b" />
           <Typography variant="body2" fontWeight="medium">
-            Falha ao carregar os dados: {error}
+            {error}
           </Typography>
         </Box>
       )}

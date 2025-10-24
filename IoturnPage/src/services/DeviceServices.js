@@ -1,21 +1,13 @@
-const DEVICES_API_URL = 'http://10.110.12.24:3000/devices/allDevices/1';
-//const DEVICES_API_URL = 'http://localhost:3000/devices';
+import ApiService from './ApiServices';
+import { formatTimestamp } from '../utils/formatters';
 
-const formatTimestamp = (timestamp) => {
-  if (!timestamp) return 'N/A';
-  const date = new Date(timestamp);
-  return date.toLocaleString('pt-BR');
-};
+const DEVICES_API_URL = '/devices';
 
 export const fetchAllDeviceData = async () => {
   console.log('Buscando dados dos dispositivos...');
-  const response = await fetch(DEVICES_API_URL);
 
-  if (!response.ok) {
-    throw new Error('Falha ao buscar os dados dos dispositivos');
-  }
+  const rawData = await ApiService.getRequest(DEVICES_API_URL);
 
-  const rawData = await response.json();
   console.log('Dados brutos dos dispositivos recebidos:', rawData);
 
   const formattedData = rawData.map(device => {

@@ -18,116 +18,26 @@ import {
 import { Search as SearchIcon, Edit, Trash2, AlertCircle } from "lucide-react";
 import { alpha } from "@mui/material/styles";
 import theme from "../../theme";
-
+import StatusChip from "../../components/StatusChip";
+import { useDataManagement } from "../../hooks/useDataManagement";
 import { fetchAllDeviceData } from "../../services/DeviceServices";
 import { Cpu } from "lucide-react";
 
+
+// Função de filtro específica para dispositivos
+const filterCallback = (device, term) =>
+  device.nodeId?.toLowerCase().includes(term) ||
+  device.description?.toLowerCase().includes(term) ||
+  device.machineName?.toLowerCase().includes(term);
+
 const GerenciamentoDispositivos = () => {
-  const [devices, setDevices] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        // 👇 Usa o serviço de dispositivos
-        const data = await fetchAllDeviceData();
-        setDevices(data);
-        setError(null);
-      } catch (err) {
-        console.error("Erro ao carregar dispositivos:", err);
-        setError("Falha ao buscar os dispositivos");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadData();
-  }, []);
-
-  // 👇 Filtro adaptado para campos de dispositivo
-  const filteredDevices = devices.filter(
-    (device) =>
-      device.nodeId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      device.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      device.machineName?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // 👇 Status específicos de dispositivos
-  const renderStatusChip = (status) => {
-    switch (status) {
-      case "ONLINE":
-        return (
-          <Chip
-            label="Online"
-            size="small"
-            sx={{
-              bgcolor: alpha(theme.palette.success.main, 0.1),
-              color: theme.palette.success.main,
-              border: `1px solid ${theme.palette.success.main}`,
-              fontWeight: 600,
-              fontSize: "0.75rem",
-            }}
-          />
-        );
-      case "OFFLINE":
-        return (
-          <Chip
-            label="Offline"
-            size="small"
-            sx={{
-              bgcolor: alpha(theme.palette.error.main, 0.1),
-              color: theme.palette.error.main,
-              border: `1px solid ${theme.palette.error.main}`,
-              fontWeight: 600,
-              fontSize: "0.75rem",
-            }}
-          />
-        );
-      case "CANCELED":
-        return (
-          <Chip
-            label={status === "ERROR" ? "Erro" : "Cancelado"}
-            size="small"
-            sx={{
-              bgcolor: alpha(theme.palette.error.main, 0.1),
-              color: theme.palette.error.main,
-              border: `1px solid ${theme.palette.error.main}`,
-              fontWeight: 600,
-              fontSize: "0.75rem",
-            }}
-          />
-        );
-      case "PROVISIONING":
-        return (
-          <Chip
-            label="Provisionando"
-            size="small"
-            sx={{
-              bgcolor: alpha(theme.palette.secondary.main),
-              color: theme.palette.secondary.main,
-              border: `1px solid ${theme.palette.secondary.main}`,
-              fontWeight: 600,
-              fontSize: "0.75rem",
-            }}
-          />
-        );
-      default:
-        return (
-          <Chip
-            label={status || "Desconhecido"}
-            size="small"
-            sx={{
-              bgcolor: alpha(theme.palette.text.secondary, 0.1),
-              color: theme.palette.text.secondary,
-              border: `1px solid ${theme.palette.text.secondary}`,
-              fontWeight: 600,
-              fontSize: "0.75rem",
-            }}
-          />
-        );
-    }
-  };
+  const {
+    filteredData: filteredDevices,
+    loading,
+    error,
+    searchTerm,
+    setSearchTerm,
+  } = useDataManagement(fetchAllDeviceData, filterCallback);
 
   return (
     <Box
@@ -164,7 +74,7 @@ const GerenciamentoDispositivos = () => {
             py: 1,
           }}
         >
-          + Cadastrar Dispositivo
+          + Novo Dispositivo
         </Button>
       </Box>
 
@@ -258,7 +168,7 @@ const GerenciamentoDispositivos = () => {
                       <TableCell>{device.description}</TableCell>
                       <TableCell>{device.machineName}</TableCell>
                       <TableCell>{device.gatewayId}</TableCell>
-                      <TableCell>{renderStatusChip(device.status)}</TableCell>
+                      <TableCell><StatusChip status={device.status} /></TableCell>
                       <TableCell>{device.lastHeartbeat}</TableCell>
                       <TableCell>
                         <Box sx={{ display: "flex", gap: 1 }}>

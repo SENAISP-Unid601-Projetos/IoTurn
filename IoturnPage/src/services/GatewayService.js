@@ -1,20 +1,13 @@
-const GATEWAYS_API_URL = 'http://10.110.12.24:3000/gateways/allGateways/1'
-//const GATEWAYS_API_URL = 'http://localhost:3000/gateways';
+import ApiService from './ApiServices';
+import { formatTimestamp } from '../utils/formatters';
 
-const formatTimestamp = (timestamp) => {
-  if (!timestamp) return 'N/A'; 
-  return new Date(timestamp).toLocaleString('pt-BR');
-};
+const GATEWAYS_API_URL = '/gateways';
 
 export const fetchAllGatewayData = async () => {
   console.log('Buscando dados dos gateways...');
-  const response = await fetch(GATEWAYS_API_URL);
+  
+  const rawData = await ApiService.getRequest(GATEWAYS_API_URL);
 
-  if (!response.ok) {
-    throw new Error('Falha ao buscar os dados dos gateways');
-  }
-
-  const rawData = await response.json();
   console.log('Dados brutos dos gateways recebidos:', rawData);
 
   const formattedData = rawData.map(gateway => ({
@@ -29,5 +22,3 @@ export const fetchAllGatewayData = async () => {
   console.log('Dados formatados dos gateways:', formattedData);
   return formattedData;
 };
-
-

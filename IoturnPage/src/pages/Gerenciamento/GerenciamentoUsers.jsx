@@ -15,101 +15,28 @@ import {
   Chip,
   IconButton,
 } from "@mui/material";
-import { Search as SearchIcon, Edit, Delete, AlertCircle } from "lucide-react";
+import { Search as SearchIcon, Edit, AlertCircle, User, Trash2 } from "lucide-react";
 import { alpha } from "@mui/material/styles";
 import theme from "../../theme";
 import { fetchAllUserData } from "../../services/usersService";
-import { Activity, Trash2 } from "lucide-react";
+import StatusChip from "../../components/StatusChip";
+import { formatTimestamp } from "../../utils/formatters";
+import { useDataManagement } from "../../hooks/useDataManagement";
+
+// Função de filtro específica para usuários
+const filterCallback = (user, term) =>
+  user.name?.toLowerCase().includes(term) ||
+  user.email?.toLowerCase().includes(term) ||
+  user.userType?.toLowerCase().includes(term);
 
 const GerenciamentoUsers = () => {
-  const [machines, setMachines] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const data = (await fetchAllUserData())
-        setMachines(data);
-        setError(null);
-      } catch (err) {
-        console.error("Erro ao carregar máquinas:", err);
-        setError("Failed to fetch");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadData();
-  }, []);
-
-  const filteredMachines = machines.filter(
-    (machine) =>
-      machine.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      machine.serialNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      machine.manufacturer?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const renderStatusChip = (machineStatus) => {
-    switch (machineStatus) {
-      case "ACTIVE":
-        return (
-          <Chip
-            label="Ativo"
-            size="small"
-            sx={{
-              bgcolor: alpha(theme.palette.success.main, 0.1),
-              color: theme.palette.success.main,
-              border: `1px solid ${theme.palette.success.main}`,
-              fontWeight: 600,
-              fontSize: "0.75rem",
-            }}
-          />
-        );
-      case "SUSPENDED":
-        return (
-          <Chip
-            label="Suspenso"
-            size="small"
-            sx={{
-              bgcolor: alpha(theme.palette.warning.main, 0.1),
-              color: theme.palette.warning.main,
-              border: `1px solid ${theme.palette.warning.main}`,
-              fontWeight: 600,
-              fontSize: "0.75rem",
-            }}
-          />
-        );
-      case "CANCELED":
-        return (
-          <Chip
-            label="Cancelado"
-            size="small"
-            sx={{
-              bgcolor: alpha(theme.palette.error.main, 0.1),
-              color: theme.palette.error.main,
-              border: `1px solid ${theme.palette.error.main}`,
-              fontWeight: 600,
-              fontSize: "0.75rem",
-            }}
-          />
-        );
-      default:
-        return (
-          <Chip
-            label="Desconhecido"
-            size="small"
-            sx={{
-              bgcolor: alpha(theme.palette.text.secondary, 0.1),
-              color: theme.palette.text.secondary,
-              border: `1px solid ${theme.palette.text.secondary}`,
-              fontWeight: 600,
-              fontSize: "0.75rem",
-            }}
-          />
-        );
-    }
-  };
+  const {
+    filteredData: filteredUsers,
+    loading,
+    error,
+    searchTerm,
+    setSearchTerm,
+  } = useDataManagement(fetchAllUserData, filterCallback);
 
   return (
     <Box
@@ -136,9 +63,9 @@ const GerenciamentoUsers = () => {
             gap: "10px",
           }}
         >
-          <Activity color={theme.palette.primary.dark} size={30} />
+          <User color={theme.palette.primary.dark} size={30} />
           <Typography variant="h4" component="h1" fontWeight="bold">
-            Máquinas Disponiveis
+            Usuários
           </Typography>
         </Box>
         <Button
@@ -150,12 +77,13 @@ const GerenciamentoUsers = () => {
             py: 1,
           }}
         >
-          + Nova Máquina
+          + Novo Usuário
         </Button>
       </Box>
 
       {!error && (
         <>
+          {/* Info Box */}
           <Box
             sx={{
               display: "flex",
@@ -170,11 +98,10 @@ const GerenciamentoUsers = () => {
           >
             <Box>
               <Typography variant="subtitle1" fontWeight="bold">
-                Total de Máquinas: {filteredMachines.length}
+                Total de Usuários: {filteredUsers.length}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                Lista completa de equipamentos industriais cadastrados no
-                sistema
+                Lista completa de usuários cadastrados no sistema
               </Typography>
             </Box>
             <TextField
@@ -222,9 +149,10 @@ const GerenciamentoUsers = () => {
                   <TableCell>Status</TableCell>
                   <TableCell>Data Criação</TableCell>
                   <TableCell>Cliente</TableCell>
+                  <TableCell>Ações</TableCell>
                 </TableRow>
               </TableHead>
-              <TableBody key={"uniqueId"}>
+              <TableBody>
                 <>
                   {loading ? (
                     <TableRow>
@@ -232,59 +160,56 @@ const GerenciamentoUsers = () => {
                         Carregando...
                       </TableCell>
                     </TableRow>
-                  ) : filteredMachines.length === 0 ? (
+                  ) : filteredUsers.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={7} align="center">
                         Nenhum usuário encontrado.
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredMachines.map((user) => (
-                      <React.Fragment key={user.id}>
-                        {/* key added here */}
-                        <TableRow key={user.id}>
-                          <TableCell>{user.name || "–"}</TableCell>
-                          <TableCell>{user.email || "–"}</TableCell>
-                          <TableCell>{user.userType || "–"}</TableCell>
-                          <TableCell>{renderStatusChip(user.status)}</TableCell>
-                          <TableCell>{user.createdAt || "–"}</TableCell>
-                          <TableCell>
-                            {user.client.companyName || "–"}
-                          </TableCell>
-                          <TableCell>
-                            <Box sx={{ display: "flex", gap: 1 }}>
-                              <IconButton
-                                size="small"
-                                sx={{
-                                  color: "primary.main",
-                                  "&:hover": {
-                                    bgcolor: alpha(
-                                      theme.palette.primary.main,
-                                      0.1
-                                    ),
-                                  },
-                                }}
-                              >
-                                <Edit size={18} />
-                              </IconButton>
-                              <IconButton
-                                size="small"
-                                sx={{
-                                  color: "error.main",
-                                  "&:hover": {
-                                    bgcolor: alpha(
-                                      theme.palette.error.main,
-                                      0.1
-                                    ),
-                                  },
-                                }}
-                              >
-                                <Trash2 size={18} />
-                              </IconButton>
-                            </Box>
-                          </TableCell>
-                        </TableRow>
-                      </React.Fragment>
+                    filteredUsers.map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell>{user.name || "–"}</TableCell>
+                        <TableCell>{user.email || "–"}</TableCell>
+                        <TableCell>{user.userType || "–"}</TableCell>
+                        <TableCell><StatusChip status={user.status} /></TableCell>
+                        <TableCell>{formatTimestamp(user.createdAt)}</TableCell>
+                        <TableCell>
+                          {user.client?.companyName || "–"}
+                        </TableCell>
+                        <TableCell>
+                          <Box sx={{ display: "flex", gap: 1 }}>
+                            <IconButton
+                              size="small"
+                              sx={{
+                                color: "primary.main",
+                                "&:hover": {
+                                  bgcolor: alpha(
+                                    theme.palette.primary.main,
+                                    0.1
+                                  ),
+                                },
+                              }}
+                            >
+                              <Edit size={18} />
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              sx={{
+                                color: "error.main",
+                                "&:hover": {
+                                  bgcolor: alpha(
+                                    theme.palette.error.main,
+                                    0.1
+                                  ),
+                                },
+                              }}
+                            >
+                              <Trash2 size={18} />
+                            </IconButton>
+                          </Box>
+                        </TableCell>
+                      </TableRow>
                     ))
                   )}
                 </>
@@ -294,7 +219,7 @@ const GerenciamentoUsers = () => {
         </>
       )}
 
-      {/* ✅ Mensagem de erro (só aparece se houver erro) */}
+      {/* Mensagem de erro */}
       {error && (
         <Box
           sx={{

@@ -1,4 +1,4 @@
-import React, { useState, forwardRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
   Box,
@@ -10,6 +10,8 @@ import {
   Collapse,
   Divider,
   Typography,
+  Avatar,
+  alpha,
 } from "@mui/material";
 import {
   Eye,
@@ -27,7 +29,6 @@ import UserProfile from "./UserProfile";
 import { fetchAllUserData } from "../services/usersService";
 import theme from "../theme";
 
-//itens da sidebar
 const sidebarItems = [
   {
     text: "Monitoramento",
@@ -49,7 +50,11 @@ const sidebarItems = [
     text: "Gerenciamento",
     icon: <Settings size={18} />,
     subItems: [
-      { text: "Usuários", icon: <User size={17} />, path: "gerenciamento/usuarios" },
+      {
+        text: "Usuários",
+        icon: <User size={17} />,
+        path: "/main/gerenciamento/usuarios"
+      },
       {
         text: "Máquinas",
         icon: <ListIcon size={17} />,
@@ -69,36 +74,32 @@ const sidebarItems = [
   },
 ];
 
-const Sidebar = forwardRef(({ isOpen }, ref) => {
+const Sidebar = ({ isSidebarExpanded, setSidebarExpanded }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [openSections, setOpenSections] = useState({ Monitoramento: true });
 
-  //dados do usuário
   useEffect(() => {
     const loadUser = async () => {
       try {
         const userData = await fetchAllUserData();
-        setUser(userData);
+        setUser(userData[0]);
       } catch (error) {
         console.error("Erro ao carregar dados do usuário:", error);
       } finally {
         setLoading(false);
       }
     };
-
     loadUser();
   }, []);
 
-  //Logout
   const handleLogout = () => {
     console.log("Logout clicado!");
     navigate("/login");
   };
 
-  //Toggle Seção
   const handleClick = (itemText) => {
     setOpenSections((prev) => ({
       ...prev,
@@ -106,7 +107,13 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
     }));
   };
 
-  // Estilização
+  const handleMouseEnter = () => {
+    setSidebarExpanded(true);
+  };
+  const handleMouseLeave = () => {
+    setSidebarExpanded(false);
+  };
+
   const mainItemSx = {
     py: 1.5,
     px: 2,
@@ -121,7 +128,6 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
       transform: "scale(1.03)",
     },
   };
-
   const subItemSx = {
     py: 1,
     px: 2,
@@ -136,12 +142,10 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
       transform: "scale(1.05)",
     },
   };
-
   const activeSubItemSx = {
     backgroundColor: "primary.main",
     color: "white",
     borderLeft: `3px solid ${theme.palette.secondary.main}`,
-
     "&:hover": {
       backgroundColor: "primary.main",
       transform: "none",
@@ -149,6 +153,18 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
     ".MuiListItemIcon-root": {
       color: "white",
     },
+  };
+
+  const textSx = {
+    opacity: isSidebarExpanded ? 1 : 0,
+    width: isSidebarExpanded ? 'auto' : 0,
+    minWidth: isSidebarExpanded ? 'auto' : 0,
+    whiteSpace: 'nowrap',
+    transition: theme.transitions.create(['opacity', 'width', 'min-width'], {
+      easing: theme.transitions.easing.easeInOut,
+      duration: theme.transitions.duration.complex,
+      delay: isSidebarExpanded ? '100ms' : 0,
+    }),
   };
 
   const renderItems = (items, isSubItem = false) => {
@@ -160,7 +176,6 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
 
       if (item.subItems) {
         if (item.subItems.length === 0) return null;
-
         const isOpen = openSections[item.text] || false;
 
         return (
@@ -172,11 +187,13 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
               <ListItemIcon sx={{ minWidth: "auto", color: "inherit" }}>
                 {item.icon}
               </ListItemIcon>
-              <ListItemText primary={item.text} />
-              {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              <ListItemText primary={item.text} sx={textSx} />
+              <Box sx={{ ...textSx, display: 'flex' }}>
+                {isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </Box>
             </ListItemButton>
 
-            <Collapse in={isOpen} timeout="auto" unmountOnExit>
+            <Collapse in={isOpen && isSidebarExpanded} timeout="auto" unmountOnExit>
               <List
                 component="div"
                 disablePadding
@@ -206,55 +223,77 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
             <ListItemIcon sx={{ minWidth: "auto", color: "inherit" }}>
               {item.icon}
             </ListItemIcon>
-            <ListItemText primary={item.text} />
+            <ListItemText primary={item.text} sx={textSx} />
           </ListItemButton>
         );
       }
-
-      if (item.divider) {
-        return (
-          <Divider
-            key="divider"
-            sx={{ my: 2, borderColor: "rgba(255,255,255,0.1)" }}
-          />
-        );
-      }
-
       return null;
     });
   };
 
   return (
     <Drawer
-      ref={ref}
-      variant="persistent"
+      variant="permanent"
       anchor="left"
-      open={isOpen}
+      open
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       PaperProps={{
         sx: {
           bgcolor: "background.default",
           color: "white",
-          width: 280,
+          width: isSidebarExpanded
+            ? theme.layout.sidebarWidth
+            : theme.layout.sidebarWidthCollapsed,
           borderRight: "1px solid rgba(255, 255, 255, 0.12)",
-          overflow: "hidden",
+          overflowX: "hidden",
+          transition: theme.transitions.create('width', {
+            easing: theme.transitions.easing.easeInOut,
+            duration: theme.transitions.duration.complex,
+          }),
         },
       }}
     >
       <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-        {/* Perfil do usuário ou loading */}
-        {loading ? (
-          <Box sx={{ p: 2, textAlign: "center" }}>
+        <Box sx={{
+          height: 110,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          {loading ? (
             <Typography variant="body2" color="text.secondary">
-              Carregando perfil...
+              ...
             </Typography>
-          </Box>
-        ) : (
-          <UserProfile user={user} />
-        )}
+          ) : (
+            <UserProfile user={user} isSidebarExpanded={isSidebarExpanded} />
+          )}
+        </Box>
 
         <Divider sx={{ borderColor: "divider" }} />
 
-        <List sx={{ flexGrow: 1, overflowY: "auto", p: 2, pb: 1 }}>
+        <List sx={{
+          flexGrow: 1,
+          overflowY: "auto",
+          overflowX: "hidden",
+          p: 2,
+          pb: 1,
+          '&::-webkit-scrollbar': {
+            width: '8px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: theme.palette.background.default,
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: theme.palette.text.tertiary,
+            borderRadius: '10px',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            backgroundColor: theme.palette.text.secondary,
+          },
+          scrollbarWidth: 'thin',
+          scrollbarColor: `${theme.palette.text.tertiary} ${theme.palette.background.default}`,
+        }}>
           {renderItems(sidebarItems)}
         </List>
 
@@ -264,12 +303,12 @@ const Sidebar = forwardRef(({ isOpen }, ref) => {
             <ListItemIcon sx={{ minWidth: "auto", color: "inherit" }}>
               <LogOut size={18} />
             </ListItemIcon>
-            <ListItemText primary="Sair" />
+            <ListItemText primary="Sair" sx={textSx} />
           </ListItemButton>
         </Box>
       </Box>
     </Drawer>
   );
-});
+};
 
 export default Sidebar;

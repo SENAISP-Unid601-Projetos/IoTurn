@@ -9,6 +9,8 @@ import DispositivosGerenciamentoPage from "./pages/Gerenciamento/GerenciamentoDi
 import GatewaysGerencimentoPage from "./pages/Gerenciamento/GerenciamentoGateways"
 import GerenciamentoUsers from "./pages/Gerenciamento/GerenciamentoUsers";
 import HermesAIPage from "./pages/Chat/HermesAiPage";
+import MachineDashboard from "./pages/Dashbord/MachineDashboard";
+
 
 function App() {
   return (
@@ -19,6 +21,7 @@ function App() {
         <Route index element={<MainLayout />} />
 
         <Route path="/main/maquinas" element={<DashboardSelector />} />
+        <Route path="dashboard/:machineId" element={<MachineDashboard />} />
         <Route path="/main/hermes" element={<HermesAIPage />} />
         <Route path="gerenciamento/maquinas" element={<MaquinasGerenciamentoPage />} />
         <Route path="gerenciamento/dispositivos" element={<DispositivosGerenciamentoPage />} />

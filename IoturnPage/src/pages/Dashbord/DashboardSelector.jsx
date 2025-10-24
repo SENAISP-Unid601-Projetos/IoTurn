@@ -8,7 +8,7 @@ import {
   useTheme,
   Divider,
 } from "@mui/material";
-import MachineCard from "../../components/MachineCard";
+import MachineCard from "./components/MachineCard";
 import { fetchAllMachineData } from "../../services/machineService";
 import { Activity } from "lucide-react";
 

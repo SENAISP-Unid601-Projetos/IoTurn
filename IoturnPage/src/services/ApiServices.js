@@ -1,31 +1,35 @@
 import axios from "axios";
 
+const API_BASE_URL = import.meta.env.VITE_APP_API_URL; //Posso usar "||" para fallback
+
 class ApiService {
-  // Método GET - envia uma requisição e retorna o JSON
+  // Método GET
   static async getRequest(APIendpoint) {
+    const fullUrl = `${API_BASE_URL}${APIendpoint}`;
     try {
-      const response = await axios.get(APIendpoint);
-      return response.data; // Axios retorna os dados diretamente em 'response.data'
+      const response = await axios.get(fullUrl);
+      return response.data;
     } catch (error) {
       console.error(
-        "Retorno null por conta de erro ao enviar requisição GET: ",
+        `Erro ao enviar requisição GET para ${fullUrl}: `,
         error
       );
-      return null; // Retorna null ou outro valor adequado
+      throw error;
     }
   }
 
-  // Método POST - envia uma requisição com um objeto JavaScript como JSON
+  // Método POST
   static async postRequest(APIendpoint, data) {
+    const fullUrl = `${API_BASE_URL}${APIendpoint}`;
     try {
-      const response = await axios.post(APIendpoint, data);
-      return response.data; // Axios retorna os dados diretamente em 'response.data'
+      const response = await axios.post(fullUrl, data);
+      return response.data;
     } catch (error) {
       console.error(
-        "Retorno null por conta de erro ao enviar a requisição POST:",
+        `Erro ao enviar a requisição POST para ${fullUrl}:`,
         error
       );
-      return null; // Retorna null ou outro valor adequado
+      throw error;
     }
   }
 }

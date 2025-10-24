@@ -21,89 +21,22 @@ import { alpha } from "@mui/material/styles";
 import theme from "../../theme";
 import { WifiCog } from "lucide-react";
 import { fetchAllGatewayData } from "../../services/GatewayService";
+import StatusChip from "../../components/StatusChip";
+import { useDataManagement } from "../../hooks/useDataManagement";
 
-
-const formatTimestamp = (timestamp) => {
-  if (!timestamp) return '–';
-  const date = new Date(timestamp);
-  return date.toLocaleString('pt-BR');
-};
+// Função de filtro específica para gateways
+const filterCallback = (gateway, term) =>
+  gateway.gatewayId?.toLowerCase().includes(term) ||
+  gateway.description?.toLowerCase().includes(term);
 
 const GerenciamentoGateways = () => {
-  const [gateways, setGateways] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const data = await fetchAllGatewayData(); 
-        setGateways(data);
-      
-        setError(null);
-      } catch (err) {
-        console.error("Erro ao carregar gateways:", err);
-        setError("Falha ao carregar os gateways");
-      } finally {
-        setLoading(false);
-      }
-    }; 
-
-    loadData();
-  }, []);
-
-  const filteredGateways = gateways.filter((gateway) =>
-    gateway.gatewayId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    gateway.description?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const renderStatusChip = (status) => {
-    switch (status) {
-      case "ONLINE":
-        return (
-          <Chip
-            label="Online"
-            size="small"
-            sx={{
-              bgcolor: alpha(theme.palette.success.main, 0.1),
-              color: theme.palette.success.main,
-              border: `1px solid ${theme.palette.success.main}`,
-              fontWeight: 600,
-              fontSize: "0.75rem",
-            }}
-          />
-        );
-      case "OFFLINE":
-        return (
-          <Chip
-            label="Offline"
-            size="small"
-            sx={{
-              bgcolor: alpha(theme.palette.error.main, 0.1),
-              color: theme.palette.error.main,
-              border: `1px solid ${theme.palette.error.main}`,
-              fontWeight: 600,
-              fontSize: "0.75rem",
-            }}
-          />
-        );
-      default:
-        return (
-          <Chip
-            label={status || "Desconhecido"}
-            size="small"
-            sx={{
-              bgcolor: alpha(theme.palette.text.secondary, 0.1),
-              color: theme.palette.text.secondary,
-              border: `1px solid ${theme.palette.text.secondary}`,
-              fontWeight: 600,
-              fontSize: "0.75rem",
-            }}
-          />
-        );
-    }
-  };
+  const {
+    filteredData: filteredGateways,
+    loading,
+    error,
+    searchTerm,
+    setSearchTerm,
+  } = useDataManagement(fetchAllGatewayData, filterCallback);
 
   return (
     <Box
@@ -226,9 +159,9 @@ const GerenciamentoGateways = () => {
                     <TableRow key={gateway.id}>
                       <TableCell>{gateway.gatewayId || "–"}</TableCell>
                       <TableCell>{gateway.description || "–"}</TableCell>
-                      <TableCell>{renderStatusChip(gateway.status)}</TableCell>
+                      <TableCell><StatusChip status={gateway.status} /></TableCell>
                       <TableCell>{gateway.connectedDevices ?? "–"}</TableCell>
-                      <TableCell>{formatTimestamp(gateway.lastHeartbeat)}</TableCell>
+                      <TableCell>{gateway.lastHeartbeat}</TableCell>
                       <TableCell>
                         <Box sx={{ display: "flex", gap: 1 }}>
                           <IconButton

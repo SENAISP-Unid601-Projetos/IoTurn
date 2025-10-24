@@ -21,13 +21,8 @@ import {
     Bot,
 } from "lucide-react";
 import ApiService from "../../services/ApiServices";
-
-const suggestedQuestions = [
-    "Qual a temperatura média da máquina Torno CNC nas últimas 24 horas?",
-    "Mostre o histórico de RPM da Fresadora Setor B",
-    "Quais máquinas tiveram alertas críticos hoje?",
-    "Compare o consumo de corrente entre todas as máquinas",
-];
+import ChatEmptyState from "./components/ChatEmptyState";
+import ChatLoadingIndicator from "./components/ChatLoadingIndicator";
 
 export default function HermesAIPage() {
     const theme = useTheme();
@@ -129,100 +124,6 @@ export default function HermesAIPage() {
         setInput(question);
     };
 
-    // --- Sub-componentes de Renderização ---
-
-    const renderEmptyState = () => (
-        <Box
-            sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                height: "100%",
-                textAlign: "center",
-                p: 3,
-            }}
-        >
-            <Avatar
-                sx={{
-                    bgcolor: alpha(theme.palette.primary.main, 0.12),
-                    border: `1px solid ${alpha(theme.palette.primary.main, 0.5)}`,
-                    color: theme.palette.primary.main,
-                    width: 60,
-                    height: 60,
-                    mb: 2,
-                }}
-            >
-                <Bot size={30} />
-            </Avatar>
-            <Typography variant="h5" component="h2" fontWeight="bold" sx={{ mb: 1 }}>
-                Bem-vindo ao Hermes AI
-            </Typography>
-            <Typography color="text.secondary" sx={{ mb: 4, maxWidth: "600px" }}>
-                Sou seu assistente inteligente para monitoramento. Posso buscar dados,
-                gerar relatórios e analisar métricas das suas máquinas em tempo real.
-            </Typography>
-            <Grid container spacing={2} justifyContent="center" maxWidth="700px">
-                {suggestedQuestions.map((question, index) => (
-                    <Grid item xs={12} sm={6} key={index}>
-                        <Button
-                            variant="outlined"
-                            fullWidth
-                            onClick={() => handleSuggestionClick(question)}
-                            startIcon={<Sparkles size={16} />}
-                            sx={{
-                                textTransform: "none",
-                                justifyContent: "flex-start",
-                                textAlign: "left",
-                                height: "100%",
-                                p: 1.5,
-                                borderRadius: 2,
-                                borderColor: theme.palette.divider,
-                                color: "text.secondary",
-                                "&:hover": {
-                                    borderColor: "primary.main",
-                                    bgcolor: alpha(theme.palette.primary.main, 0.05),
-                                    color: "text.primary",
-                                },
-                            }}
-                        >
-                            {question}
-                        </Button>
-                    </Grid>
-                ))}
-            </Grid>
-        </Box>
-    );
-
-    const renderLoadingIndicator = () => (
-        <Box sx={{ display: "flex", alignItems: "center", gap: 2, p: 1, mr: "auto" }}>
-            <Avatar
-                sx={{
-                    bgcolor: alpha(theme.palette.primary.main, 0.1),
-                    color: theme.palette.primary.main,
-                    width: 40,
-                    height: 40,
-                }}
-            >
-                <Bot size={20} />
-            </Avatar>
-            <Paper
-                elevation={0}
-                sx={{
-                    px: 2,
-                    py: 1.5,
-                    bgcolor: "background.paper",
-                    borderRadius: 3,
-                    border: `1px solid ${theme.palette.divider}`,
-                }}
-            >
-                <Typography variant="body2" color="text.secondary">
-                    Hermes está pensando...
-                </Typography>
-            </Paper>
-        </Box>
-    );
-
     // --- Layout Principal (JSX) ---
 
     return (
@@ -297,7 +198,7 @@ export default function HermesAIPage() {
                 }}
             >
                 <Box sx={{ flexGrow: 1 }}>
-                    {messages.length === 0 && !isLoading && renderEmptyState()}
+                    {messages.length === 0 && !isLoading && <ChatEmptyState onSuggestionClick={handleSuggestionClick} />}
 
                     {messages.map((message) => (
                         <Box
@@ -399,7 +300,7 @@ export default function HermesAIPage() {
                         </Box>
                     ))}
 
-                    {isLoading && messages.length > 0 && renderLoadingIndicator()}
+                    {isLoading && messages.length > 0 && <ChatLoadingIndicator />}
                     <div ref={messagesEndRef} />
                 </Box>
             </Paper>

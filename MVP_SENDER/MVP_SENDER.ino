@@ -9,8 +9,8 @@
 #include <array>
 #include <numeric>
 #include "Sensor_RPM.h"
+#include "EmonLib.h"
 
-// --- Configurações LoRa ---
 #define RF_FREQUENCY                                915000000 // Hz
 #define TX_OUTPUT_POWER                             20        // dBm
 #define LORA_BANDWIDTH                              0         // [0: 125 kHz]
@@ -23,31 +23,32 @@
 #define RX_TIMEOUT_VALUE                            1000
 #define BUFFER_SIZE                                 64
 
-// --- Display ---
+float pinSCT013 = A0;
+
 SSD1306Wire  factory_display(0x3c, 500000, SDA_OLED, SCL_OLED, GEOMETRY_128_64, RST_OLED);
 
-// --- Buffers e JSON ---
+EnergyMonitor emon1;
+
 char txpacket[BUFFER_SIZE];
 StaticJsonDocument<256> doc;
 String nodeChipID;
 
-// --- Controle de Estado ---
 volatile bool lora_idle = true;
 
-// --- Variáveis de Telemetria e Deltas ---
-
-// Temperatura
 float currentTemperature;
-float lastSentTemperature = -100.0; // Usar valor inicial que não será lido
-const float tempChangeDelta = 0.5;   // Delta absoluto de 0.5°C
+float lastSentTemperature = -100.0; 
+const float tempChangeDelta = 0.5;   
 
-// RPM (Média Móvel)
+double Irms;
+const float currentChangeDelta = 0.5;
+double lastSentCurrent = -1;
+
 std::array<int, 5> rpmReadings;
 int rpmReadingIndex = 0;
 bool rpmBufferFull = false;
-int lastSentAverageRPM = -1; // Usar -1 para indicar que nunca foi enviado
+int lastSentAverageRPM = -1; 
 float averageRPM = 0.0;
-const float rpmChangeDeltaPercent = 0.10; // Delta de 5%
+const float rpmChangeDeltaPercent = 0.10; 
 
 // Nível do Tanque
 int lastSentLevelPercentage = -1;
@@ -60,6 +61,7 @@ float tankHeight = 10.0; // Ex: 10 metros
 float stagedTemperature;
 float stagedAverageRPM;
 int stagedLevelPercentage;
+double stagedCurrent;
 
 // Controle de tempo
 unsigned long lastReadTime = 0;
@@ -92,10 +94,10 @@ void setup() {
                       true, 0, 0, LORA_IQ_INVERSION_ON, 3000);
                       
     nodeChipID = getChipId();
+    emon1.current(pinSCT013, 111.11);
     startTemperature(); 
     startRPM();
     startLevel();
-    
     VextON();
     delay(100);
     factory_display.init();
@@ -115,6 +117,7 @@ void loop() {
     if (millis() - lastReadTime >= readInterval && lora_idle) {
         lastReadTime = millis();
         // --- Leitura dos Sensores ---
+         Irms = emon1.calcIrms(1480); // Calcula a corrente RMS
          currentTemperature = readTemperature();
          AddReadingRPM(getRPM()); 
          currentLevelPercentage = readLevel(tankHeight);
@@ -131,52 +134,50 @@ void loop() {
             
             lora_idle = false; 
             Serial.printf("\r\nEnviando PACOTE DE ALERTA: \"%s\"\r\n", txpacket);
-            return; // Sai do loop para esperar o envio ser concluído
+            return; 
         }
 
-        // --- Lógica de Envio por Delta ---
-        if (!rpmBufferFull) { // Não faz nada até o buffer de RPM estar cheio
+        
+        if (!rpmBufferFull) { 
             Serial.print("oi");
             return;
         }
         
         averageRPM = std::accumulate(rpmReadings.begin(), rpmReadings.end(), 0) / (float)rpmReadings.size();
-        Serial.print("MEDIA RPM");
-        Serial.println(averageRPM);
+
         bool shouldSend = false;
         doc.clear();
-
-        // Verifica delta da temperatura
+  
+        if(fabs(Irms - lastSentCurrent) > currentChangeDelta){
+            doc["current"] = Irms;
+            shouldSend = true;
+        }
         if (fabs(currentTemperature - lastSentTemperature) > tempChangeDelta) {
             doc["temp"] = currentTemperature;
             shouldSend = true;
         }
 
-        // Verifica delta do RPM (percentual)
         float rpmChange = 0;
         
         rpmChange = fabs(averageRPM - lastSentAverageRPM) / lastSentAverageRPM;
         if (rpmChange > rpmChangeDeltaPercent || lastSentAverageRPM < 0) {
-             Serial.println("Montei json");
              doc["rpm_avg"] = round(averageRPM);
              shouldSend = true;
         }
 
-        // Verifica delta do Nível
         if (abs(currentLevelPercentage - lastSentLevelPercentage) > levelChangeDelta) {
             doc["level"] = currentLevelPercentage; 
             shouldSend = true;
         }
 
-        // Se alguma condição foi atendida, monta e envia o pacote
         if (shouldSend) {   
             doc["nodeID"] = nodeChipID;
             serializeJson(doc, txpacket, sizeof(txpacket));
 
-            // Armazena os valores que serão enviados para confirmar no OnTxDone
             if (doc.containsKey("temp")) stagedTemperature = currentTemperature;
             if (doc.containsKey("rpm_avg")) stagedAverageRPM = averageRPM;
             if (doc.containsKey("level")) stagedLevelPercentage = currentLevelPercentage;
+            if(doc.containsKey("current")) stagedCurrent = Irms;
 
             Radio.Send((uint8_t *)txpacket, strlen(txpacket));
             
@@ -193,16 +194,13 @@ void loop() {
     }
 }
 
-// =====================================================================
-// CALLBACKS LoRa
-// =====================================================================
 void OnTxDone(void) {
   Serial.println("TX done......");
   
-  // Confirma a atualização dos valores "último enviado"
   if (doc.containsKey("temp")) lastSentTemperature = stagedTemperature;
   if (doc.containsKey("rpm_avg")) lastSentAverageRPM = stagedAverageRPM;
   if (doc.containsKey("level")) lastSentLevelPercentage = stagedLevelPercentage;
+  if(doc.containsKey("current")) lastSentCurrent = stagedCurrent;
   
   lora_idle = true;
 }
@@ -213,15 +211,12 @@ void OnTxTimeout(void) {
     lora_idle = true;
 }
 
-// =====================================================================
-// Funções Auxiliares
-// =====================================================================
 void AddReadingRPM(int newValue) {
     rpmReadings[rpmReadingIndex] = newValue;
     rpmReadingIndex = (rpmReadingIndex + 1) % rpmReadings.size();
     
     if (!rpmBufferFull && rpmReadingIndex == 0) {
-        rpmBufferFull = true; // Buffer foi preenchido pela primeira vez
+        rpmBufferFull = true; 
     }
 }
 

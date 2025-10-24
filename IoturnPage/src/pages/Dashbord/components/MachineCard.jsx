@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 const iconMap = {
   RPM: GaugeCircle,
   Temp: Thermometer,
-  Óleo: Droplets,
+  'Nível de Óleo': Droplets,
   Corrente: Zap,
 };
 
@@ -21,10 +21,13 @@ const MachineCard = ({ machine, onClick }) => {
   const navigate = useNavigate();
 
   const leftMetrics =
-    Object.values(machine.metrics || {}).filter((m) => ["Óleo", "Corrente"].includes(m.name)) || [];
+    Object.values(machine.metrics || {}).filter((m) =>
+      ["Nível de Óleo", "Corrente"].includes(m.name)
+    ) || [];
   const rightMetrics =
-    Object.values(machine.metrics || {}).filter((m) => ["RPM", "Temperatura"].includes(m.name)) || [];
-
+    Object.values(machine.metrics || {}).filter((m) =>
+      ["RPM", "Temperatura"].includes(m.name)
+    ) || [];
 
   const handleCardClick = () => {
     if (onClick) {
@@ -32,7 +35,6 @@ const MachineCard = ({ machine, onClick }) => {
     }
     navigate(`/main/dashboard/${machine.id}`);
   };
-
 
   return (
     <Box
@@ -120,11 +122,13 @@ const MachineCard = ({ machine, onClick }) => {
                       mb: 0.3,
                     }}
                   >
-                    {IconComponent && <IconComponent
-                      color={theme.palette.text.secondary}
-                      size={16}
-                      style={{ marginRight: theme.spacing(0.5) }}
-                    />}
+                    {IconComponent && (
+                      <IconComponent
+                        color={theme.palette.text.secondary}
+                        size={16}
+                        style={{ marginRight: theme.spacing(0.5) }}
+                      />
+                    )}
                     {metric.name}
                   </Typography>
                   <Typography
@@ -156,11 +160,13 @@ const MachineCard = ({ machine, onClick }) => {
                       mb: 0.3,
                     }}
                   >
-                    {IconComponent && <IconComponent
-                      color={theme.palette.text.secondary}
-                      size={16}
-                      style={{ marginRight: theme.spacing(0.5) }}
-                    />}
+                    {IconComponent && (
+                      <IconComponent
+                        color={theme.palette.text.secondary}
+                        size={16}
+                        style={{ marginRight: theme.spacing(0.5) }}
+                      />
+                    )}
                     {metric.name}
                   </Typography>
                   <Typography

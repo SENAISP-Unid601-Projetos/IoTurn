@@ -10,6 +10,8 @@ import GatewaysGerencimentoPage from "./pages/Gerenciamento/GerenciamentoGateway
 import GerenciamentoUsers from "./pages/Gerenciamento/GerenciamentoUsers";
 import HermesAIPage from "./pages/Chat/HermesAiPage";
 import MachineDashboard from "./pages/Dashbord/MachineDashboard";
+import CadastroMaquina from "./pages/Gerenciamento/Cadastro/CadastroMaquina"
+
 
 
 function App() {
@@ -27,6 +29,7 @@ function App() {
         <Route path="gerenciamento/dispositivos" element={<DispositivosGerenciamentoPage />} />
         <Route path="gerenciamento/gateways" element={<GatewaysGerencimentoPage />} />
         <Route path="gerenciamento/usuarios" element={<GerenciamentoUsers />} />
+        <Route path="/main/gerenciamento/cadastro" element={<CadastroMaquina />} />
       </Route>
     </Routes>
   );

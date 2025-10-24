@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Box,
   Typography,
@@ -22,6 +22,7 @@ import StatusChip from "../../components/StatusChip";
 import { useDataManagement } from "../../hooks/useDataManagement";
 import { fetchAllDeviceData } from "../../services/DeviceServices";
 import { Cpu } from "lucide-react";
+
 
 
 // Função de filtro específica para dispositivos
@@ -65,13 +66,15 @@ const GerenciamentoDispositivos = () => {
             Dispositivos IoT
           </Typography>
         </Box>
-        <Button
+      
+        <Button 
           variant="contained"
           sx={{
             borderRadius: "20px",
             textTransform: "none",
             px: 2,
             py: 1,
+            path: "arrumar aqui",
           }}
         >
           + Novo Dispositivo

@@ -20,6 +20,8 @@ import theme from "../../theme";
 import { fetchAllMachineData } from "../../services/machineService";
 import StatusChip from "../../components/StatusChip";
 import { useDataManagement } from "../../hooks/useDataManagement";
+import { Link } from "react-router-dom";
+
 
 // Função de filtro específica para máquinas
 const filterCallback = (machine, term) =>
@@ -67,6 +69,8 @@ const GerenciamentoMaquinas = () => {
           </Typography>
         </Box>
         <Button
+          component = {Link}
+          to="/main/gerenciamento/maquinas/cadastro"
           variant="contained"
           sx={{
             borderRadius: "20px",

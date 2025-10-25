@@ -1,4 +1,3 @@
-// src/pages/Gerenciamento/Machines/CadastroMaquina.jsx
 import React, { useState } from "react";
 import {
   Box,
@@ -9,6 +8,7 @@ import {
   Container,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import Buttons from "../components/BottonsActions";
 
 const CadastroMaquina = () => {
   const navigate = useNavigate();
@@ -88,16 +88,8 @@ const CadastroMaquina = () => {
           />
 
           <Box sx={{ display: "flex", gap: 2 }}>
-            <Button
-              type="button"
-              variant="outlined"
-              onClick={() => navigate("/main/gerenciamento")}
-            >
-              Cancelar
-            </Button>
-            <Button type="submit" variant="contained">
-              Salvar Máquina
-            </Button>
+            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}></Box>
+            <Buttons onNext={handleSubmit} cancelPath="/main/gerenciamento/maquinas" />
           </Box>
         </Box>
       </Paper>

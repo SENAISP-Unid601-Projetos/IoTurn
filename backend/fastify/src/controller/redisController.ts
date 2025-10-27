@@ -68,5 +68,5 @@ export const redisController = {
                 message: error || 'Erro desconhecido.',
             });
         }
-    }
+    },
 };

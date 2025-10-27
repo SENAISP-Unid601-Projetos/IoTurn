@@ -3,6 +3,7 @@ import { error } from 'console';
 import mqttClient from './src/config/mqttClient'
 import { sensoresReadingRepository } from './src/infrastructure/repository/sensoresReadingRepository';
 import { unifiedMachineStateService } from './src/services/unifiedMachineStateService';
+import { redisService } from './src/services/redisService';
 const TOPIC = 'ioturn/maquinas/+/dt/+'; 
 
  export interface NewDataPoint {
@@ -87,7 +88,8 @@ mqttClient.on('message',async (topic, message) => {
         break;
     }
     //console.log(dataPoint)
-    unifiedMachineStateService.unifiedState(dataPoint)
+    unifiedMachineStateService.unifiedState(dataPoint);
+    redisService.publishMessageToMachine(numericMachineId, dataPoint);
   } catch (error) {
     console.error('[ERRO DE PARSE MQTT]:', error)
   }

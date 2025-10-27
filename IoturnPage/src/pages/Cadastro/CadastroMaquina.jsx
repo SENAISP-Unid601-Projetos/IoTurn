@@ -8,7 +8,7 @@ import {
   Container,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import Buttons from "../components/BottonsActions";
+import Buttons from "./components/BottonsActions";
 
 const CadastroMaquina = () => {
   const navigate = useNavigate();

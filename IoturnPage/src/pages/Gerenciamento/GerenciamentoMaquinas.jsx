@@ -70,7 +70,7 @@ const GerenciamentoMaquinas = () => {
         </Box>
         <Button
           component = {Link}
-          to="/main/gerenciamento/maquinas/cadastro"
+          to="/main/maquinas/cadastro"
           variant="contained"
           sx={{
             borderRadius: "20px",

@@ -1,6 +1,7 @@
 import { Button, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowRight } from "lucide-react"; // 👈 ícones Lucide
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import theme from "../../../theme";
 
 const Buttons = ({
   onNext,
@@ -29,6 +30,9 @@ const Buttons = ({
           display: "flex",
           alignItems: "center",
           gap: "6px",
+          backgroundColor: "theme.palette.background.default",
+          color: theme.palette.text.primary,
+          borderColor: theme.palette.divider, 
         }}
       >
         <ArrowLeft size={18} />

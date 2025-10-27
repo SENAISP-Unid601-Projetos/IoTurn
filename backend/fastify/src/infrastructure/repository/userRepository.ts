@@ -12,6 +12,7 @@ export interface NewUserData {
     clientId: number;
 }
 export interface RawUserData {
+    id: number;
     name: string;
     email: string;
     userType: UserType;
@@ -59,6 +60,7 @@ export const userRepository = {
                     status: Status.ACTIVE
                 },
                 select: {
+                    id: true,
                     name: true,
                     email: true,
                     userType: true,

@@ -1,8 +1,8 @@
-import Redis from "ioredis";
+import Redis from 'ioredis'
 
 const redis = new Redis({
-    host:'172.27.64.1',
-    port:30379,
-});
+  host: 'localhost',
+  port: 6379,
+})
 
-export default redis;
+export default redis

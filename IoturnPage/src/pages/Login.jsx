@@ -24,7 +24,6 @@ function Login() {
   const [passwordError, setPasswordError] = useState("");
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [isPasswordValid, setIsPasswordValid] = useState(false);
-  const [loginCookie, setLoginCookie] = useState("");
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event) => {
@@ -32,25 +31,34 @@ function Login() {
   };
 
   //WIP
-  //WIP
-  //WIP
+  async function getCookie() {
+    try {
+      const loginCredentials = {
+        email: email,
+        password: password,
+      };
 
-  const getCookie = () => {
-    const loginCredentials = {
-      email: email,
-      password: password,
-    };
-    const cookie = ApiService.postRequest("/clients/login", loginCredentials);
-    setLoginCookie(cookie);
-  };
+      // Espera a resposta da API (provavelmente um token JWT)
+      const response = await ApiService.postRequest(
+        "/clients/login",
+        loginCredentials
+      );
 
-  // // Envia cookie de login
-  // const sendCookie = () => {
-  //   const cookie = ApiService.postRequest("/login", loginCookie);
-  // };
+      // Verifica se a resposta contém um token
+      if (response && response.token) {
+        // Armazenando o token diretamente no cookie
+        document.cookie = `loginCookie=${response.token}; path=/; max-age=${
+          30 * 60 * 60 * 24
+        }`; // 30 dias em segundos
+        console.log("Token armazenado no cookie:", response.token);
+      } else {
+        console.error("Token não encontrado na resposta da API", response);
+      }
+    } catch (error) {
+      console.error("Erro ao tentar obter o cookie:", error);
+    }
+  }
 
-  //WIP
-  //WIP
   //WIP
 
   useEffect(() => {
@@ -82,11 +90,7 @@ function Login() {
 
     if (isEmailValid && isPasswordValid) {
       const data = { email: email, password: password };
-      console.log("Validação OK!");
-      console.log("Email:", email);
-      console.log("Senha:", password);
-      // ApiService.postRequest("/login", { email, data });
-      getCookie;
+      getCookie();
     }
   };
 

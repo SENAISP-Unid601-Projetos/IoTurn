@@ -24,6 +24,7 @@ function Login() {
   const [passwordError, setPasswordError] = useState("");
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [isPasswordValid, setIsPasswordValid] = useState(false);
+  const [loginCookie, setLoginCookie] = useState("");
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event) => {
@@ -33,23 +34,21 @@ function Login() {
   //WIP
   //WIP
   //WIP
-  const getCookie = () => {
-    const cookie = ApiService.postRequest(
-      APILink,
-      Enviar_Email & Senha_no_formato_library
-    );
-  };
 
-  // Envia cookie de login
-  const sendCookie = () => {
-    const token = JWTToken.getCookie("DEFINIR NOME DO COOKIE");
+  const getCookie = () => {
     const loginCredentials = {
       email: email,
       password: password,
     };
-    const cookie = ApiService.postRequest("/", loginCredentials);
+    const cookie = ApiService.postRequest("/clients/login", loginCredentials);
+    setLoginCookie(cookie);
   };
-  const storageCookie = () => JWTToken.getCookie("");
+
+  // // Envia cookie de login
+  // const sendCookie = () => {
+  //   const cookie = ApiService.postRequest("/login", loginCookie);
+  // };
+
   //WIP
   //WIP
   //WIP
@@ -87,6 +86,7 @@ function Login() {
       console.log("Email:", email);
       console.log("Senha:", password);
       // ApiService.postRequest("/login", { email, data });
+      getCookie;
     }
   };
 

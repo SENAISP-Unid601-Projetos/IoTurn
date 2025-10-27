@@ -1,4 +1,4 @@
-// Esse código serve para gerenciar requisições envolvendo cookies.
+   // Esse código serve para gerenciar requisições envolvendo cookies.
 // Serve principalmente para que o back-end receba Token JWT armazenado durante o login. Com esse token será possível o back-end saber que tipo de autorização o usuário possuí.
 
 class JWTToken {

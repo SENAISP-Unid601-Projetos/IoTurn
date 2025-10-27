@@ -1,4 +1,4 @@
-from thompsonSampling import ThompsonSampling
+from .thompsonSampling import ThompsonSampling
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi import HTTPException

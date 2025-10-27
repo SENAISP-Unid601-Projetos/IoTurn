@@ -17,7 +17,7 @@ spec:
       containers:
       - name: fastapi-container
         # <<< AQUI ESTÁ A MUDANÇA >>>
-        image: pedroleme/fastapi-service:latest
+        image: pedroleme/fast-api-ml:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8000

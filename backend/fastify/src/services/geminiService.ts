@@ -1,6 +1,6 @@
 import { GenerationConfig, GoogleGenerativeAI } from "@google/generative-ai";
 import chooseBestArm from "./chooseBestArm";
-import { InputPredictionLog } from "./logDiagnosis";
+import { InputPredictionLog } from "./logDiagnosisService";
 
 function getSchemaContext(): string {
   return `
@@ -68,32 +68,34 @@ function getSchemaContext(): string {
 
 async function initGemini() {
   const bestArm = await chooseBestArm();
-  
+
   const generationConfig: GenerationConfig = {
     temperature: Number(bestArm.temperature),
     topP: Number(bestArm.topP),
     topK: Number(bestArm.topK),
     maxOutputTokens: Number(bestArm.maxOutputTokens),
-    responseMimeType: 'application/json',
+    responseMimeType: "application/json",
   };
-  
+
   console.log("Estou no gemini service:", bestArm);
-  const key = process.env.API_GEMINI_KEY; 
+  const key = process.env.API_GEMINI_KEY;
 
   if (!key) {
     throw new Error("A variável de ambiente API_GEMINI_KEY não foi definida.");
   }
 
   const genAI = new GoogleGenerativeAI(key);
-  
+
   return {
-    model: genAI.getGenerativeModel({ model: "gemini-2.0-flash-thinking-exp-01-21", generationConfig }),
-    generationConfig
+    model: genAI.getGenerativeModel({
+      model: "gemini-2.0-flash-thinking-exp-01-21",
+      generationConfig,
+    }),
+    generationConfig,
   };
 }
 
 export const geminiService = {
-
   askGeminiSQL: async (userMessage: string): Promise<string> => {
     const { model } = await initGemini();
     const schemaContext = getSchemaContext();
@@ -114,14 +116,19 @@ export const geminiService = {
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    
+
     return response.text();
   },
 
- 
-  askGeminiHuman: async (originalQuestion: string, sqlResult: any): Promise<{dataHuman:string, hiperParamsHuman:GenerationConfig}> => {
-    console.log(`Pergunta original: ${originalQuestion}, Resultado da consulta SQL:`, sqlResult);
-    
+  askGeminiHuman: async (
+    originalQuestion: string,
+    sqlResult: any
+  ): Promise<{ dataHuman: string; hiperParamsHuman: GenerationConfig }> => {
+    console.log(
+      `Pergunta original: ${originalQuestion}, Resultado da consulta SQL:`,
+      sqlResult
+    );
+
     const { model, generationConfig } = await initGemini();
 
     const sqlResultString = JSON.stringify(sqlResult, null, 2);
@@ -148,7 +155,11 @@ export const geminiService = {
 
     return { dataHuman: response.text(), hiperParamsHuman: generationConfig };
   },
-  askGeminiInsight: async (logData: InputPredictionLog, clusterPrediction: number, clusterStrength: number): Promise<string> => {
+  askGeminiInsight: async (
+    logData: InputPredictionLog,
+    clusterPrediction: number,
+    clusterStrength: number
+  ): Promise<string> => {
     const { model } = await initGemini();
     const context = `
       Você é Lia, uma IA especialista em análise industrial e manutenção preditiva.
@@ -190,5 +201,5 @@ export const geminiService = {
     const result = await model.generateContent(prompt);
     const response = await result.response;
     return response.text();
-  }
+  },
 };

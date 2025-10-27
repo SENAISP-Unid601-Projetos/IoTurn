@@ -88,8 +88,8 @@ mqttClient.on('message',async (topic, message) => {
         break;
     }
     //console.log(dataPoint)
-    unifiedMachineStateService.unifiedState(dataPoint);
-    redisService.publishMessageToMachine(numericMachineId, dataPoint);
+    //unifiedMachineStateService.unifiedState(dataPoint);
+    //redisService.publishMessageToMachine(numericMachineId, dataPoint);
   } catch (error) {
     console.error('[ERRO DE PARSE MQTT]:', error)
   }

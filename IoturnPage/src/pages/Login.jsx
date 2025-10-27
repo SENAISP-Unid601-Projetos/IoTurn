@@ -32,6 +32,9 @@ function Login() {
 
   //WIP
   async function getCookie() {
+    // "user=JohnDoe; expires=" +
+    //   new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000).toUTCString() +
+    //   "; path=/";
     try {
       const loginCredentials = {
         email: email,
@@ -47,10 +50,8 @@ function Login() {
       // Verifica se a resposta contém um token
       if (response && response.token) {
         // Armazenando o token diretamente no cookie
-        document.cookie = `loginCookie=${response.token}; path=/; max-age=${
-          30 * 60 * 60 * 24
-        }`; // 30 dias em segundos
-        console.log("Token armazenado no cookie:", response.token);
+        const cookie = JWTToken.setCookie("loginCookie", response.token, 7);
+        document.cookie = cookie;
       } else {
         console.error("Token não encontrado na resposta da API", response);
       }
@@ -81,6 +82,12 @@ function Login() {
   }, [password]);
 
   const handleLogin = () => {
+    console.log("EEE");
+    console.log("EEE");
+    console.log("EEE");
+    console.log("EEE");
+    console.log("EEE");
+
     if (!isEmailValid) {
       setEmailError("Por favor, insira um email válido.");
     }
@@ -90,8 +97,8 @@ function Login() {
 
     if (isEmailValid && isPasswordValid) {
       const data = { email: email, password: password };
-      getCookie();
     }
+    document.cookie = getCookie();
   };
 
   const textFieldStyles = {

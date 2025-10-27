@@ -1,22 +1,25 @@
 import React, { useState } from "react";
 import {
   Box,
-  Button,
-  TextField,
   Typography,
-  Paper,
   Container,
 } from "@mui/material";
+import { Settings } from "lucide-react"; 
 import { useNavigate } from "react-router-dom";
-import Buttons from "./components/BottonsActions";
+import Buttons from "../Cadastro/components/BottonsActions"; 
+import RegistrationStepper from "../Cadastro/components/RegistrationStepper"; 
+import theme from "../../theme";
 
 const CadastroMaquina = () => {
   const navigate = useNavigate();
+  const [activeStep, setActiveStep] = useState(0);
+
   const [formData, setFormData] = useState({
     name: "",
     serialNumber: "",
     manufacturer: "",
     model: "",
+    status: "Ativo", 
   });
 
   const handleChange = (e) => {
@@ -27,72 +30,45 @@ const CadastroMaquina = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Dados da máquina:", formData);
-    // Aqui você vai chamar sua API depois:
-    // createMachine(formData).then(() => navigate("/main/gerenciamento"));
-    alert("Máquina cadastrada com sucesso!");
-    navigate("/main/gerenciamento"); // ou o caminho da sua lista
+    // lógica da API 
+    navigate("/main/gerenciamento"); // caminho da sua lista
   };
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      <Paper
+    <Container maxWidth="md" sx={{ py: 4, border: '1px solid yellow'}}>
+      <Box
         sx={{
-          p: 4,
-          bgcolor: "background.paper",
-          borderRadius: 2,
-          border: "1px solid",
-          borderColor: "divider",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2, 
         }}
       >
-        <Typography variant="h4" fontWeight="bold" gutterBottom>
-          Cadastrar Nova Máquina
-        </Typography>
-        <Typography variant="body1" color="text.secondary" gutterBottom>
-          Preencha as informações básicas da máquina industrial.
-        </Typography>
-
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-          <TextField
-            label="Nome da Máquina *"
-            name="name"
-            fullWidth
-            required
-            value={formData.name}
-            onChange={handleChange}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            label="Número de Série *"
-            name="serialNumber"
-            fullWidth
-            required
-            value={formData.serialNumber}
-            onChange={handleChange}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            label="Fabricante"
-            name="manufacturer"
-            fullWidth
-            value={formData.manufacturer}
-            onChange={handleChange}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            label="Modelo"
-            name="model"
-            fullWidth
-            value={formData.model}
-            onChange={handleChange}
-            sx={{ mb: 3 }}
-          />
-
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}></Box>
-            <Buttons onNext={handleSubmit} cancelPath="/main/gerenciamento/maquinas" />
-          </Box>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+          }}
+        >
+          <Settings color={theme.palette.primary.dark} size={30} />
+          <Typography variant="h4" component="h1" fontWeight="bold">
+            Cadastro de Máquina
+          </Typography>
         </Box>
-      </Paper>
+      </Box>
+
+      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+        Registre uma nova máquina e vincule um dispositivo IoT
+      </Typography>
+
+      <RegistrationStepper activeStep={activeStep} />
+
+
+        <Box sx={{ display: "flex", gap: 2, mt: 4 }}>
+          <Buttons onNext={handleSubmit} cancelPath="/main/gerenciamento/maquinas" />
+        </Box>
+    
     </Container>
   );
 };

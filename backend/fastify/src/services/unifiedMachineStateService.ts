@@ -147,7 +147,7 @@ export const unifiedMachineStateService = {
         predictionPayload
       );
       const response = await axios.post(
-        "http://127.0.0.1:8000/predictCluster",
+        "http://10.110.18.15:30007/predictCluster",
         predictionPayload
       );
 

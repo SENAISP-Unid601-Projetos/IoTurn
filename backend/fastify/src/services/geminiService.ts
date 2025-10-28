@@ -192,7 +192,7 @@ export const geminiService = {
       \`\`\`
 
       Predição do cluster: ${clusterPrediction}
-      Confiança: ${clusterStrength}%
+      Força: ${clusterStrength}%
 
       Gere um insight claro para o operador da máquina, explicando o que está acontecendo e qual ação tomar.
       Use linguagem técnica simples e baseada em diagnósticos reais de operação industrial.

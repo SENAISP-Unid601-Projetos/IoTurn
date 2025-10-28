@@ -34,7 +34,7 @@ export const logDiagnosisService = {
         console.warn("[logDiagnosis] Nenhum insight retornado do Gemini.");
         throw new Error("Não foi possível gerar o insight.");
       }
-
+      console.log(response)
       const output: OutputBodySchema = {
         data,
         clusterPredict,

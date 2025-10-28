@@ -6,4 +6,6 @@ export async function machineRoutes(fastify: FastifyInstance) {
     fastify.get('/getAll/:id', machineController.getAllUsersMachineController)
     fastify.put('/update/:id', machineController.updateMachine)
     fastify.delete('/delete/:id', machineController.softDelete)
+    fastify.get('/getMachine/:clientId/:machineId', machineController.getMachineByClientAndIdController)
+
 }

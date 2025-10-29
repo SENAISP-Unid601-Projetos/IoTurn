@@ -75,6 +75,9 @@ const CadastroMaquina = () => {
           border: `1px solid ${theme.palette.divider}`,
           borderRadius: 3,
           p: 3,
+          maxWidth: "45rem",
+          width: "100%",
+          margin: "0 auto",
         }}
       >
         <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
@@ -141,7 +144,7 @@ const CadastroMaquina = () => {
           />
         </Grid>
 
-        <Box sx={{ display: "flex", gap: 2, mt: 5 }}>
+        <Box sx={{px: 3, mt: 4 }}>
           <Buttons
             onNext={handleSubmit}
             cancelPath="/main/gerenciamento/maquinas"

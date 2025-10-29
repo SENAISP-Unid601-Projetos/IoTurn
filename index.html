@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard de Cliente</title>
+    <title>Teste de Stream SSE</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -13,20 +13,13 @@
             padding: 20px;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
         }
-        main {
-            display: flex;
-            gap: 30px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .form-container, .stream-container {
+        .container {
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             padding: 25px;
-            width: 400px;
+            width: 600px;
         }
         h2 {
             margin-top: 0;
@@ -35,321 +28,215 @@
         }
         .form-group {
             margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
         }
         .form-group label {
-            display: block;
-            margin-bottom: 5px;
             font-weight: 600;
+            padding-top: 10px;
         }
         .form-group input {
-            width: 95%;
+            flex: 1;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
         }
         button {
-            width: 100%;
-            padding: 12px;
-            background-color: #007bff;
+            padding: 12px 20px;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
         }
-        button:hover {
-            background-color: #0056b3;
+        #connect-btn {
+            background-color: #28a745; /* Verde */
         }
-        #stream-section {
-            display: none; /* Oculto por padrão */
+        #connect-btn:hover {
+            background-color: #218838;
+        }
+        #disconnect-btn {
+            background-color: #dc3545; /* Vermelho */
+        }
+        #disconnect-btn:hover {
+            background-color: #c82333;
+        }
+        #disconnect-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #status {
+            margin-top: 10px;
+            font-style: italic;
+            color: #555;
         }
         #messages {
             background-color: #2b2b2b;
             color: #f1f1f1;
             padding: 15px;
             border-radius: 4px;
-            height: 300px;
+            height: 400px;
             overflow-y: auto;
             white-space: pre-wrap; /* Mantém a formatação do JSON */
             font-family: "Courier New", Courier, monospace;
-        }
-        #logout-button {
-            background-color: #dc3545;
-            margin-top: 15px;
-        }
-        #logout-button:hover {
-            background-color: #c82333;
-        }
-        #error-message {
-            color: #dc3545;
-            margin-top: 10px;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
 
-    <main>
-        <div id="auth-section">
-            <div class="form-container">
-                <h2>Login</h2>
-                <form id="login-form">
-                    <div class="form-group">
-                        <label for="login-email">Email</label>
-                        <input type="email" id="login-email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="login-password">Senha</label>
-                        <input type="password" id="login-password" minlength="8" required>
-                    </div>
-                    <button type="submit">Entrar</button>
-                    <p id="login-error" class="error-message"></p>
-                </form>
-            </div>
-
-            <div class="form-container" style="margin-top: 20px;">
-                <h2>Novo Cliente</h2>
-                <form id="register-form">
-                    <div class="form-group">
-                        <label for="reg-companyName">Nome da Empresa</label>
-                        <input type="text" id="reg-companyName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="reg-cnpj">CNPJ</label>
-                        <input type="text" id="reg-cnpj" minlength="14" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="reg-phone">Telefone</label>
-                        <input type="text" id="reg-phone" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="reg-address">Endereço</label>
-                        <input type="text" id="reg-address" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="reg-email">Email</label>
-                        <input type="email" id="reg-email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="reg-password">Senha</label>
-                        <input type="password" id="reg-password" minlength="8" required>
-                    </div>
-                    <button type="submit">Cadastrar</button>
-                    <p id="register-error" class="error-message"></p>
-                </form>
-            </div>
+    <div class="container">
+        <h2>Teste de Conexão SSE</h2>
+        
+        <div class="form-group">
+            <label for="user-id">ID do Usuário:</label>
+            <input type="text" id="user-id" placeholder="Digite o ID para conectar (ex: 123)">
+            <button id="connect-btn">Conectar</button>
+            <button id="disconnect-btn" disabled>Desconectar</button>
         </div>
 
-        <div id="stream-section" class="stream-container">
-            <h2 id="welcome-message"></h2>
-            <h3>Stream de Dados em Tempo Real</h3>
-            <div id="messages">Aguardando dados do servidor...</div>
-            <button id="logout-button">Sair (Desconectar)</button>
-        </div>
+        <div id="status">Status: Desconectado</div>
 
-    </main>
+        <h3>Log de Mensagens</h3>
+        <div id="messages">Aguardando conexão...</div>
+    </div>
 
     <script>
-        // Referência global para a conexão SSE
+        // --- Configuração ---
+        // Altere se o seu backend não estiver rodando localmente na porta 3333
+        const API_BASE_URL = 'http://localhost:3000/machines'; 
+        // --- Fim da Configuração ---
+
         let sseSource = null;
 
         // Seletores do DOM
-        const authSection = document.getElementById('auth-section');
-        const streamSection = document.getElementById('stream-section');
-        const loginForm = document.getElementById('login-form');
-        const registerForm = document.getElementById('register-form');
-        const logoutButton = document.getElementById('logout-button');
+        const connectBtn = document.getElementById('connect-btn');
+        const disconnectBtn = document.getElementById('disconnect-btn');
+        const userIdInput = document.getElementById('user-id');
         const messagesDiv = document.getElementById('messages');
-        const welcomeMessage = document.getElementById('welcome-message');
-        const loginError = document.getElementById('login-error');
-        const registerError = document.getElementById('register-error');
-
-        // URL base da sua API (ajuste se necessário)
-        const API_BASE_URL = 'http://localhost:3333'; // Assumindo que seu Fastify roda na porta 3333
+        const statusDiv = document.getElementById('status');
 
         /**
-         * Lida com o envio do formulário de login
+         * Lida com o clique no botão Conectar
          */
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            loginError.textContent = '';
-            
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
+        connectBtn.addEventListener('click', () => {
+            const userId = userIdInput.value;
+
+            if (!userId) {
+                alert("Por favor, insira um ID de usuário.");
+                return;
+            }
+
+            if (sseSource) {
+                logMessage("Já existe uma conexão ativa.");
+                return;
+            }
+
+            const url = `${API_BASE_URL}/stream/${userId}`;
 
             try {
-                const response = await fetch(`${API_BASE_URL}/login`, { // Ajuste a rota se for diferente
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
+                // 1. Cria a conexão
+                sseSource = new EventSource(url);
+                updateUI(true, userId);
+                logMessage(`Tentando conectar ao stream: ${url}`);
+
+                // 2. Evento 'open' (conexão estabelecida)
+                sseSource.onopen = () => {
+                    console.log("[SSE] Conexão estabelecida.");
+                    logMessage("--- Conexão estabelecida com o servidor ---");
+                };
+
+                // 3. Evento 'message' (mensagens padrão "data: ...")
+                sseSource.onmessage = (event) => {
+                    console.log("[SSE] Mensagem recebida:", event.data);
+                    try {
+                        // Tenta formatar o JSON para exibição
+                        const jsonData = JSON.parse(event.data);
+                        const prettyJson = JSON.stringify(jsonData, null, 2);
+                        logMessage(`\n${prettyJson}`);
+                    } catch (e) {
+                        // Se não for JSON, apenas exibe o texto
+                        logMessage(event.data);
+                    }
+                };
+
+                // 4. Evento customizado 'connected' (que você envia do backend)
+                sseSource.addEventListener('connected', (event) => {
+                    console.log("[SSE] Evento 'connected' recebido:", event.data);
+                    const data = JSON.parse(event.data);
+                    logMessage(`Servidor: ${data.message}`);
                 });
 
-                if (!response.ok) {
-                    throw new Error('Email ou senha inválidos.');
-                }
-
-                const data = await response.json();
-                
-                // Salva o token (localStorage é simples, mas considere alternativas mais seguras)
-                localStorage.setItem('authToken', data.token);
-
-                // Atualiza a UI
-                showStreamUI(data.companyName);
-
-                // Inicia a conexão SSE
-                connectToStream(data.token);
+                // 5. Evento 'error'
+                sseSource.onerror = (err) => {
+                    console.error("[SSE] Erro na conexão:", err);
+                    logMessage("!!! Erro na conexão com o stream. Verifique o console. !!!");
+                    
+                    // Se o erro fechar a conexão, limpamos
+                    if (sseSource.readyState === EventSource.CLOSED) {
+                        logMessage("--- Conexão perdida permanentemente ---");
+                        disconnectStream();
+                    }
+                };
 
             } catch (err) {
-                loginError.textContent = err.message;
+                console.error("Erro ao iniciar EventSource:", err);
+                logMessage(`Erro: ${err.message}`);
+                updateUI(false);
             }
         });
 
         /**
-         * Lida com o envio do formulário de cadastro
+         * Lida com o clique no botão Desconectar
          */
-        registerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            registerError.textContent = '';
-
-            const formData = {
-                companyName: document.getElementById('reg-companyName').value,
-                cnpj: document.getElementById('reg-cnpj').value,
-                phone: document.getElementById('reg-phone').value,
-                address: document.getElementById('reg-address').value,
-                email: document.getElementById('reg-email').value,
-                password: document.getElementById('reg-password').value,
-            };
-
-            // Validação simples (Zod é no backend, mas é bom ter no frontend)
-            if (formData.password.length < 8) {
-                registerError.textContent = "A senha deve ter no mínimo 8 caracteres.";
-                return;
-            }
-            if (formData.cnpj.length < 14) {
-                registerError.textContent = "O CNPJ deve ter pelo menos 14 caracteres.";
-                return;
-            }
-
-            try {
-                const response = await fetch(`${API_BASE_URL}/clients`, { // Ajuste a rota se for diferente
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData)
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Erro ao cadastrar.');
-                }
-
-                alert('Cadastro realizado com sucesso! Faça o login.');
-                registerForm.reset();
-
-            } catch (err) {
-                registerError.textContent = err.message;
-            }
+        disconnectBtn.addEventListener('click', () => {
+            disconnectStream();
         });
 
         /**
-         * Lida com o logout
+         * Função para fechar a conexão SSE
          */
-        logoutButton.addEventListener('click', () => {
-            // Fecha a conexão SSE
+        function disconnectStream() {
             if (sseSource) {
                 sseSource.close();
                 sseSource = null;
                 console.log("[SSE] Conexão fechada pelo cliente.");
+                logMessage("--- Desconectado pelo usuário ---");
+                updateUI(false);
             }
-            
-            // Limpa o token
-            localStorage.removeItem('authToken');
-
-            // Reseta a UI
-            showAuthUI();
-        });
-
-        /**
-         * Inicia a conexão Server-Sent Events (SSE)
-         */
-        function connectToStream(token) {
-            // ⚠️ IMPORTANTE: A API EventSource (SSE) não suporta
-            // envio de headers 'Authorization'.
-            // Seu backend DEVE ser adaptado para aceitar o token
-            // via Query String (parâmetro de URL), como abaixo.
-            const url = `${API_BASE_URL}/stream?token=${token}`;
-
-            sseSource = new EventSource(url);
-            
-            // Limpa a área de mensagens
-            messagesDiv.innerHTML = '';
-            
-            function logMessage(text) {
-                const line = document.createElement('div');
-                line.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
-                messagesDiv.appendChild(line);
-                messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto-scroll
-            }
-
-            // Evento 'open' é disparado quando a conexão é estabelecida
-            sseSource.onopen = () => {
-                console.log("[SSE] Conexão estabelecida com /stream");
-                logMessage("Conectado ao servidor.");
-            };
-
-            // Evento 'message' (padrão) - captura "data: ..."
-            sseSource.onmessage = (event) => {
-                console.log("[SSE] Mensagem recebida:", event.data);
-                
-                try {
-                    // Tenta formatar o JSON para exibição
-                    const jsonData = JSON.parse(event.data);
-                    const prettyJson = JSON.stringify(jsonData, null, 2);
-                    logMessage(`\n${prettyJson}`);
-                } catch (e) {
-                    // Se não for JSON, apenas exibe o texto
-                    logMessage(event.data);
-                }
-            };
-
-            // Evento customizado 'connected' (que você envia do backend)
-            sseSource.addEventListener('connected', (event) => {
-                console.log("[SSE] Evento 'connected' recebido:", event.data);
-                const data = JSON.parse(event.data);
-                logMessage(`Servidor: ${data.message}`);
-            });
-
-            // Evento 'error'
-            sseSource.onerror = (err) => {
-                console.error("[SSE] Erro na conexão:", err);
-                logMessage("Erro na conexão com o stream. Tentando reconectar...");
-                if (sseSource.readyState === EventSource.CLOSED) {
-                    logMessage("A conexão foi permanentemente fechada pelo servidor.");
-                    sseSource.close();
-                }
-            };
         }
 
         /**
-         * Funções auxiliares para mostrar/ocultar seções
+         * Atualiza a UI (botões e status)
          */
-        function showStreamUI(companyName) {
-            welcomeMessage.textContent = `Bem-vindo, ${companyName}!`;
-            authSection.style.display = 'none';
-            streamSection.style.display = 'block';
+        function updateUI(isConnected, userId = '') {
+            if (isConnected) {
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+                userIdInput.disabled = true;
+                statusDiv.textContent = `Status: Conectado ao ID: ${userId}`;
+                messagesDiv.innerHTML = ''; // Limpa logs anteriores
+            } else {
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+                userIdInput.disabled = false;
+                statusDiv.textContent = 'Status: Desconectado';
+            }
         }
 
-        function showAuthUI() {
-            authSection.style.display = 'block';
-            streamSection.style.display = 'none';
-            loginForm.reset();
-            registerForm.reset();
-            loginError.textContent = '';
-            registerError.textContent = '';
+        /**
+         * Adiciona uma mensagem ao log na tela
+         */
+        function logMessage(text) {
+            const line = document.createElement('div');
+            // Adiciona um timestamp simples
+            const timestamp = new Date().toLocaleTimeString();
+            line.textContent = `[${timestamp}] ${text}`;
+            
+            messagesDiv.appendChild(line);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto-scroll
         }
-        
-        // Verifica se o usuário já está logado ao carregar a página
-        // (Neste exemplo simples, vamos sempre começar pela tela de login)
-        showAuthUI();
 
     </script>
 </body>

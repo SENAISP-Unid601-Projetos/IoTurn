@@ -7,31 +7,32 @@ export async function machineRoutes(fastify: FastifyInstance) {
     fastify.get('/getAll/:id', machineController.getAllUsersMachineController)
     fastify.put('/update/:id', machineController.updateMachine)
     fastify.delete('/delete/:id', machineController.softDelete)
-    fastify.get('/stream', { preValidation: [fastify.authenticate] }, (request: FastifyRequest, reply: FastifyReply) => {
+    fastify.get('/stream/:id', async (request: FastifyRequest, reply: FastifyReply) => {
     
         const HEADERS = {
             'Content-Type': 'text/event-stream',
             'Connection': 'keep-alive',
             'Cache-Control': 'no-cache',
+            'Access-Control-Allow-Origin': 'http://127.0.0.1:5500',
+            'Access-Control-Allow-Credentials': 'true'
         };
         reply.raw.writeHead(200, HEADERS);
 
-        const user = request.user as { id: number };
-        if (!user.id) {
+        const params = request.params as { id: string };
+        const user = params.id;
+        if (!user) {
             return reply.raw.end(); 
         }
 
         const subscriber = redis.duplicate(); 
-        const channel = `machineOwnerChannel-${user.id}`;
-
-        subscriber.connect().catch(console.error);
+        const channel = `machineOwnerChannel-${user}`;
 
         subscriber.subscribe(channel, (err) => {
             if (err) {
                 console.error(`Erro ao se inscrever no canal Redis: ${channel}`, err.message);
                 return reply.raw.end();
             } else {
-                console.log(`[SSE] Usuário ${user.id} inscrito com sucesso no canal: ${channel}`);
+                console.log(`[SSE] Usuário ${user} inscrito com sucesso no canal: ${channel}`);
                 reply.raw.write(`event: connected\ndata: ${JSON.stringify({ message: "Conectado ao stream" })}\n\n`);
             }
         });
@@ -43,7 +44,7 @@ export async function machineRoutes(fastify: FastifyInstance) {
         });
 
         request.raw.on('close', () => {
-            console.log(`[SSE] Usuário ${user.id} desconectado. Fechando inscrição do canal: ${channel}`);
+            console.log(`[SSE] Usuário ${user} desconectado. Fechando inscrição do canal: ${channel}`);
             subscriber.removeAllListeners('message');
             subscriber.unsubscribe(channel);
             subscriber.quit();

@@ -1,7 +1,7 @@
 
 import mqtt, { MqttClient } from 'mqtt'
 
-const MQTT_BROKER_URL = 'mqtt://10.110.18.15:32333' // Substitua pelo URL do seu broker MQTT
+const MQTT_BROKER_URL = 'mqtt://172.27.64.1:32333' // Substitua pelo URL do seu broker MQTT
 const CLIENT_ID = `mqtt_client_${Math.random().toString(16).slice(2, 8)}`
 
 const options = {

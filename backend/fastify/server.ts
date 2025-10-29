@@ -25,8 +25,9 @@ dotenv.config()
 const fastify = Fastify({ logger: true })
 
 fastify.register(cors, {
-  origin: true,
-  credentials: true
+  origin: 'http://127.0.0.1:5500',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 })
 //Registro plugin de cookies
 fastify.register(require('@fastify/cookie'));

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react"; 
 import {
   Box,
   Typography,
@@ -12,7 +12,6 @@ import {
   Button,
   TextField,
   InputAdornment,
-  Chip,
   IconButton,
 } from "@mui/material";
 import { Search as SearchIcon, Edit, Trash2, AlertCircle } from "lucide-react";
@@ -22,6 +21,7 @@ import StatusChip from "../../components/StatusChip";
 import { useDataManagement } from "../../hooks/useDataManagement";
 import { fetchAllDeviceData } from "../../services/DeviceServices";
 import { Cpu } from "lucide-react";
+import DispositivoModal from "../Cadastro/components/DispositivoModal";
 
 
 
@@ -39,6 +39,8 @@ const GerenciamentoDispositivos = () => {
     searchTerm,
     setSearchTerm,
   } = useDataManagement(fetchAllDeviceData, filterCallback);
+
+  const [modalOpen, setModalOpen] = useState(false);
 
   return (
     <Box
@@ -66,19 +68,24 @@ const GerenciamentoDispositivos = () => {
             Dispositivos IoT
           </Typography>
         </Box>
-      
-        <Button 
+
+        <Button
+          onClick={() => setModalOpen(true)}
           variant="contained"
           sx={{
             borderRadius: "20px",
             textTransform: "none",
             px: 2,
             py: 1,
-            path: "arrumar aqui",
+
           }}
         >
           + Novo Dispositivo
         </Button>
+        <DispositivoModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+        />
       </Box>
 
       {!error && (
@@ -171,7 +178,9 @@ const GerenciamentoDispositivos = () => {
                       <TableCell>{device.description}</TableCell>
                       <TableCell>{device.machineName}</TableCell>
                       <TableCell>{device.gatewayId}</TableCell>
-                      <TableCell><StatusChip status={device.status} /></TableCell>
+                      <TableCell>
+                        <StatusChip status={device.status} />
+                      </TableCell>
                       <TableCell>{device.lastHeartbeat}</TableCell>
                       <TableCell>
                         <Box sx={{ display: "flex", gap: 1 }}>

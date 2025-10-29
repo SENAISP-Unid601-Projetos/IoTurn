@@ -53,7 +53,7 @@ const RegistrationStepper = ({ activeStep = 0 }) => {
                                         bgcolor:
                                             index === activeStep
                                                 ? theme.palette.primary.main
-                                                : theme.palette.grey[300],
+                                                : theme.palette.grey[500],
                                         color:
                                             index === activeStep
                                                 ? theme.palette.common.white

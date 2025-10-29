@@ -1,10 +1,5 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Typography,
-  Container,
-  Grid, // 👈 Você ainda precisa do Container
-} from "@mui/material";
+import { Box, Typography, Container, Grid } from "@mui/material";
 import { Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Buttons from "../Cadastro/components/BottonsActions";
@@ -20,7 +15,7 @@ const statusOptions = [
 
 const CadastroMaquina = () => {
   const navigate = useNavigate();
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep] = useState(0);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -46,9 +41,10 @@ const CadastroMaquina = () => {
       <Box
         sx={{
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: "column",
           alignItems: "center",
-          mb: 2,
+          flexDirection: "column",
+          textAlign: "center",
         }}
       >
         <Box
@@ -56,17 +52,18 @@ const CadastroMaquina = () => {
             display: "flex",
             alignItems: "center",
             gap: "10px",
+            mb: 1,
           }}
         >
           <Settings color={theme.palette.primary.dark} size={30} />
-          <Typography variant="h4" component="h1" fontWeight="bold">
+          <Typography variant="h4" component="h1" fontWeight="bold" sx={{}}>
             Cadastro de Máquina
           </Typography>
         </Box>
-      </Box>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+      <Typography variant="body1" color="text.secondary" sx={{ mb: 4}}>
         Registre uma nova máquina e vincule um dispositivo IoT
       </Typography>
+      </Box>
 
       <RegistrationStepper activeStep={activeStep} />
 

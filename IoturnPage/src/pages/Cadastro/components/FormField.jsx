@@ -27,48 +27,69 @@ const FormField = ({
   options = [],
   ...props
 }) => {
-  
   const inputBaseStyle = {
     borderRadius: borderRadius,
-    height: 42, 
+    height: 42,
     fontSize: "0.95rem",
     "& input, & .MuiSelect-select": {
-      padding: "8px 14px", 
+      padding: "8px 14px",
     },
     "& .MuiOutlinedInput-notchedOutline": {
       borderColor: theme.palette.divider,
     },
     "&:hover .MuiOutlinedInput-notchedOutline": {
-      borderColor: theme.palette.primary.dark, 
+      borderColor: theme.palette.primary.dark,
     },
   };
 
   // -------------------
   // CASO 1: SELECT
   // -------------------
-  const renderSelect = () => (
-    <FormControl fullWidth>
-      <Select
-        id={name}
-        name={name}
-        value={value}
-        onChange={onChange}
-        sx={inputBaseStyle} 
-        {...props}
-      >
-        {placeholder && (
-          <MenuItem value="" disabled>
-            <em>{placeholder}</em>
-          </MenuItem>
-        )}
-        {options.map((option) => (
-          <MenuItem key={option.value} value={option.value}>
-            {option.label}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
-  );
+const renderSelect = () => (
+  <FormControl fullWidth>
+    <Select
+      id={name}
+      name={name}
+      value={value}
+      onChange={onChange}
+      sx={inputBaseStyle}
+      MenuProps={{
+        PaperProps: {
+          sx: {
+            backgroundColor: theme.palette.background.default,
+            borderRadius: "12px",
+            border: `1px solid ${theme.palette.divider}`,
+            boxShadow: "0px 4px 12px rgba(0,0,0,0.15)",
+            mt: 0.5,
+          },
+        },
+      }}
+      {...props}
+    >
+      {placeholder && (
+        <MenuItem value="" disabled>
+          <em>{placeholder}</em>
+        </MenuItem>
+      )}
+      {options.map((option) => (
+        <MenuItem
+          key={option.value}
+          value={option.value}
+          sx={{
+            "&.Mui-selected": {
+              backgroundColor: "transparent",
+            },
+            "&.Mui-selected:hover": {
+              backgroundColor: "transparent",
+            },
+          }}
+        >
+          {option.label}
+        </MenuItem>
+      ))}
+    </Select>
+  </FormControl>
+);
 
   // -------------------
   // CASO 2: TEXTFIELD
@@ -83,7 +104,7 @@ const FormField = ({
       placeholder={placeholder}
       variant="outlined"
       InputProps={{
-        sx: inputBaseStyle, 
+        sx: inputBaseStyle,
       }}
       {...props}
     />
@@ -120,7 +141,6 @@ const FormField = ({
           </Typography>
         )}
 
-  
         {select ? renderSelect() : renderTextField()}
       </Box>
     </Grid>

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -15,7 +16,13 @@ import {
   Chip,
   IconButton,
 } from "@mui/material";
-import { Search as SearchIcon, Edit, AlertCircle, User, Trash2 } from "lucide-react";
+import {
+  Search as SearchIcon,
+  Edit,
+  AlertCircle,
+  User,
+  Trash2,
+} from "lucide-react";
 import { alpha } from "@mui/material/styles";
 import theme from "../../theme";
 import { fetchAllUserData } from "../../services/usersService";
@@ -37,6 +44,17 @@ const GerenciamentoUsers = () => {
     searchTerm,
     setSearchTerm,
   } = useDataManagement(fetchAllUserData, filterCallback);
+
+  // WIP
+  // const [users, setUsers] = useState([]);
+
+  // useEffect(() => {
+  //   fetchAllUserData().then(setUsers);
+  // }, []);
+
+  // const handleDelete = (id) => {
+  //   setUsers((prev) => prev.filter((u) => u.id !== id));
+  // };
 
   return (
     <Box
@@ -172,14 +190,15 @@ const GerenciamentoUsers = () => {
                         <TableCell>{user.name || "–"}</TableCell>
                         <TableCell>{user.email || "–"}</TableCell>
                         <TableCell>{user.userType || "–"}</TableCell>
-                        <TableCell><StatusChip status={user.status} /></TableCell>
-                        <TableCell>{formatTimestamp(user.createdAt)}</TableCell>
                         <TableCell>
-                          {user.client?.companyName || "–"}
+                          <StatusChip status={user.status} />
                         </TableCell>
+                        <TableCell>{formatTimestamp(user.createdAt)}</TableCell>
+                        <TableCell>{user.client?.companyName || "–"}</TableCell>
                         <TableCell>
                           <Box sx={{ display: "flex", gap: 1 }}>
                             <IconButton
+                              onClick={() => handleDelete(user.id)}
                               size="small"
                               sx={{
                                 color: "primary.main",
@@ -194,14 +213,12 @@ const GerenciamentoUsers = () => {
                               <Edit size={18} />
                             </IconButton>
                             <IconButton
+                              onClick={() => handleDelete(user.id)}
                               size="small"
                               sx={{
                                 color: "error.main",
                                 "&:hover": {
-                                  bgcolor: alpha(
-                                    theme.palette.error.main,
-                                    0.1
-                                  ),
+                                  bgcolor: alpha(theme.palette.error.main, 0.1),
                                 },
                               }}
                             >

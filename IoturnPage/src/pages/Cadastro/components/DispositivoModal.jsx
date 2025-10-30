@@ -4,13 +4,13 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Button,
-  Grid,
   Typography,
   Box,
+  Grid,
 } from "@mui/material";
 import { Settings } from "lucide-react";
 import FormField from "./FormField";
+import Buttons from "../../Cadastro/components/BottonsActions";
 import theme from "../../../theme";
 
 const statusOptions = [
@@ -34,8 +34,7 @@ const DispositivoModal = ({ open, onClose }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Novo dispositivo:", formData);
-    // Aqui você chamaria sua API
-    onClose(); // fecha o modal
+    onClose();
   };
 
   return (
@@ -50,33 +49,41 @@ const DispositivoModal = ({ open, onClose }) => {
           border: `1px solid ${theme.palette.divider}`,
           borderRadius: "16px",
           boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.5)",
-          "& .MuiDialogTitle-root, & .MuiDialogContent-root, & .MuiDialogActions-root":
-            {
-              bgcolor: "#000 !important",
-              color: "#fff",
-            },
+          "& .MuiDialogTitle-root, & .MuiDialogContent-root, & .MuiDialogActions-root": {
+            bgcolor: "#000 !important",
+          },
         },
       }}
     >
-      <DialogTitle
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: 1,
-          fontWeight: "bold",
-        }}
-      >
-        <Settings color={theme.palette.primary.dark} size={24} />
-        Cadastrar Novo Dispositivo
-      </DialogTitle>
-
       <DialogContent>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          Preencha as informações do sensor Heltec V2. A vinculação com gateway
-          e máquina será feita posteriormente no cadastro da máquina.
-        </Typography>
+        {/* Título + Descrição com linha azul */}
+        <Box
+          sx={{
+            position: "relative",
+            pl: 2,
+            mb: 3,
+            "&::before": {
+              content: '""',
+              position: "absolute",
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: "4px",
+              bgcolor: theme.palette.primary.main,
+            },
+          }}
+        >
+          <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
+            Cadastrar Novo Dispositivo
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Preencha as informações do sensor Heltec V2. A vinculação com gateway
+            e máquina será feita posteriormente no cadastro da máquina.
+          </Typography>
+        </Box>
 
-        <Box component="form" onSubmit={handleSubmit}>
+        {/* Formulário */}
+        <Box component="form" onSubmit={handleSubmit} sx={{ borderTop: `1px solid ${theme.palette.divider}`, borderBottom: `1px solid ${theme.palette.divider}`, pt: 3, pb: 3 }}>
           <Grid container spacing={3}>
             <FormField
               xs={12}
@@ -114,13 +121,12 @@ const DispositivoModal = ({ open, onClose }) => {
         </Box>
       </DialogContent>
 
-      <DialogActions sx={{ p: 3 }}>
-        <Button onClick={onClose} variant="outlined">
-          Cancelar
-        </Button>
-        <Button onClick={handleSubmit} variant="contained">
-          Cadastrar Dispositivo
-        </Button>
+      <DialogActions sx={{ p: 1 }}>
+        <Buttons
+          onNext={handleSubmit}
+          onCancel={onClose}
+          nextLabel="Cadastrar Dispositivo"
+        />
       </DialogActions>
     </Dialog>
   );

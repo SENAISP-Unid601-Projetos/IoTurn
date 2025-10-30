@@ -148,6 +148,8 @@ const CadastroMaquina = () => {
           <Buttons
             onNext={handleSubmit}
             cancelPath="/main/gerenciamento/maquinas"
+            nextLabel="Próximo"
+            showNextIcon={true}
           />
         </Box>
       </Box>

@@ -1,5 +1,4 @@
-// pages/Gerenciamento/GerenciamentoGateways.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -13,7 +12,6 @@ import {
   Button,
   TextField,
   InputAdornment,
-  Chip,
   IconButton,
 } from "@mui/material";
 import { Search as SearchIcon, Edit, Trash2, AlertCircle } from "lucide-react";
@@ -23,8 +21,8 @@ import { WifiCog } from "lucide-react";
 import { fetchAllGatewayData } from "../../services/GatewayService";
 import StatusChip from "../../components/StatusChip";
 import { useDataManagement } from "../../hooks/useDataManagement";
+import GatewayModal from "../Cadastro/components/GatewayModal"; // ✅ caminho correto
 
-// Função de filtro específica para gateways
 const filterCallback = (gateway, term) =>
   gateway.gatewayId?.toLowerCase().includes(term) ||
   gateway.description?.toLowerCase().includes(term);
@@ -37,6 +35,9 @@ const GerenciamentoGateways = () => {
     searchTerm,
     setSearchTerm,
   } = useDataManagement(fetchAllGatewayData, filterCallback);
+
+  // ✅ Estado do modal DENTRO do componente
+  const [modalOpen, setModalOpen] = useState(false);
 
   return (
     <Box
@@ -64,6 +65,7 @@ const GerenciamentoGateways = () => {
           </Typography>
         </Box>
         <Button
+          onClick={() => setModalOpen(true)} // ✅ abre o modal
           variant="contained"
           sx={{
             borderRadius: "20px",
@@ -74,6 +76,11 @@ const GerenciamentoGateways = () => {
         >
           + Novo Gateway
         </Button>
+        {/* ✅ Modal renderizado */}
+        <GatewayModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+        />
       </Box>
 
       {!error && (

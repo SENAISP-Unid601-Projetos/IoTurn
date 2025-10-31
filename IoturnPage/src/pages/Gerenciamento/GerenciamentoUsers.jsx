@@ -1,5 +1,3 @@
-
-import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -29,6 +27,7 @@ import { fetchAllUserData } from "../../services/usersService";
 import StatusChip from "../../components/StatusChip";
 import { formatTimestamp } from "../../utils/formatters";
 import { useDataManagement } from "../../hooks/useDataManagement";
+import ApiService from "../../services/ApiServices";
 
 // Função de filtro específica para usuários
 const filterCallback = (user, term) =>
@@ -44,6 +43,14 @@ const GerenciamentoUsers = () => {
     searchTerm,
     setSearchTerm,
   } = useDataManagement(fetchAllUserData, filterCallback);
+
+  // Existe um problema de segurança nessa função que só pode ser verificada pelo back-end. O usuário em tese pode realizar uma ação de DELETE em qualquer id dentro da tabela users se ele enviar um pacote com um id ('e') diferente. Portanto é necessário que o usuário da sessão só possa alterar valores de usuários a ele registrado.
+  const DeletaFuncionario = (e) => {
+    const data = {
+      userId: e,
+    };
+    ApiService.postRequest("/delete", data);
+  };
 
   // WIP
   // const [users, setUsers] = useState([]);
@@ -198,7 +205,7 @@ const GerenciamentoUsers = () => {
                         <TableCell>
                           <Box sx={{ display: "flex", gap: 1 }}>
                             <IconButton
-                              onClick={() => handleDelete(user.id)}
+                              //WIP sem funcionalidade (Ainda)
                               size="small"
                               sx={{
                                 color: "primary.main",
@@ -213,7 +220,7 @@ const GerenciamentoUsers = () => {
                               <Edit size={18} />
                             </IconButton>
                             <IconButton
-                              onClick={() => handleDelete(user.id)}
+                              onClick={() => DeletaFuncionario(user.id)}
                               size="small"
                               sx={{
                                 color: "error.main",

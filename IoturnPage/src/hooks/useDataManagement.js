@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from "react";
 
 /**
  * Hook personalizado para gerenciar o carregamento, erro,
@@ -9,42 +9,44 @@ import { useState, useEffect, useMemo } from 'react';
  * @returns {Object}
  */
 export const useDataManagement = (fetchFunction, filterCallback) => {
-    const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [searchTerm, setSearchTerm] = useState("");
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  console.log(data);
 
-    useEffect(() => {
-        const loadData = async () => {
-            try {
-                setLoading(true);
-                const result = await fetchFunction();
-                setData(result);
-                setError(null);
-            } catch (err) {
-                console.error("Erro ao carregar dados:", err);
-                setError(`Falha ao carregar os dados. Erro: ${err.message || 'Desconhecido'}`);
-            } finally {
-                setLoading(false);
-            }
-        };
-        loadData();
-    }, [fetchFunction]);
-
-
-    const filteredData = useMemo(() => {
-        const term = searchTerm.toLowerCase();
-        if (!term) {
-            return data;
-        }
-        return data.filter(item => filterCallback(item, term));
-    }, [data, searchTerm, filterCallback]);
-
-    return {
-        filteredData,
-        loading,
-        error,
-        searchTerm,
-        setSearchTerm,
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        const result = await fetchFunction();
+        setData(result);
+        setError(null);
+      } catch (err) {
+        console.error("Erro ao carregar dados:", err);
+        setError(
+          `Falha ao carregar os dados. Erro: ${err.message || "Desconhecido"}`
+        );
+      } finally {
+        setLoading(false);
+      }
     };
+    loadData();
+  }, [fetchFunction]);
+
+  const filteredData = useMemo(() => {
+    const term = searchTerm.toLowerCase();
+    if (!term) {
+      return data;
+    }
+    return data.filter((item) => filterCallback(item, term));
+  }, [data, searchTerm, filterCallback]);
+
+  return {
+    filteredData,
+    loading,
+    error,
+    searchTerm,
+    setSearchTerm,
+  };
 };

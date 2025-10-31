@@ -1,159 +1,158 @@
 import React, { useState } from "react";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Typography,
-  Box,
-  Grid,
+    Dialog,
+    DialogContent,
+    DialogActions,
+    Typography,
+    Box,
+    Grid,
 } from "@mui/material";
-import { WifiCog } from "lucide-react";
-import FormField from "../../Cadastro/components/FormField"; // ajuste o caminho se necessário
-import Buttons from "../../Cadastro/components/BottonsActions"; // ajuste o caminho
+import FormField from "../../Cadastro/components/FormField";
+import Buttons from "../../Cadastro/components/BottonsActions";
 import theme from "../../../theme";
 
 const statusOptions = [
-  { value: "Online", label: "Online" },
-  { value: "Offline", label: "Offline" },
-  { value: "Manutencao", label: "Em Manutenção" },
+    { value: "Online", label: "Online" },
+    { value: "Offline", label: "Offline" },
+    { value: "Manutencao", label: "Em Manutenção" },
 ];
 
 const GatewayModal = ({ open, onClose }) => {
-  const [formData, setFormData] = useState({
-    gatewayId: "",
-    description: "",
-    status: "Offline",
-  });
+    const [formData, setFormData] = useState({
+        gatewayId: "",
+        description: "",
+        status: "Offline",
+    });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Novo gateway:", formData);
-    onClose(); // fecha o modal
-  };
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        console.log("Novo gateway:", formData);
+        onClose();
+    };
 
-  return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      maxWidth="sm"
-      fullWidth
-      PaperProps={{
-        sx: {
-          bgcolor: "#000 !important",
-          border: `1px solid ${theme.palette.divider}`,
-          borderRadius: "16px",
-          boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.5)",
-          "& .MuiDialogTitle-root, & .MuiDialogContent-root, & .MuiDialogActions-root": {
-            bgcolor: "#000 !important",
-            color: "#fff",
-          },
-        },
-      }}
-    >
-      <DialogContent>
-        {/* Título + descrição com linha azul */}
-        <Box
-          sx={{
-            position: "relative",
-            pl: 2,
-            mb: 3,
-            "&::before": {
-              content: '""',
-              position: "absolute",
-              left: 0,
-              top: 0,
-              bottom: 0,
-              width: "4px",
-              bgcolor: theme.palette.primary.main,
-            },
-          }}
+    return (
+        <Dialog
+            open={open}
+            onClose={onClose}
+            maxWidth="sm"
+            fullWidth
+            PaperProps={{
+                sx: {
+                    bgcolor: "#000 !important",
+                    border: `1px solid ${theme.palette.divider}`,
+                    borderRadius: "16px",
+                    boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.5)",
+                    "& .MuiDialogTitle-root, & .MuiDialogContent-root, & .MuiDialogActions-root": {
+                        bgcolor: "#000 !important",
+                        color: "#fff",
+                    },
+                },
+            }}
         >
-          <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
-            Cadastrar Novo Gateway
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Preencha as informações do Gateway ESP32 com Wi-Fi no sistema.
-          </Typography>
-        </Box>
+            <DialogContent>
+                <Box
+                    sx={{
+                        position: "relative",
+                        pl: 2,
+                        mb: 3,
+                        "&::before": {
+                            content: '""',
+                            position: "absolute",
+                            left: 0,
+                            top: 0,
+                            bottom: 0,
+                            width: "4px",
+                            bgcolor: theme.palette.primary.main,
+                        },
+                    }}
+                >
+                    <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
+                        Cadastrar Novo Gateway
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        Preencha as informações do Gateway ESP32 com Wi-Fi no sistema.
+                    </Typography>
+                </Box>
 
-        {/* Campos */}
-        <Box component="form" onSubmit={handleSubmit} sx={{ borderTop: `1px solid ${theme.palette.divider}`, borderBottom: `1px solid ${theme.palette.divider}`, pt: 3, pb: 3 }}>
-          <Grid container spacing={3}>
-            <FormField
-              xs={12}
-              label="Gateway ID"
-              name="gatewayId"
-              value={formData.gatewayId}
-              onChange={handleChange}
-              placeholder="Ex: ESP32-GW-A1B2C3D4E5F6"
-              description="ID único do hardware (Chip ID do ESP32)"
-              required
-            />
+                <Box component="form" onSubmit={handleSubmit} sx={{ borderTop: `1px solid ${theme.palette.divider}`, borderBottom: `1px solid ${theme.palette.divider}`, pt: 3, pb: 3 }}>
+                    <Grid container spacing={3}>
+                        {/* Gateway ID + Status Inicial em linha */}
+                        <Grid item xs={6}>
+                            <FormField
+                                label="Gateway ID"
+                                name="gatewayId"
+                                value={formData.gatewayId}
+                                onChange={handleChange}
+                                placeholder="Ex: ESP32-GW-A1B2C3D4E5F6"
+                                description="ID único do hardware (Chip ID do ESP32)"
+                                required
+                            />
+                        </Grid>
 
-            <FormField
-              xs={12}
-              label="Status Inicial"
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              description="Estado do gateway no momento do cadastro"
-              required
-              select
-              options={statusOptions}
-            />
+                        <Grid item xs={12} sm={6}>
+                            <FormField
+                                label="Status Inicial"
+                                name="status"
+                                value={formData.status}
+                                onChange={handleChange}
+                                description="Estado do gateway no momento do cadastro"
+                                required
+                                select
+                                options={statusOptions}
+                            />
+                        </Grid>
 
-            <FormField
-              xs={12}
-              label="Descrição / Localização"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Ex: Gateway do Setor A - Próximo à doca 3, instalado no teto"
-              description="Localização física ou identificação adicional (opcional)"
-            />
-          </Grid>
-        </Box>
+                        {/* Descrição / Localização em linha completa */}
+                        <Grid item xs={12}>
+                            <FormField
+                                label="Descrição / Localização"
+                                name="description"
+                                value={formData.description}
+                                onChange={handleChange}
+                                placeholder="Ex: Gateway do Setor A - Próximo à doca 3, instalado no teto"
+                                description="Localização física ou identificação adicional (opcional)"
+                            />
+                        </Grid>
+                    </Grid>
+                </Box>
 
-        {/* Informações técnicas */}
-        <Box sx={{ mt: 3, p: 2, bgcolor: "background.paper", borderRadius: 2 }}>
-          <Typography variant="subtitle1" fontWeight="bold">Função do Gateway</Typography>
-          <Typography variant="body2">
-            O Gateway ESP32 atua como ponto de comunicação entre os sensores Heltec V2 (LoRa) e o servidor central via Wi-Fi. Ele é responsável por:
-            • Receber dados dos dispositivos IoT via protocolo LoRa
-            • Encaminhar os dados para o servidor através da rede Wi-Fi
-            • Gerenciar múltiplos dispositivos simultaneamente
-            • Enviar heartbeats periódicos para monitoramento de conectividade
-          </Typography>
-        </Box>
+                <Box sx={{ mt: 3, p: 2, bgcolor: "background.paper", borderRadius: 2 }}>
+                    <Typography variant="subtitle1" fontWeight="bold">Função do Gateway</Typography>
+                    <Typography variant="body2">
+                        O Gateway ESP32 atua como ponto de comunicação entre os sensores Heltec V2 (LoRa) e o servidor central via Wi-Fi. Ele é responsável por:
+                        • Receber dados dos dispositivos IoT via protocolo LoRa
+                        • Encaminhar os dados para o servidor através da rede Wi-Fi
+                        • Gerenciar múltiplos dispositivos simultaneamente
+                        • Enviar heartbeats periódicos para monitoramento de conectividade
+                    </Typography>
+                </Box>
 
-        {/* Diretrizes de cadastro */}
-        <Box sx={{ mt: 3, p: 2, bgcolor: "background.paper", borderRadius: 2 }}>
-          <Typography variant="subtitle1" fontWeight="bold">Diretrizes de Cadastro</Typography>
-          <Typography variant="body2">
-            • O Gateway ID deve ser único e corresponder ao Chip ID do ESP32
-            • Gateways offline não conseguem gerenciar dispositivos até ficarem online
-            • Um único Gateway pode gerenciar múltiplos dispositivos IoT simultaneamente
-            • O status será atualizado automaticamente quando o Gateway enviar o primeiro heartbeat
-            • Certifique-se de que o Gateway tenha acesso à rede Wi-Fi antes de ativá-lo
-          </Typography>
-        </Box>
-      </DialogContent>
+                <Box sx={{ mt: 3, p: 2, bgcolor: "background.paper", borderRadius: 2 }}>
+                    <Typography variant="subtitle1" fontWeight="bold">Diretrizes de Cadastro</Typography>
+                    <Typography variant="body2">
+                        • O Gateway ID deve ser único e corresponder ao Chip ID do ESP32
+                        • Gateways offline não conseguem gerenciar dispositivos até ficarem online
+                        • Um único Gateway pode gerenciar múltiplos dispositivos IoT simultaneamente
+                        • O status será atualizado automaticamente quando o Gateway enviar o primeiro heartbeat
+                        • Certifique-se de que o Gateway tenha acesso à rede Wi-Fi antes de ativá-lo
+                    </Typography>
+                </Box>
+            </DialogContent>
 
-      <DialogActions sx={{ p: 1 }}>
-        <Buttons
-          onNext={handleSubmit}
-          onCancel={onClose}
-          nextLabel="Salvar Gateway"
-        />
-      </DialogActions>
-    </Dialog>
-  );
+            <DialogActions sx={{ p: 1 }}>
+                <Buttons
+                    onNext={handleSubmit}
+                    onCancel={onClose}
+                    nextLabel="Salvar Gateway"
+                />
+            </DialogActions>
+        </Dialog>
+    );
 };
 
-export default GatewayModal; // ✅ ESSE É O IMPORTANTE!
+export default GatewayModal; 

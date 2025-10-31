@@ -69,6 +69,7 @@ const GerenciamentoUsers = () => {
           </Typography>
         </Box>
         <Button
+          onClick={() => setModalOpen(true)}
           variant="contained"
           sx={{
             borderRadius: "20px",

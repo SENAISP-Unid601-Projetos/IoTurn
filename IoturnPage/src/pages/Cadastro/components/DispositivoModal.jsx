@@ -70,6 +70,7 @@ const DispositivoModal = ({ open, onClose }) => {
               bottom: 0,
               width: "4px",
               bgcolor: theme.palette.primary.main,
+              borderRadius: 2,
             },
           }}
         >

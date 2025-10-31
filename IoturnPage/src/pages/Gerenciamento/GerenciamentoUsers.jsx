@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -15,13 +15,20 @@ import {
   Chip,
   IconButton,
 } from "@mui/material";
-import { Search as SearchIcon, Edit, AlertCircle, User, Trash2 } from "lucide-react";
+import {
+  Search as SearchIcon,
+  Edit,
+  AlertCircle,
+  User,
+  Trash2,
+} from "lucide-react";
 import { alpha } from "@mui/material/styles";
 import theme from "../../theme";
 import { fetchAllUserData } from "../../services/usersService";
 import StatusChip from "../../components/StatusChip";
 import { formatTimestamp } from "../../utils/formatters";
 import { useDataManagement } from "../../hooks/useDataManagement";
+import { Modal } from "../Cadastro/components/Users.Modal";
 
 // Função de filtro específica para usuários
 const filterCallback = (user, term) =>
@@ -37,6 +44,8 @@ const GerenciamentoUsers = () => {
     searchTerm,
     setSearchTerm,
   } = useDataManagement(fetchAllUserData, filterCallback);
+
+  const [modalOpen, setModalOpen] = useState(false);
 
   return (
     <Box
@@ -80,6 +89,7 @@ const GerenciamentoUsers = () => {
         >
           + Novo Usuário
         </Button>
+        <UserModal open={modalOpen} onClose={() => setModalOpen(false)} />
       </Box>
 
       {!error && (
@@ -92,7 +102,7 @@ const GerenciamentoUsers = () => {
               alignItems: "center",
               mb: 3,
               p: 2,
-              bgcolor: "theme.palette.background.default",
+              bgcolor: theme.palette.background.default,
               borderRadius: 2,
               border: `1px solid ${theme.palette.divider}`,
             }}
@@ -173,11 +183,11 @@ const GerenciamentoUsers = () => {
                         <TableCell>{user.name || "–"}</TableCell>
                         <TableCell>{user.email || "–"}</TableCell>
                         <TableCell>{user.userType || "–"}</TableCell>
-                        <TableCell><StatusChip status={user.status} /></TableCell>
-                        <TableCell>{formatTimestamp(user.createdAt)}</TableCell>
                         <TableCell>
-                          {user.client?.companyName || "–"}
+                          <StatusChip status={user.status} />
                         </TableCell>
+                        <TableCell>{formatTimestamp(user.createdAt)}</TableCell>
+                        <TableCell>{user.client?.companyName || "–"}</TableCell>
                         <TableCell>
                           <Box sx={{ display: "flex", gap: 1 }}>
                             <IconButton
@@ -199,10 +209,7 @@ const GerenciamentoUsers = () => {
                               sx={{
                                 color: "error.main",
                                 "&:hover": {
-                                  bgcolor: alpha(
-                                    theme.palette.error.main,
-                                    0.1
-                                  ),
+                                  bgcolor: alpha(theme.palette.error.main, 0.1),
                                 },
                               }}
                             >

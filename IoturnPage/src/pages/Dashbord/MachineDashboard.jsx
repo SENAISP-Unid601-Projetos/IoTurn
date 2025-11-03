@@ -21,14 +21,12 @@ import {
     Droplets,
     Zap,
 } from "lucide-react";
-// import mqtt from "mqtt";
 import { fetchMachineById } from "../../services/machineService";
 import MetricCard from "./components/MetricCard";
 import DynamicChart from "./components/DynamicChart";
 
 const MAX_DATA_POINTS = 30;
 
-// (Funções generateMockDataPoint e getInitialChartData - sem alterações)
 const generateMockDataPoint = (lastValue, min, max) => {
     let newValue = lastValue + (Math.random() - 0.5) * (max / 10);
     if (newValue < min) newValue = min;
@@ -70,7 +68,6 @@ const MachineDashboard = () => {
 
     const intervalRef = useRef(null);
 
-    // (Hooks useCallback e useEffects - sem alterações)
     const updateMockData = useCallback(() => {
         if (!machine) return;
 
@@ -124,8 +121,6 @@ const MachineDashboard = () => {
         };
     }, [updateMockData]);
 
-
-    // (Renderização de loading/error - sem alterações)
     if (loading) {
         return (
             <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80vh" }}>
@@ -141,8 +136,7 @@ const MachineDashboard = () => {
     }
 
     return (
-        <Box>
-            {/* (Header e Seletores - sem alterações) */}
+        <Box sx={{ width: '100%' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Box>
                     <Typography variant="h5" sx={{ fontWeight: 'bold' }}>Monitoramento IoT</Typography>
@@ -202,11 +196,16 @@ const MachineDashboard = () => {
                 {machine.name}
             </Typography>
 
-
-            {/* --- ATUALIZADO: GRID DE MÉTRICAS (Cards Neon) --- */}
-            {/* Cada Grid item ocupa 12 (total) em telas pequenas, 6 (metade) em telas 'sm' e 3 (um quarto) em telas 'md' */}
-            <Grid container spacing={2} sx={{ mb: 3 }}>
-                <Grid item xs={12} sm={6} md={3}>
+            <Grid
+                container
+                spacing={2}
+                sx={{
+                    mb: 3,
+                    maxWidth: '100%',
+                    border: '1px solid red'
+                }}
+            >
+                <Grid item xs sx={{ display: 'flex' }}>
                     <MetricCard
                         title="RPM"
                         icon={GaugeCircle}
@@ -218,7 +217,8 @@ const MachineDashboard = () => {
                         status="good"
                     />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+
+                <Grid item xs sx={{ display: 'flex' }}>
                     <MetricCard
                         title="Temperatura"
                         icon={Thermometer}
@@ -230,7 +230,8 @@ const MachineDashboard = () => {
                         status="warning"
                     />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+
+                <Grid item xs sx={{ display: 'flex' }}>
                     <MetricCard
                         title="Nível de Óleo"
                         icon={Droplets}
@@ -242,11 +243,12 @@ const MachineDashboard = () => {
                         status="good"
                     />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+
+                <Grid item xs sx={{ display: 'flex' }}>
                     <MetricCard
                         title="Corrente"
                         icon={Zap}
-                        value={correnteData[correnteData.length - 1]?.y || .0}
+                        value={correnteData[correnteData.length - 1]?.y || 0.0}
                         unit={machine.metrics.corrente.unit}
                         min={machine.metrics.corrente.min}
                         med={machine.metrics.corrente.med}
@@ -257,10 +259,8 @@ const MachineDashboard = () => {
             </Grid>
 
 
-            {/* --- ATUALIZADO: GRID DE GRÁFICOS (Gráficos Azuis) --- */}
-            {/* O layout dos gráficos acompanha o dos cards */}
             <Grid container spacing={2}>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs sx={{ display: 'flex' }}>
                     <DynamicChart
                         title="RPM"
                         seriesData={rpmData}
@@ -269,7 +269,7 @@ const MachineDashboard = () => {
                         unit=""
                     />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs sx={{ display: 'flex' }}>
                     <DynamicChart
                         title="Temperatura"
                         seriesData={tempData}
@@ -278,7 +278,7 @@ const MachineDashboard = () => {
                         unit="°C"
                     />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs sx={{ display: 'flex' }}>
                     <DynamicChart
                         title="Nível de Óleo"
                         seriesData={oleoData}
@@ -287,7 +287,7 @@ const MachineDashboard = () => {
                         unit="%"
                     />
                 </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                <Grid item xs sx={{ display: 'flex' }}>
                     <DynamicChart
                         title="Corrente"
                         seriesData={correnteData}

@@ -1,4 +1,3 @@
-// UserModal.jsx
 import React, { useState } from "react";
 import {
   Dialog,
@@ -8,18 +7,18 @@ import {
   Box,
   Grid,
 } from "@mui/material";
-import FormField from "../../Cadastro/components/FormField";
-import Buttons from "../../Cadastro/components/BottonsActions";
+import FormField from "./FormField";
+import Buttons from "./BottonsActions";
 import theme from "../../../theme";
 
-// ✅ Tipos de usuário
+
 const userTypes = [
   { value: "visualizador", label: "Visualizador" },
   { value: "tecnico", label: "Técnico" },
   { value: "administrador", label: "Administrador" },
 ];
 
-// ✅ Status atualizado
+
 const statusOptions = [
   { value: "Ativo", label: "Ativo" },
   { value: "Inativo", label: "Inativo" },
@@ -34,7 +33,7 @@ const UserModal = ({ open, onClose }) => {
     confirmPassword: "",
     userType: "visualizador",
     status: "Ativo",
-    clientId: "", // pode ficar vazio por enquanto
+    clientId: "",
   });
 
   const handleChange = (e) => {
@@ -72,7 +71,7 @@ const UserModal = ({ open, onClose }) => {
       }}
     >
       <DialogContent>
-        {/* Título + descrição com linha azul */}
+        {/* Título */}
         <Box
           sx={{
             position: "relative",
@@ -86,6 +85,7 @@ const UserModal = ({ open, onClose }) => {
               bottom: 0,
               width: "4px",
               bgcolor: theme.palette.primary.main,
+              borderRadius: "4px",
             },
           }}
         >
@@ -207,26 +207,34 @@ const UserModal = ({ open, onClose }) => {
               />
             </Grid> */}
           </Grid>
-          <Box sx={{ mt: 2, p: 2, bgcolor: "background.paper", borderRadius: 2 }}>
-            <Typography variant="body2">
-              • Visualizador: Acesso somente leitura aos dashboards e relatórios
-              • Técnico: Gerencia máquinas e dispositivos, mas não altera configurações
-              • Administrador: Acesso total ao sistema
-            </Typography>
-          </Box>
         </Box>
 
-        {/* Diretrizes de cadastro */}
-        <Box sx={{ mt: 3, p: 2, bgcolor: "background.paper", borderRadius: 2 }}>
+        <Box sx={{ mt: 3, p: 2, bgcolor: theme.palette.background.default }}>
           <Typography variant="subtitle1" fontWeight="bold">
             Diretrizes de Cadastro
           </Typography>
-          <Typography variant="body2">
-            • O e-mail deve ser único no sistema e será usado para login
-            • Senhas devem ter no mínimo 8 caracteres com letras maiúsculas, minúsculas e números
-            • Administradores têm acesso total, incluindo gerenciamento de usuários e configurações
-            • Técnicos podem gerenciar máquinas e dispositivos, mas não alterar configurações do sistema
-            • Visualizadores têm acesso somente leitura aos dashboards e relatórios
+          <Typography variant="body2" color="text.secondary" sx={{
+            position: "relative",
+            pl: 2,
+            mb: 3,
+            "&::before": {
+              content: '""',
+              position: "absolute",
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: "4px",
+              bgcolor: theme.palette.primary.main,
+              borderRadius: "4px",
+            },
+          }}>
+            <ul style={{ margin: 0, padding: '0 0 0 16px', listStyleType: 'disc' }}>
+              <li>O e-mail deve ser único no sistema e será usado para login</li>
+              <li>Senhas devem ter no mínimo 8 caracteres com letras maiúsculas, minúsculas e números</li>
+              <li>Administradores têm acesso total, incluindo gerenciamento de usuários e configurações</li>
+              <li>Técnicos podem gerenciar máquinas e dispositivos, mas não alterar configurações do sistema</li>
+              <li>Visualizadores têm acesso somente leitura aos dashboards e relatórios</li>
+            </ul>
           </Typography>
         </Box>
       </DialogContent>

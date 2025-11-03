@@ -28,9 +28,9 @@ import { fetchAllUserData } from "../../services/usersService";
 import StatusChip from "../../components/StatusChip";
 import { formatTimestamp } from "../../utils/formatters";
 import { useDataManagement } from "../../hooks/useDataManagement";
-import { Modal } from "../Cadastro/components/Users.Modal";
+import UserModal from "../Cadastro/components/UsersModal";
 
-// Função de filtro específica para usuários
+
 const filterCallback = (user, term) =>
   user.name?.toLowerCase().includes(term) ||
   user.email?.toLowerCase().includes(term) ||

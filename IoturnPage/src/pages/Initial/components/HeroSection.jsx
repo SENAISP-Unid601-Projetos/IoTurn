@@ -2,16 +2,37 @@ import React from 'react';
 import { Typography, Box, Container, Stack } from '@mui/material';
 import { CheckCircle2 } from 'lucide-react';
 import BtnAcess from './BtnAcess';
+import bgImage from '../../../assets/bg.jpg'
 
 const HeroSection = () => (
-    <Container
+    <Box
         maxWidth="md"
         sx={{
-            display: "flex",
+            display: 'flex',
+            position: 'relative',
+            backgroundImage: `url(${bgImage})`,
+            backgroundSize: 'cover',
+            backfaceVisibility: '10%',
+            minWidth: '100%',
+            maxWidth: '100%',
             flexDirection: "column",
             alignItems: "center",
             textAlign: "center",
             py: { xs: 4, md: 8 },
+            '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'rgba(7, 10, 17, 0.9)',
+                zIndex: 1,
+            },
+            '& > *': {
+                position: 'relative',
+                zIndex: 2,
+            }
         }}
     >
         <Typography
@@ -68,7 +89,7 @@ const HeroSection = () => (
                 </Typography>
             </Stack>
         </Stack>
-    </Container>
+    </Box>
 );
 
 export default HeroSection;

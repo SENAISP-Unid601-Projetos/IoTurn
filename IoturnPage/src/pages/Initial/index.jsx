@@ -17,7 +17,7 @@ function Home() {
         bgcolor: "background.default",
       }}
     >
-      <Box component="main" sx={{ flexGrow: 1 }}>
+      <Box component="main" sx={{ flex: 1 }}>
         <PageHeader />
         <Divider />
         <HeroSection />

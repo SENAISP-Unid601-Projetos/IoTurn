@@ -42,12 +42,11 @@ const LogoCarousel = () => {
                 sx={{
                     display: 'flex',
                     width: 'fit-content',
-                    filter: 'grayscale(25%)',
                     opacity: 0.8,
                     animation: `${scrollX} 50s linear infinite`,
                     '&:hover': {
-                        animationPlayState: 'paused',
-                    },
+                        animationPlayState: 'paused'
+                    }
                 }}
             >
                 {duplicatedLogos.map((logo, index) => (
@@ -59,10 +58,13 @@ const LogoCarousel = () => {
                         sx={{
                             height: { xs: 35, md: 50 },
                             width: 'auto',
+                            cursor: 'pointer',
                             mx: { xs: 4, md: 6 },
                             transition: 'transform 0.3s',
+                            filter: 'grayscale(45%)',
                             '&:hover': {
                                 transform: 'scale(1.1)',
+                                filter: 'grayscale(0%)',
                             },
                         }}
                     />

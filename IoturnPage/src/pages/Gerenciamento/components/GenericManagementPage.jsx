@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Box,
   Typography,
+  TextField,
+  InputAdornment,
   Table,
   TableBody,
   TableCell,
@@ -9,36 +11,31 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Button,
-  TextField,
-  InputAdornment,
   IconButton,
+  Button,
 } from "@mui/material";
 import { Search as SearchIcon, Edit, Trash2, AlertCircle } from "lucide-react";
 import { alpha } from "@mui/material/styles";
-import theme from "../../theme";
-import { WifiCog } from "lucide-react";
-import { fetchAllGatewayData } from "../../services/GatewayService";
-import StatusChip from "../../components/StatusChip";
-import { useDataManagement } from "../../hooks/useDataManagement";
-import GatewayModal from "../Cadastro/components/GatewayModal"; // ✅ caminho correto
+import theme from "../../../theme";
 
-const filterCallback = (gateway, term) =>
-  gateway.gatewayId?.toLowerCase().includes(term) ||
-  gateway.description?.toLowerCase().includes(term);
-
-const GerenciamentoGateways = () => {
-  const {
-    filteredData: filteredGateways,
-    loading,
-    error,
-    searchTerm,
-    setSearchTerm,
-  } = useDataManagement(fetchAllGatewayData, filterCallback);
-
-  // ✅ Estado do modal DENTRO do componente
-  const [modalOpen, setModalOpen] = useState(false);
-
+const GenericManagementPage = ({
+  title,
+  icon: IconComponent,
+  total,
+  description,
+  searchPlaceholder,
+  columns,
+  data,
+  loading,
+  error,
+  onAdd,
+  onEdit,
+  onDelete,
+  searchTerm,
+  onSearchChange,
+  renderAddButton,
+  addButtonLabel = "+ Novo",
+}) => {
   return (
     <Box
       sx={{
@@ -49,7 +46,7 @@ const GerenciamentoGateways = () => {
         p: 3,
       }}
     >
-      {/* Header */}
+
       <Box
         sx={{
           display: "flex",
@@ -59,28 +56,28 @@ const GerenciamentoGateways = () => {
         }}
       >
         <Box sx={{ display: "flex", gap: "10px" }}>
-          <WifiCog color={theme.palette.primary.dark} size={30} />
+          <IconComponent color={theme.palette.primary.dark} size={30} />
           <Typography variant="h4" component="h1" fontWeight="bold">
-            Gateways ESP32
+            {title}
           </Typography>
         </Box>
-        <Button
-          onClick={() => setModalOpen(true)} // ✅ abre o modal
-          variant="contained"
-          sx={{
-            borderRadius: "20px",
-            textTransform: "none",
-            px: 2,
-            py: 1,
-          }}
-        >
-          + Novo Gateway
-        </Button>
-        {/* ✅ Modal renderizado */}
-        <GatewayModal
-          open={modalOpen}
-          onClose={() => setModalOpen(false)}
-        />
+
+        {renderAddButton ? (
+          renderAddButton()
+        ) : (
+          <Button
+            onClick={onAdd}
+            variant="contained"
+            sx={{
+              borderRadius: "20px",
+              textTransform: "none",
+              px: 2,
+              py: 1,
+            }}
+          >
+            {addButtonLabel}
+          </Button>
+        )}
       </Box>
 
       {!error && (
@@ -94,22 +91,23 @@ const GerenciamentoGateways = () => {
               p: 2,
               borderRadius: 2,
               border: `1px solid ${theme.palette.divider}`,
+              bgcolor: theme.palette.background.default,
             }}
           >
             <Box>
               <Typography variant="subtitle1" fontWeight="bold">
-                Total de Gateways: {filteredGateways.length}
+                Total de {title}: {total}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                Lista completa de Gateways ESP32 cadastrados no sistema
+                {description}
               </Typography>
             </Box>
             <TextField
-              placeholder="Buscar por Gateway ID"
+              placeholder={searchPlaceholder}
               variant="outlined"
               size="small"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={onSearchChange}
               sx={{
                 width: 300,
                 bgcolor: "background.default",
@@ -126,8 +124,6 @@ const GerenciamentoGateways = () => {
               }}
             />
           </Box>
-
-          {/* Tabela */}
           <TableContainer
             component={Paper}
             sx={{
@@ -140,35 +136,33 @@ const GerenciamentoGateways = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Gateway ID</TableCell>
-                  <TableCell>Descrição / Localização</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Dispositivos Conectados</TableCell>
-                  <TableCell>Último Heartbeat</TableCell>
+                  {columns.map((col, index) => (
+                    <TableCell key={index}>{col.header}</TableCell>
+                  ))}
                   <TableCell>Ações</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={6} align="center">
+                    <TableCell colSpan={columns.length + 1} align="center">
                       Carregando...
                     </TableCell>
                   </TableRow>
-                ) : filteredGateways.length === 0 ? (
+                ) : data.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} align="center">
-                      Nenhum gateway encontrado.
+                    <TableCell colSpan={columns.length + 1} align="center">
+                      Nenhum item encontrado.
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredGateways.map((gateway) => (
-                    <TableRow key={gateway.id}>
-                      <TableCell>{gateway.gatewayId || "–"}</TableCell>
-                      <TableCell>{gateway.description || "–"}</TableCell>
-                      <TableCell><StatusChip status={gateway.status} /></TableCell>
-                      <TableCell>{gateway.connectedDevices ?? "–"}</TableCell>
-                      <TableCell>{gateway.lastHeartbeat}</TableCell>
+                  data.map((item) => (
+                    <TableRow key={item.id}>
+                      {columns.map((col, index) => (
+                        <TableCell key={index}>
+                          {col.render ? col.render(item) : item[col.field] || "–"}
+                        </TableCell>
+                      ))}
                       <TableCell>
                         <Box sx={{ display: "flex", gap: 1 }}>
                           <IconButton
@@ -179,6 +173,7 @@ const GerenciamentoGateways = () => {
                                 bgcolor: alpha(theme.palette.primary.main, 0.1),
                               },
                             }}
+                            onClick={() => onEdit && onEdit(item)}
                           >
                             <Edit size={18} />
                           </IconButton>
@@ -190,6 +185,7 @@ const GerenciamentoGateways = () => {
                                 bgcolor: alpha(theme.palette.error.main, 0.1),
                               },
                             }}
+                            onClick={() => onDelete && onDelete(item)}
                           >
                             <Trash2 size={18} />
                           </IconButton>
@@ -228,4 +224,4 @@ const GerenciamentoGateways = () => {
   );
 };
 
-export default GerenciamentoGateways;
+export default GenericManagementPage;

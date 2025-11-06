@@ -10,18 +10,18 @@ body {
 
 /* barra de rolagem no tema escuro */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #161b22;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #30363d;
-  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: #8b949e;
+  background: rgba(255, 255, 255, 0.2);
 }

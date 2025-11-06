@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Box,
   Typography,
+  TextField,
+  InputAdornment,
   Table,
   TableBody,
   TableCell,
@@ -9,36 +11,31 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Button,
-  TextField,
-  InputAdornment,
-  Chip,
   IconButton,
+  Button,
 } from "@mui/material";
 import { Search as SearchIcon, Edit, Trash2, AlertCircle } from "lucide-react";
 import { alpha } from "@mui/material/styles";
-import theme from "../../theme";
-import StatusChip from "../../components/StatusChip";
-import { useDataManagement } from "../../hooks/useDataManagement";
-import { fetchAllDeviceData } from "../../services/DeviceServices";
-import { Cpu } from "lucide-react";
+import theme from "../../../theme";
 
-
-// Função de filtro específica para dispositivos
-const filterCallback = (device, term) =>
-  device.nodeId?.toLowerCase().includes(term) ||
-  device.description?.toLowerCase().includes(term) ||
-  device.machineName?.toLowerCase().includes(term);
-
-const GerenciamentoDispositivos = () => {
-  const {
-    filteredData: filteredDevices,
-    loading,
-    error,
-    searchTerm,
-    setSearchTerm,
-  } = useDataManagement(fetchAllDeviceData, filterCallback);
-
+const GenericManagementPage = ({
+  title,
+  icon: IconComponent,
+  total,
+  description,
+  searchPlaceholder,
+  columns,
+  data,
+  loading,
+  error,
+  onAdd,
+  onEdit,
+  onDelete,
+  searchTerm,
+  onSearchChange,
+  renderAddButton,
+  addButtonLabel = "+ Novo",
+}) => {
   return (
     <Box
       sx={{
@@ -49,7 +46,7 @@ const GerenciamentoDispositivos = () => {
         p: 3,
       }}
     >
-      {/* Header */}
+
       <Box
         sx={{
           display: "flex",
@@ -59,23 +56,28 @@ const GerenciamentoDispositivos = () => {
         }}
       >
         <Box sx={{ display: "flex", gap: "10px" }}>
-          <Cpu color={theme.palette.primary.dark} size={30} />{" "}
-          {/* Ícone atualizado */}
+          <IconComponent color={theme.palette.primary.dark} size={30} />
           <Typography variant="h4" component="h1" fontWeight="bold">
-            Dispositivos IoT
+            {title}
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          sx={{
-            borderRadius: "20px",
-            textTransform: "none",
-            px: 2,
-            py: 1,
-          }}
-        >
-          + Novo Dispositivo
-        </Button>
+
+        {renderAddButton ? (
+          renderAddButton()
+        ) : (
+          <Button
+            onClick={onAdd}
+            variant="contained"
+            sx={{
+              borderRadius: "20px",
+              textTransform: "none",
+              px: 2,
+              py: 1,
+            }}
+          >
+            {addButtonLabel}
+          </Button>
+        )}
       </Box>
 
       {!error && (
@@ -89,23 +91,23 @@ const GerenciamentoDispositivos = () => {
               p: 2,
               borderRadius: 2,
               border: `1px solid ${theme.palette.divider}`,
+              bgcolor: theme.palette.background.default,
             }}
           >
             <Box>
               <Typography variant="subtitle1" fontWeight="bold">
-                Total de Dispositivos: {filteredDevices.length}
+                Total de {title}: {total}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                Lista completa de sensores IoT cadastrados. A vinculação com
-                gateway e máquina é feita no cadastro da máquina.
+                {description}
               </Typography>
             </Box>
             <TextField
-              placeholder="Buscar por Node ID"
+              placeholder={searchPlaceholder}
               variant="outlined"
               size="small"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={onSearchChange}
               sx={{
                 width: 300,
                 bgcolor: "background.default",
@@ -116,17 +118,12 @@ const GerenciamentoDispositivos = () => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <SearchIcon
-                      size={16}
-                      color={theme.palette.text.secondary}
-                    />
+                    <SearchIcon size={16} color={theme.palette.text.secondary} />
                   </InputAdornment>
                 ),
               }}
             />
           </Box>
-
-          {/* Tabela */}
           <TableContainer
             component={Paper}
             sx={{
@@ -139,37 +136,33 @@ const GerenciamentoDispositivos = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Node ID</TableCell>
-                  <TableCell>Descrição</TableCell>
-                  <TableCell>Máquina Vinculada</TableCell>
-                  <TableCell>Gateway</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Último Heartbeat</TableCell>
+                  {columns.map((col, index) => (
+                    <TableCell key={index}>{col.header}</TableCell>
+                  ))}
                   <TableCell>Ações</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={7} align="center">
+                    <TableCell colSpan={columns.length + 1} align="center">
                       Carregando...
                     </TableCell>
                   </TableRow>
-                ) : filteredDevices.length === 0 ? (
+                ) : data.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} align="center">
-                      Nenhum dispositivo encontrado.
+                    <TableCell colSpan={columns.length + 1} align="center">
+                      Nenhum item encontrado.
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredDevices.map((device) => (
-                    <TableRow key={device.id}>
-                      <TableCell>{device.nodeId}</TableCell>
-                      <TableCell>{device.description}</TableCell>
-                      <TableCell>{device.machineName}</TableCell>
-                      <TableCell>{device.gatewayId}</TableCell>
-                      <TableCell><StatusChip status={device.status} /></TableCell>
-                      <TableCell>{device.lastHeartbeat}</TableCell>
+                  data.map((item) => (
+                    <TableRow key={item.id}>
+                      {columns.map((col, index) => (
+                        <TableCell key={index}>
+                          {col.render ? col.render(item) : item[col.field] || "–"}
+                        </TableCell>
+                      ))}
                       <TableCell>
                         <Box sx={{ display: "flex", gap: 1 }}>
                           <IconButton
@@ -180,6 +173,7 @@ const GerenciamentoDispositivos = () => {
                                 bgcolor: alpha(theme.palette.primary.main, 0.1),
                               },
                             }}
+                            onClick={() => onEdit && onEdit(item)}
                           >
                             <Edit size={18} />
                           </IconButton>
@@ -191,6 +185,7 @@ const GerenciamentoDispositivos = () => {
                                 bgcolor: alpha(theme.palette.error.main, 0.1),
                               },
                             }}
+                            onClick={() => onDelete && onDelete(item)}
                           >
                             <Trash2 size={18} />
                           </IconButton>
@@ -229,4 +224,4 @@ const GerenciamentoDispositivos = () => {
   );
 };
 
-export default GerenciamentoDispositivos;
+export default GenericManagementPage;

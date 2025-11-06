@@ -80,7 +80,7 @@ const MetricCard = ({ icon: Icon, title, value, unit, min, med, max, status = 'd
                 border: `1px solid ${borderColor}`,
                 boxShadow: `0 0 12px ${glow}`,
                 borderRadius: 3,
-                flex: 1,
+                minWidth: '100%',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',

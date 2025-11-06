@@ -33,14 +33,14 @@ const DynamicChart = ({ seriesData, title, unit = '', yMin = 0, yMax = 100 }) =>
             dataLabels: { enabled: false },
             stroke: { curve: 'smooth', width: 2 },
             series: [{ name: title, data: seriesData }],
-            colors: [chartColor], 
+            colors: [chartColor],
             fill: {
                 type: 'gradient',
                 gradient: {
                     shade: 'dark',
                     type: 'vertical',
                     shadeIntensity: 0.5,
-                    gradientToColors: [alpha(chartColor, 0.05)], 
+                    gradientToColors: [alpha(chartColor, 0.05)],
                     inverseColors: false,
                     opacityFrom: 0.6,
                     opacityTo: 0.1,
@@ -88,7 +88,7 @@ const DynamicChart = ({ seriesData, title, unit = '', yMin = 0, yMax = 100 }) =>
                 chartInstance.current = null;
             }
         };
-    }, [theme.palette.primary.main, theme.palette.divider, theme.palette.text.secondary]); 
+    }, [theme.palette.primary.main, theme.palette.divider, theme.palette.text.secondary]);
 
     // Efeito para atualizar os dados da série
     useEffect(() => {
@@ -115,10 +115,9 @@ const DynamicChart = ({ seriesData, title, unit = '', yMin = 0, yMax = 100 }) =>
             sx={{
                 p: 2.5,
                 // ATUALIZADO: Fundo preto padrão do tema
-                bgcolor: 'background.default', 
+                bgcolor: 'background.default',
                 border: `1px solid ${theme.palette.divider}`,
                 borderRadius: 3,
-                height: '100%'
             }}
         >
             <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>

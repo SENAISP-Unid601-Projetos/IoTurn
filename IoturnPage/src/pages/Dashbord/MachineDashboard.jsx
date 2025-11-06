@@ -121,6 +121,7 @@ const MachineDashboard = () => {
         };
     }, [updateMockData]);
 
+
     if (loading) {
         return (
             <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80vh" }}>
@@ -136,7 +137,7 @@ const MachineDashboard = () => {
     }
 
     return (
-        <Box sx={{ width: '100%' }}>
+        <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Box>
                     <Typography variant="h5" sx={{ fontWeight: 'bold' }}>Monitoramento IoT</Typography>
@@ -196,16 +197,9 @@ const MachineDashboard = () => {
                 {machine.name}
             </Typography>
 
-            <Grid
-                container
-                spacing={2}
-                sx={{
-                    mb: 3,
-                    maxWidth: '100%',
-                    border: '1px solid red'
-                }}
-            >
-                <Grid item xs sx={{ display: 'flex' }}>
+
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', mx: -1.5, mb: 3, alignItems: 'flex-start' }}>
+                <Box sx={{ width: '25%', p: 1.5 }}>
                     <MetricCard
                         title="RPM"
                         icon={GaugeCircle}
@@ -216,9 +210,8 @@ const MachineDashboard = () => {
                         max={machine.metrics.rpm.max}
                         status="good"
                     />
-                </Grid>
-
-                <Grid item xs sx={{ display: 'flex' }}>
+                </Box>
+                <Box sx={{ width: '25%', p: 1.5 }}>
                     <MetricCard
                         title="Temperatura"
                         icon={Thermometer}
@@ -229,9 +222,8 @@ const MachineDashboard = () => {
                         max={machine.metrics.temp.max}
                         status="warning"
                     />
-                </Grid>
-
-                <Grid item xs sx={{ display: 'flex' }}>
+                </Box>
+                <Box sx={{ width: '25%', p: 1.5 }}>
                     <MetricCard
                         title="Nível de Óleo"
                         icon={Droplets}
@@ -242,9 +234,8 @@ const MachineDashboard = () => {
                         max={machine.metrics.oleo.max}
                         status="good"
                     />
-                </Grid>
-
-                <Grid item xs sx={{ display: 'flex' }}>
+                </Box>
+                <Box sx={{ width: '25%', p: 1.5 }}>
                     <MetricCard
                         title="Corrente"
                         icon={Zap}
@@ -255,12 +246,12 @@ const MachineDashboard = () => {
                         max={machine.metrics.corrente.max}
                         status="danger"
                     />
-                </Grid>
-            </Grid>
+                </Box>
+            </Box>
 
 
-            <Grid container spacing={2}>
-                <Grid item xs sx={{ display: 'flex' }}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', mx: -1.5, alignItems: 'flex-start' }}>
+                <Box sx={{ width: { xs: '100%', sm: '50%', md: '50%', lg: '25%' }, p: 1.5 }}>
                     <DynamicChart
                         title="RPM"
                         seriesData={rpmData}
@@ -268,8 +259,8 @@ const MachineDashboard = () => {
                         yMax={1800}
                         unit=""
                     />
-                </Grid>
-                <Grid item xs sx={{ display: 'flex' }}>
+                </Box>
+                <Box sx={{ width: { xs: '100%', sm: '50%', md: '50%', lg: '25%' }, p: 1.5 }}>
                     <DynamicChart
                         title="Temperatura"
                         seriesData={tempData}
@@ -277,8 +268,8 @@ const MachineDashboard = () => {
                         yMax={90}
                         unit="°C"
                     />
-                </Grid>
-                <Grid item xs sx={{ display: 'flex' }}>
+                </Box>
+                <Box sx={{ width: { xs: '100%', sm: '50%', md: '50%', lg: '25%' }, p: 1.5 }}>
                     <DynamicChart
                         title="Nível de Óleo"
                         seriesData={oleoData}
@@ -286,8 +277,8 @@ const MachineDashboard = () => {
                         yMax={100}
                         unit="%"
                     />
-                </Grid>
-                <Grid item xs sx={{ display: 'flex' }}>
+                </Box>
+                <Box sx={{ width: { xs: '100%', sm: '50%', md: '50%', lg: '25%' }, p: 1.5 }}>
                     <DynamicChart
                         title="Corrente"
                         seriesData={correnteData}
@@ -295,8 +286,8 @@ const MachineDashboard = () => {
                         yMax={16}
                         unit="A"
                     />
-                </Grid>
-            </Grid>
+                </Box>
+            </Box>
         </Box>
     );
 };

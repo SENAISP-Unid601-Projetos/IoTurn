@@ -25,6 +25,8 @@ const FormField = ({
   lg,
   select = false,
   options = [],
+  error = false,
+  helperText = "",
   ...props
 }) => {
   const inputBaseStyle = {
@@ -42,58 +44,59 @@ const FormField = ({
     },
   };
 
-  // -------------------
-  // CASO 1: SELECT
-  // -------------------
-const renderSelect = () => (
-  <FormControl fullWidth>
-    <Select
-      id={name}
-      name={name}
-      value={value}
-      onChange={onChange}
-      sx={inputBaseStyle}
-      MenuProps={{
-        PaperProps: {
-          sx: {
-            backgroundColor: theme.palette.background.default,
-            borderRadius: "12px",
-            border: `1px solid ${theme.palette.divider}`,
-            boxShadow: "0px 4px 12px rgba(0,0,0,0.15)",
-            mt: 0.5,
+  const renderSelect = () => (
+    <FormControl fullWidth error={!!error}>
+      <Select
+        id={name}
+        name={name}
+        value={value}
+        onChange={onChange}
+        sx={inputBaseStyle}
+        displayEmpty
+        MenuProps={{
+          PaperProps: {
+            sx: {
+              backgroundColor: theme.palette.background.default,
+              borderRadius: "12px",
+              border: `1px solid ${theme.palette.divider}`,
+              boxShadow: "0px 4px 12px rgba(0,0,0,0.15)",
+              mt: 0.5,
+            },
           },
-        },
-      }}
-      {...props}
-    >
-      {placeholder && (
-        <MenuItem value="" disabled>
-          <em>{placeholder}</em>
-        </MenuItem>
+        }}
+        {...props}
+      >
+        {placeholder && (
+          <MenuItem value="" disabled>
+            <em>{placeholder}</em>
+          </MenuItem>
+        )}
+        {options.map((option) => (
+          <MenuItem
+            key={option.value}
+            value={option.value}
+            sx={{
+              "&.Mui-selected": {
+                backgroundColor: "transparent",
+              },
+              "&.Mui-selected:hover": {
+                backgroundColor: "transparent",
+              },
+            }}
+          >
+            {option.label}
+          </MenuItem>
+        ))}
+      </Select>
+      {error && helperText && ( 
+        <Typography variant="caption" color="error.main" sx={{ mt: 0.5 }}>
+          {helperText}
+        </Typography>
       )}
-      {options.map((option) => (
-        <MenuItem
-          key={option.value}
-          value={option.value}
-          sx={{
-            "&.Mui-selected": {
-              backgroundColor: "transparent",
-            },
-            "&.Mui-selected:hover": {
-              backgroundColor: "transparent",
-            },
-          }}
-        >
-          {option.label}
-        </MenuItem>
-      ))}
-    </Select>
-  </FormControl>
-);
+    </FormControl>
+  );
 
-  // -------------------
-  // CASO 2: TEXTFIELD
-  // -------------------
+
   const renderTextField = () => (
     <TextField
       fullWidth
@@ -103,6 +106,8 @@ const renderSelect = () => (
       onChange={onChange}
       placeholder={placeholder}
       variant="outlined"
+      error={error}
+      helperText={helperText}
       InputProps={{
         sx: inputBaseStyle,
       }}

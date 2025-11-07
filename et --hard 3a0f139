@@ -1,0 +1,17 @@
+[33m3a0f139[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mFront/Login/JWTtoken[m[33m, [m[1;31morigin/Front/Login/JWTtoken[m[33m)[m HEAD@{0}: reset: moving to HEAD
+[33m3a0f139[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mFront/Login/JWTtoken[m[33m, [m[1;31morigin/Front/Login/JWTtoken[m[33m)[m HEAD@{1}: checkout: moving from SetupFront to Front/Login/JWTtoken
+[33md382b91[m[33m ([m[1;31morigin/SetupFront[m[33m, [m[1;32mSetupFront[m[33m)[m HEAD@{2}: reset: moving to d382b91
+[33m21229f9[m HEAD@{3}: checkout: moving from Front/Login/JWTtoken to SetupFront
+[33m3a0f139[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mFront/Login/JWTtoken[m[33m, [m[1;31morigin/Front/Login/JWTtoken[m[33m)[m HEAD@{4}: checkout: moving from Front/Login/JWTtoken to Front/Login/JWTtoken
+[33m3a0f139[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mFront/Login/JWTtoken[m[33m, [m[1;31morigin/Front/Login/JWTtoken[m[33m)[m HEAD@{5}: commit: hardReset para d382b91
+[33md382b91[m[33m ([m[1;31morigin/SetupFront[m[33m, [m[1;32mSetupFront[m[33m)[m HEAD@{6}: reset: moving to d382b91
+[33m52b945f[m HEAD@{7}: checkout: moving from SetupFront to Front/Login/JWTtoken
+[33m21229f9[m HEAD@{8}: checkout: moving from Front/Login/JWTtoken to SetupFront
+[33m52b945f[m HEAD@{9}: reset: moving to HEAD
+[33m52b945f[m HEAD@{10}: pull: Merge made by the 'ort' strategy.
+[33m013d511[m HEAD@{11}: commit: jwt token funcionando
+[33m00353d5[m HEAD@{12}: checkout: moving from Front/Registro to Front/Login/JWTtoken
+[33m02b20f1[m[33m ([m[1;32mFront/Registro[m[33m)[m HEAD@{13}: checkout: moving from Front/Login/JWTtoken to Front/Registro
+[33m00353d5[m HEAD@{14}: commit: .
+[33mdc21c9d[m HEAD@{15}: checkout: moving from main to Front/Login/JWTtoken
+[33m430cfeb[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m HEAD@{16}: clone: from https://github.com/SENAISP-Unid601-Projetos/IoTurn.git

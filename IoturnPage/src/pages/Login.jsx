@@ -32,20 +32,18 @@ function Login() {
 
   //WIP
   async function getCookie() {
-    // "user=JohnDoe; expires=" +
-    //   new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000).toUTCString() +
-    //   "; path=/";
     try {
       const loginCredentials = {
         email: email,
         password: password,
       };
 
-      // Espera a resposta da API (provavelmente um token JWT)
+      // Espera a resposta da API e recebe o token
       const response = await ApiService.postRequest(
         "/clients/login",
         loginCredentials
       );
+      localStorage.setItem("util_info", JSON.stringify(response));
 
       // Verifica se a resposta contém um token
       if (response && response.token) {
@@ -59,8 +57,6 @@ function Login() {
       console.error("Erro ao tentar obter o cookie:", error);
     }
   }
-
-  //WIP
 
   useEffect(() => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -82,19 +78,12 @@ function Login() {
   }, [password]);
 
   const handleLogin = () => {
-    console.log("EEE");
-    console.log("EEE");
-    console.log("EEE");
-    console.log("EEE");
-    console.log("EEE");
-
     if (!isEmailValid) {
       setEmailError("Por favor, insira um email válido.");
     }
     if (!isPasswordValid) {
       setPasswordError("A senha deve ter no mínimo 8 caracteres.");
     }
-
     if (isEmailValid && isPasswordValid) {
       const data = { email: email, password: password };
     }
@@ -228,7 +217,7 @@ function Login() {
               variant="contained"
               size="large"
               fullWidth
-              // href="/main/maquinas"
+              href="/main/maquinas"
               sx={{ py: 1.5 }}
               onClick={handleLogin}
             >

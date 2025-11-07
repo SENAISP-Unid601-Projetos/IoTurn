@@ -13,7 +13,7 @@ export async function machineRoutes(fastify: FastifyInstance) {
             'Content-Type': 'text/event-stream',
             'Connection': 'keep-alive',
             'Cache-Control': 'no-cache',
-            'Access-Control-Allow-Origin': 'http://127.0.0.1:5500',
+            'Access-Control-Allow-Origin': 'http://localhost:5173',
             'Access-Control-Allow-Credentials': 'true'
         };
         reply.raw.writeHead(200, HEADERS);

@@ -6,6 +6,7 @@ class ApiService {
   // Método GET
   static async getRequest(APIendpoint) {
     const fullUrl = `${API_BASE_URL}${APIendpoint}`;
+    console.log(fullUrl);
     try {
       const response = await axios.get(fullUrl);
       return response.data;

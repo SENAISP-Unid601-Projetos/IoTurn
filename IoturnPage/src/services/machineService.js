@@ -1,11 +1,11 @@
-import ApiService from './ApiServices';
-import { formatTimestamp } from '../utils/formatters';
+import ApiService from "./ApiServices";
+import { formatTimestamp } from "../utils/formatters";
 
-const API_URL = '/machines';
+const API_URL = "/machines/getAll/1";
 
 const formatMachineData = (machine) => {
-  const companyName = machine.client?.companyName || '–';
-  const deviceId = machine.device?.nodeId || '–';
+  const companyName = machine.client?.companyName || "–";
+  const deviceId = machine.device?.nodeId || "–";
 
   return {
     id: machine.id,
@@ -19,38 +19,38 @@ const formatMachineData = (machine) => {
     status: machine.status,
     metrics: {
       rpm: {
-        name: 'RPM',
+        name: "RPM",
         value: machine.lastRpm?.rpm ?? 0,
-        unit: '',
+        unit: "",
         min: machine.lastRpm?.min ?? 0,
         med: machine.lastRpm?.med ?? 0,
         max: machine.lastRpm?.max ?? 0,
       },
       temp: {
-        name: 'Temperatura',
+        name: "Temperatura",
         value: machine.lastOilTemperature?.temperature ?? 0,
-        unit: '°C',
+        unit: "°C",
         min: machine.lastOilTemperature?.min ?? 0,
         med: machine.lastOilTemperature?.med ?? 0,
         max: machine.lastOilTemperature?.max ?? 0,
       },
       oleo: {
-        name: 'Nível de Óleo',
+        name: "Nível de Óleo",
         value: machine.lastOilLevel?.level ?? 0,
-        unit: '%',
+        unit: "%",
         min: machine.lastOilLevel?.min ?? 0,
         med: machine.lastOilLevel?.med ?? 0,
         max: machine.lastOilLevel?.max ?? 0,
       },
       corrente: {
-        name: 'Corrente',
+        name: "Corrente",
         value: machine.lastCurrent?.current ?? 0,
-        unit: 'A',
+        unit: "A",
         min: machine.lastCurrent?.min ?? 0,
         med: machine.lastCurrent?.med ?? 0,
         max: machine.lastCurrent?.max ?? 0,
       },
-    }
+    },
   };
 };
 
@@ -67,11 +67,11 @@ export const fetchAllMachineData = async () => {
 
 export const fetchMachineById = async (id) => {
   console.log(`Buscando dados da máquina ${id}...`);
-  const rawData = await ApiService.getRequest(`${API_URL}/${id}`);
+  const rawData = await ApiService.getRequest(API_URL);
   console.log("Dados brutos da máquina:", rawData);
 
   const formattedData = formatMachineData(rawData);
 
   console.log("Dados formatados da máquina:", formattedData);
   return formattedData;
-}
+};

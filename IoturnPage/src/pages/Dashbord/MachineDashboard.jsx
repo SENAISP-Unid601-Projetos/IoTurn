@@ -21,14 +21,12 @@ import {
     Droplets,
     Zap,
 } from "lucide-react";
-// import mqtt from "mqtt";
 import { fetchMachineById } from "../../services/machineService";
 import MetricCard from "./components/MetricCard";
 import DynamicChart from "./components/DynamicChart";
 
 const MAX_DATA_POINTS = 30;
 
-// (Funções generateMockDataPoint e getInitialChartData - sem alterações)
 const generateMockDataPoint = (lastValue, min, max) => {
     let newValue = lastValue + (Math.random() - 0.5) * (max / 10);
     if (newValue < min) newValue = min;
@@ -70,7 +68,6 @@ const MachineDashboard = () => {
 
     const intervalRef = useRef(null);
 
-    // (Hooks useCallback e useEffects - sem alterações)
     const updateMockData = useCallback(() => {
         if (!machine) return;
 
@@ -125,7 +122,6 @@ const MachineDashboard = () => {
     }, [updateMockData]);
 
 
-    // (Renderização de loading/error - sem alterações)
     if (loading) {
         return (
             <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80vh" }}>
@@ -142,7 +138,6 @@ const MachineDashboard = () => {
 
     return (
         <Box>
-            {/* (Header e Seletores - sem alterações) */}
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Box>
                     <Typography variant="h5" sx={{ fontWeight: 'bold' }}>Monitoramento IoT</Typography>
@@ -203,10 +198,8 @@ const MachineDashboard = () => {
             </Typography>
 
 
-            {/* --- ATUALIZADO: GRID DE MÉTRICAS (Cards Neon) --- */}
-            {/* Cada Grid item ocupa 12 (total) em telas pequenas, 6 (metade) em telas 'sm' e 3 (um quarto) em telas 'md' */}
-            <Grid container spacing={2} sx={{ mb: 3 }}>
-                <Grid item xs={12} sm={6} md={3}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', mx: -1.5, mb: 3, alignItems: 'flex-start' }}>
+                <Box sx={{ width: '25%', p: 1.5 }}>
                     <MetricCard
                         title="RPM"
                         icon={GaugeCircle}
@@ -217,8 +210,8 @@ const MachineDashboard = () => {
                         max={machine.metrics.rpm.max}
                         status="good"
                     />
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                </Box>
+                <Box sx={{ width: '25%', p: 1.5 }}>
                     <MetricCard
                         title="Temperatura"
                         icon={Thermometer}
@@ -229,8 +222,8 @@ const MachineDashboard = () => {
                         max={machine.metrics.temp.max}
                         status="warning"
                     />
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                </Box>
+                <Box sx={{ width: '25%', p: 1.5 }}>
                     <MetricCard
                         title="Nível de Óleo"
                         icon={Droplets}
@@ -241,26 +234,24 @@ const MachineDashboard = () => {
                         max={machine.metrics.oleo.max}
                         status="good"
                     />
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                </Box>
+                <Box sx={{ width: '25%', p: 1.5 }}>
                     <MetricCard
                         title="Corrente"
                         icon={Zap}
-                        value={correnteData[correnteData.length - 1]?.y || .0}
+                        value={correnteData[correnteData.length - 1]?.y || 0.0}
                         unit={machine.metrics.corrente.unit}
                         min={machine.metrics.corrente.min}
                         med={machine.metrics.corrente.med}
                         max={machine.metrics.corrente.max}
                         status="danger"
                     />
-                </Grid>
-            </Grid>
+                </Box>
+            </Box>
 
 
-            {/* --- ATUALIZADO: GRID DE GRÁFICOS (Gráficos Azuis) --- */}
-            {/* O layout dos gráficos acompanha o dos cards */}
-            <Grid container spacing={2}>
-                <Grid item xs={12} sm={6} md={3}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', mx: -1.5, alignItems: 'flex-start' }}>
+                <Box sx={{ width: { xs: '100%', sm: '50%', md: '50%', lg: '25%' }, p: 1.5 }}>
                     <DynamicChart
                         title="RPM"
                         seriesData={rpmData}
@@ -268,8 +259,8 @@ const MachineDashboard = () => {
                         yMax={1800}
                         unit=""
                     />
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                </Box>
+                <Box sx={{ width: { xs: '100%', sm: '50%', md: '50%', lg: '25%' }, p: 1.5 }}>
                     <DynamicChart
                         title="Temperatura"
                         seriesData={tempData}
@@ -277,8 +268,8 @@ const MachineDashboard = () => {
                         yMax={90}
                         unit="°C"
                     />
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                </Box>
+                <Box sx={{ width: { xs: '100%', sm: '50%', md: '50%', lg: '25%' }, p: 1.5 }}>
                     <DynamicChart
                         title="Nível de Óleo"
                         seriesData={oleoData}
@@ -286,8 +277,8 @@ const MachineDashboard = () => {
                         yMax={100}
                         unit="%"
                     />
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
+                </Box>
+                <Box sx={{ width: { xs: '100%', sm: '50%', md: '50%', lg: '25%' }, p: 1.5 }}>
                     <DynamicChart
                         title="Corrente"
                         seriesData={correnteData}
@@ -295,8 +286,8 @@ const MachineDashboard = () => {
                         yMax={16}
                         unit="A"
                     />
-                </Grid>
-            </Grid>
+                </Box>
+            </Box>
         </Box>
     );
 };

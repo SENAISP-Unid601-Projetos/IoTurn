@@ -5,7 +5,9 @@ import BtnAcess from './BtnAcess';
 const CallSection = () => (
     <Container
         sx={{
+            backgroundColor: '#0b0b0bff',
             display: "flex",
+            minWidth: '100%',
             flexDirection: "column",
             alignItems: "center",
             textAlign: "center",

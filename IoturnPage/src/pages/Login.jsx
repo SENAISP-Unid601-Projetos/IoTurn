@@ -65,6 +65,9 @@ function Login() {
     try {
       const salvaToken = await ApiService.postRequest("/clients/login", data);
       console.log("Resposta do servidor:", salvaToken);
+
+      // Back tem que corrigir o cookie
+      document.cookie = data;
       localStorage.setItem("login_info", JSON.stringify(salvaToken));
     } catch (error) {
       console.error("Erro ao fazer login:", error);

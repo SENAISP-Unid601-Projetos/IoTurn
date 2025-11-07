@@ -55,13 +55,21 @@ function Login() {
     if (!isPasswordValid) {
       setPasswordError("A senha deve ter no mínimo 8 caracteres.");
     }
-
     if (isEmailValid && isPasswordValid) {
       const data = { email: email, password: password };
-      const salvaToken = ApiService.postRequest("/login", { email, data });
-      localStorage.setItem("login_info", salvaToken);
+      getLoginCookie(data);
     }
   };
+
+  async function getLoginCookie(data) {
+    try {
+      const salvaToken = await ApiService.postRequest("/clients/login", data);
+      console.log("Resposta do servidor:", salvaToken);
+      localStorage.setItem("login_info", JSON.stringify(salvaToken));
+    } catch (error) {
+      console.error("Erro ao fazer login:", error);
+    }
+  }
 
   const textFieldStyles = {
     "& .MuiOutlinedInput-root": {
@@ -190,7 +198,7 @@ function Login() {
               variant="contained"
               size="large"
               fullWidth
-              href="/main/maquinas"
+              //   href="/main/maquinas"
               sx={{ py: 1.5 }}
               onClick={handleLogin}
             >

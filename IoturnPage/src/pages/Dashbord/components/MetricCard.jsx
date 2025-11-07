@@ -76,17 +76,11 @@ const MetricCard = ({ icon: Icon, title, value, unit, min, med, max, status = 'd
             elevation={0}
             sx={{
                 p: 2.5,
-                bgcolor: backgroundColor, 
+                bgcolor: backgroundColor,
                 border: `1px solid ${borderColor}`,
-                boxShadow: `0 0 12px ${glow}`, 
+                boxShadow: `0 0 12px ${glow}`,
                 borderRadius: 3,
-
-                // --- ATUALIZADO ---
-                // Aplicando a altura mínima e 100% (para esticar se necessário)
-                minHeight: '260px',
-                height: '100%',
-                // --- FIM DA ATUALIZAÇÃO ---
-
+                minWidth: '100%',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
@@ -105,11 +99,11 @@ const MetricCard = ({ icon: Icon, title, value, unit, min, med, max, status = 'd
             {/* VALOR PRINCIPAL */}
             <Box sx={{
                 my: 2,
-                textAlign: 'center', 
+                textAlign: 'center',
             }}>
                 <Typography component="span" variant="h3" sx={{
                     fontWeight: 'bold',
-                    color: valueTextColor, 
+                    color: valueTextColor,
                     transition: 'color 0.3s ease',
                 }}>
                     {value}

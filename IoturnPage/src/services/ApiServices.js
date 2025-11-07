@@ -10,10 +10,7 @@ class ApiService {
       const response = await axios.get(fullUrl);
       return response.data;
     } catch (error) {
-      console.error(
-        `Erro ao enviar requisição GET para ${fullUrl}: `,
-        error
-      );
+      console.error(`Erro ao enviar requisição GET para ${fullUrl}: `, error);
       throw error;
     }
   }
@@ -22,13 +19,12 @@ class ApiService {
   static async postRequest(APIendpoint, data) {
     const fullUrl = `${API_BASE_URL}${APIendpoint}`;
     try {
-      const response = await axios.post(fullUrl, data);
+      const response = await axios.post(fullUrl, data, {
+        withCredentials: true,
+      });
       return response.data;
     } catch (error) {
-      console.error(
-        `Erro ao enviar a requisição POST para ${fullUrl}:`,
-        error
-      );
+      console.error(`Erro ao enviar a requisição POST para ${fullUrl}:`, error);
       throw error;
     }
   }

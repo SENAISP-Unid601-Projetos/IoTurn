@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Divider } from "@mui/material";
 import PageHeader from "./components/PageHeader";
 import HeroSection from "./components/HeroSection";
+import LogoCarousel from "./components/LogoCarousel";
 import MoreInfos from "./components/MoreInfos";
 import CallSection from "./components/CallSection";
 import PageFooter from "./components/PageFooter";
@@ -16,10 +17,12 @@ function Home() {
         bgcolor: "background.default",
       }}
     >
-      <Box component="main" sx={{ flexGrow: 1 }}>
+      <Box component="main" sx={{ flex: 1 }}>
         <PageHeader />
         <Divider />
         <HeroSection />
+        <Divider />
+        <LogoCarousel />
         <Divider />
         <MoreInfos />
         <Divider />

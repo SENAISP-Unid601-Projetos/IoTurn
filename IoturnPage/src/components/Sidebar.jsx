@@ -24,6 +24,7 @@ import {
   ChevronDown,
   ChevronUp,
   LogOut,
+  LayoutGrid,
 } from "lucide-react";
 import UserProfile from "./UserProfile";
 import { fetchAllUserData } from "../services/usersService";
@@ -40,6 +41,11 @@ const sidebarItems = [
         path: "/main/maquinas",
       },
     ],
+  },
+  {
+    text: "Análise de Cluster",
+    icon: <LayoutGrid size={18} />,
+    path: "/main/clusters",
   },
   {
     text: "Hermes AI",

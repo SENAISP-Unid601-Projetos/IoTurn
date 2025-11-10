@@ -5,6 +5,9 @@ import {
   Stepper,
   Step,
   StepLabel,
+  StepConnector,
+  stepConnectorClasses,
+  styled,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -16,93 +19,84 @@ const steps = [
   { label: "Dispositivo IoT", icon: <Cpu size={22} /> },
 ];
 
+// 🔹 Cria um conector personalizado
+const CustomStepConnector = styled(StepConnector)(({ theme }) => ({
+  [`&.${stepConnectorClasses.alternativeLabel}`]: {
+    top: 22,
+  },
+  [`& .${stepConnectorClasses.line}`]: {
+    height: 3,
+    border: 0,
+    borderRadius: 2,
+    backgroundColor: theme.palette.divider,
+    transition: "background-color 0.3s ease",
+  },
+  // Azul nas etapas ativas ou concluídas
+  [`&.${stepConnectorClasses.active} .${stepConnectorClasses.line}`]: {
+    backgroundColor: theme.palette.primary.main,
+  },
+  [`&.${stepConnectorClasses.completed} .${stepConnectorClasses.line}`]: {
+    backgroundColor: theme.palette.primary.main,
+  },
+}));
+
 const RegistrationStepper = ({ activeStep = 0 }) => {
   const theme = useTheme();
 
   return (
     <Box sx={{ width: "100%", mb: 5 }}>
       <Stepper
-        activeStep={activeStep}
         alternativeLabel
-        sx={{
-          "& .MuiStepConnector-root": {
-            top: 20,
-            // 👇 Estiliza a linha entre os passos
-            "& .MuiStepConnector-line": {
-              borderColor: theme.palette.divider, // cor padrão
-              borderWidth: 2,
-              transition: "border-color 0.3s ease",
-            },
-          },
-          "& .MuiStepIcon-root": {
-            color: theme.palette.grey[400],
-            // 👇 Etapa ativa → azul
-            "&.Mui-active": {
-              color: theme.palette.primary.main,
-            },
-            // 👇 Etapa completa → azul
-            "&.Mui-completed": {
-              color: theme.palette.primary.main,
-            },
-          },
-          "& .MuiStepLabel-label": {
-            color: theme.palette.text.secondary,
-            // 👇 Texto ativo → azul
-            "&.Mui-active": {
-              color: theme.palette.primary.main,
-              fontWeight: "bold",
-            },
-            // 👇 Texto completo → azul
-            "&.Mui-completed": {
-              color: theme.palette.primary.main,
-              fontWeight: "bold",
-            },
-          },
-        }}
+        activeStep={activeStep}
+        connector={<CustomStepConnector />}
       >
-        {steps.map((step, index) => (
-          <Step key={index}>
-            <StepLabel
-              StepIconComponent={() => (
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: 42,
-                    height: 42,
-                    borderRadius: "50%",
-                    bgcolor:
-                      index <= activeStep // TUDO até a etapa atual é azul
+        {steps.map((step, index) => {
+          const isCompleted = index < activeStep;
+          const isActive = index === activeStep;
+
+          return (
+            <Step key={index}>
+              <StepLabel
+                StepIconComponent={() => (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: 42,
+                      height: 42,
+                      borderRadius: "50%",
+                      bgcolor: isCompleted || isActive
                         ? theme.palette.primary.main
                         : theme.palette.grey[500],
+                      color:
+                        isCompleted || isActive
+                          ? theme.palette.common.white
+                          : theme.palette.text.primary,
+                      transition: "all 0.3s ease",
+                    }}
+                  >
+                    {step.icon}
+                  </Box>
+                )}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{
+                    mt: 1,
+                    fontWeight: isCompleted || isActive ? "bold" : "normal",
                     color:
-                      index <= activeStep
-                        ? theme.palette.common.white
-                        : theme.palette.text.primary,
-                    transition: "all 0.3s ease",
+                      isCompleted || isActive
+                        ? theme.palette.primary.main
+                        : theme.palette.text.secondary,
                   }}
                 >
-                  {step.icon}
-                </Box>
-              )}
-            >
-              <Typography
-                variant="body2"
-                sx={{
-                  mt: 1,
-                  fontWeight: index <= activeStep ? "bold" : "normal",
-                  color:
-                    index <= activeStep
-                      ? theme.palette.primary.main
-                      : theme.palette.text.secondary,
-                }}
-              >
-                {step.label}
-              </Typography>
-            </StepLabel>
-          </Step>
-        ))}
+                  {step.label}
+                </Typography>
+              </StepLabel>
+            </Step>
+          );
+        })}
       </Stepper>
     </Box>
   );

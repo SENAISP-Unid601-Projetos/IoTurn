@@ -43,7 +43,7 @@ function Login() {
         "/clients/login",
         loginCredentials
       );
-      localStorage.setItem("util_info", JSON.stringify(response));
+      localStorage.setItem("login_info", JSON.stringify(response));
 
       // Verifica se a resposta contém um token
       if (response && response.token) {

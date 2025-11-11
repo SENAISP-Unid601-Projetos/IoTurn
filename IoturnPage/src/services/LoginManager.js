@@ -1,4 +1,4 @@
-class LoginManager {
+class StorageService {
 
     // Por ser meio redundante talvez seja melhor utilizar no código isso:
     // const token = JSON.parse(localStorage.getItem("login_info"))

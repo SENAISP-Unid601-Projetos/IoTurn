@@ -10,10 +10,12 @@ import MachineFormSection from "./components/MachineFormSection";
 import { fetchAllUserData } from "../../services/usersService";
 import { useDataManagement } from "../../hooks/useDataManagement";
 import FormField from "./components/FormField";
+import { fetchAllGatewayData } from "../../services/GatewayService"; 
+import { fetchAllDeviceData } from "../../services/DeviceServices";  
 
 const CadastroMaquina = () => {
   const navigate = useNavigate();
-  const [activeStep, setActiveStep] = useState(0); 
+  const [activeStep, setActiveStep] = useState(0);
 
   const [formErrors, setFormErrors] = useState({});
   const [formData, setFormData] = useState({
@@ -22,30 +24,55 @@ const CadastroMaquina = () => {
     manufacturer: "",
     model: "",
     status: "Ativo",
-    clientId: "", 
-    responsibleUserId: "", 
+    clientId: "",
+    responsibleUserId: "",
+    gatewayId: "",
+    device: "",
   });
 
   const [clientData, setClientData] = useState(null);
   const [users, setUsers] = useState([]);
+  const [gateways, setGateways] = useState([]);
+  const [devices, setDevice] = useState([];)
 
   const {
     filteredData: filteredUsers,
     loading: usersLoading,
     error: usersError,
-  } = useDataManagement(fetchAllUserData, (user, term) =>
-    user.name?.toLowerCase().includes(term) ||
-    user.email?.toLowerCase().includes(term) ||
-    user.userType?.toLowerCase().includes(term)
+  } = useDataManagement(
+    fetchAllUserData,
+    (user, term) =>
+      user.name?.toLowerCase().includes(term) ||
+      user.email?.toLowerCase().includes(term) ||
+      user.userType?.toLowerCase().includes(term)
+  );
+
+    const {
+    filteredData: filteredGateways,
+    loading: gatewaysLoading,
+    error: gatewaysError,
+  } = useDataManagement(fetchAllGatewayData, (gateway, term) =>
+    gateway.gatewayId?.toLowerCase().includes(term) ||
+    gateway.description?.toLowerCase().includes(term)
+  );
+
+    const {
+    filteredData: filteredDevices,
+    loading: devicesLoading,
+    error: devicesError,
+  } = useDataManagement(fetchAllDeviceData, (device, term) =>
+    device.nodeId?.toLowerCase().includes(term) ||
+    device.description?.toLowerCase().includes(term) ||
+    device.machineName?.toLowerCase().includes(term)
   );
 
   useEffect(() => {
     const mockClient = {
       id: 1,
-      companyName: "Indústria Metalúrgica Silva LTDA"
+      companyName: "Indústria Metalúrgica Silva LTDA",
     };
     setClientData(mockClient);
-    setFormData(prev => ({ ...prev, clientId: mockClient.id }));
+    setFormData((prev) => ({ ...prev, clientId: mockClient.id }));
   }, []);
 
   useEffect(() => {
@@ -61,16 +88,22 @@ const CadastroMaquina = () => {
     if (formErrors[name]) {
       const valueTrimmed = value.trim();
       if (valueTrimmed) {
-        setFormErrors(prev => ({ ...prev, [name]: false }));
+        setFormErrors((prev) => ({ ...prev, [name]: false }));
       }
     }
   };
 
   const validateStep1 = () => {
     const errors = {};
-    const requiredFields = ['name', 'serialNumber', 'manufacturer', 'model', 'status'];
+    const requiredFields = [
+      "name",
+      "serialNumber",
+      "manufacturer",
+      "model",
+      "status",
+    ];
 
-    requiredFields.forEach(field => {
+    requiredFields.forEach((field) => {
       if (!formData[field]?.trim()) {
         errors[field] = true;
       }
@@ -96,7 +129,7 @@ const CadastroMaquina = () => {
         alert("Por favor, preencha todos os campos obrigatórios da etapa 1.");
         return;
       }
-      setActiveStep(1); 
+      setActiveStep(1);
     } else if (activeStep === 1) {
       if (!validateStep2()) {
         alert("Por favor, selecione um usuário responsável.");
@@ -201,17 +234,21 @@ const CadastroMaquina = () => {
                 value={formData.responsibleUserId}
                 onChange={handleChange}
                 select
-                options={users.map(user => ({
+                options={users.map((user) => ({
                   value: user.id,
                   label: `${user.name} (${user.userType.toUpperCase()})`,
                 }))}
                 required
                 error={formErrors.responsibleUserId}
-                helperText={formErrors.responsibleUserId ? "Campo obrigatório" : ""}
+                helperText={
+                  formErrors.responsibleUserId ? "Campo obrigatório" : ""
+                }
               />
             </Box>
 
-            <Box sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
+            <Box
+              sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}
+            >
               <Button
                 variant="outlined"
                 onClick={handleBack}
@@ -235,6 +272,132 @@ const CadastroMaquina = () => {
                 }}
               >
                 Próximo
+              </Button>
+            </Box>
+          </>
+        )}
+
+        {activeStep === 2 && (
+          <>
+            {/* 👇 Título com linha vertical azul */}
+            <Box
+              sx={{
+                position: "relative",
+                pl: 2,
+                mb: 3,
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  width: "4px",
+                  bgcolor: theme.palette.primary.main,
+                  borderRadius: "4px",
+                },
+              }}
+            >
+              <Typography variant="h6" fontWeight="bold">
+                Dispositivo IoT
+              </Typography>
+            </Box>
+
+            {/* Gateway Responsável (opcional) */}
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="subtitle1" fontWeight="bold">
+                Gateway Responsável
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Gateway ESP32 que gerenciará este sensor (opcional)
+              </Typography>
+              <FormField
+                label="Selecione um gateway"
+                name="gatewayId"
+                value={formData.gatewayId}
+                onChange={handleChange}
+                select
+                options={gateways.map((gateway) => ({
+                  value: gateway.gatewayId,
+                  label: `${gateway.gatewayId} • ${gateway.status}`,
+                }))}
+                error={formErrors.gatewayId}
+                helperText={formErrors.gatewayId ? "Campo obrigatório" : ""}
+              />
+            </Box>
+
+            {/* Dispositivo IoT (opcional) */}
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="subtitle1" fontWeight="bold">
+                Dispositivo IoT
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Selecione um sensor Heltec V2 disponível para vinculação
+                (opcional)
+              </Typography>
+              <FormField
+                label="Selecione um dispositivo"
+                name="deviceId"
+                value={formData.deviceId}
+                onChange={handleChange}
+                select
+                options={devices.map((device) => ({
+                  value: device.nodeId,
+                  label: `${device.nodeId} • ${device.status}`,
+                }))}
+                error={formErrors.deviceId}
+                helperText={formErrors.deviceId ? "Campo obrigatório" : ""}
+              />
+            </Box>
+
+            {/* Informações do dispositivo selecionado */}
+            {formData.deviceId && (
+              <Box
+                sx={{
+                  bgcolor: theme.palette.background.default,
+                  p: 2,
+                  borderRadius: 2,
+                  mb: 3,
+                  border: `1px solid ${theme.palette.divider}`,
+                }}
+              >
+                <Typography variant="subtitle1" fontWeight="bold">
+                  Dispositivo Selecionado
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Node ID: {formData.deviceId}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Status: Pronto para vinculação
+                </Typography>
+              </Box>
+            )}
+
+            <Box
+              sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}
+            >
+              <Button
+                variant="outlined"
+                onClick={handleBack}
+                sx={{
+                  borderRadius: "20px",
+                  textTransform: "none",
+                  px: 2,
+                  py: 1,
+                }}
+              >
+                Voltar
+              </Button>
+              <Button
+                variant="contained"
+                type="submit"
+                sx={{
+                  borderRadius: "20px",
+                  textTransform: "none",
+                  px: 2,
+                  py: 1,
+                }}
+              >
+                Finalizar
               </Button>
             </Box>
           </>

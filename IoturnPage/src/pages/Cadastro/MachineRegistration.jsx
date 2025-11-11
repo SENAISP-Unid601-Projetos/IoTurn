@@ -1,6 +1,6 @@
 // src/pages/Cadastro/MachineRegistration/index.jsx
 import React, { useState, useEffect } from "react";
-import { Box, Container, Typography, Button} from "@mui/material";
+import { Box, Container, Typography, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Buttons from "./components/BottonsActions";
 import RegistrationStepper from "./components/RegistrationStepper";
@@ -8,12 +8,12 @@ import theme from "../../theme";
 import MachineHeaderSection from "./components/MachineHeaderSection";
 import MachineFormSection from "./components/MachineFormSection";
 import { fetchAllUserData } from "../../services/usersService";
-import { useDataManagement } from "../../hooks/useDataManagement"; 
+import { useDataManagement } from "../../hooks/useDataManagement";
 import FormField from "./components/FormField";
 
 const CadastroMaquina = () => {
   const navigate = useNavigate();
-  const [activeStep, setActiveStep] = useState(0); // 👈 agora é state!
+  const [activeStep, setActiveStep] = useState(0); 
 
   const [formErrors, setFormErrors] = useState({});
   const [formData, setFormData] = useState({
@@ -22,16 +22,13 @@ const CadastroMaquina = () => {
     manufacturer: "",
     model: "",
     status: "Ativo",
-    // Novos campos da etapa 2
-    clientId: "", // ID do cliente (vem do login)
-    responsibleUserId: "", // ID do usuário responsável
+    clientId: "", 
+    responsibleUserId: "", 
   });
 
-  // ✅ Estado para armazenar dados do cliente e usuários
   const [clientData, setClientData] = useState(null);
   const [users, setUsers] = useState([]);
 
-  // ✅ Hook para buscar usuários (reutiliza useDataManagement)
   const {
     filteredData: filteredUsers,
     loading: usersLoading,
@@ -42,9 +39,7 @@ const CadastroMaquina = () => {
     user.userType?.toLowerCase().includes(term)
   );
 
-  // 👇 Função para carregar dados do cliente (simulado por enquanto)
   useEffect(() => {
-    // Em produção, isso vem do token de autenticação
     const mockClient = {
       id: 1,
       companyName: "Indústria Metalúrgica Silva LTDA"
@@ -53,7 +48,6 @@ const CadastroMaquina = () => {
     setFormData(prev => ({ ...prev, clientId: mockClient.id }));
   }, []);
 
-  // 👇 Função para carregar os usuários (se já não estiverem carregados)
   useEffect(() => {
     if (filteredUsers.length > 0) {
       setUsers(filteredUsers);
@@ -63,7 +57,7 @@ const CadastroMaquina = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    
+
     if (formErrors[name]) {
       const valueTrimmed = value.trim();
       if (valueTrimmed) {
@@ -72,22 +66,20 @@ const CadastroMaquina = () => {
     }
   };
 
-  // Validação da etapa 1
   const validateStep1 = () => {
     const errors = {};
     const requiredFields = ['name', 'serialNumber', 'manufacturer', 'model', 'status'];
-    
+
     requiredFields.forEach(field => {
       if (!formData[field]?.trim()) {
         errors[field] = true;
       }
     });
-    
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
-  // Validação da etapa 2
   const validateStep2 = () => {
     const errors = {};
     if (!formData.responsibleUserId?.trim()) {
@@ -104,7 +96,7 @@ const CadastroMaquina = () => {
         alert("Por favor, preencha todos os campos obrigatórios da etapa 1.");
         return;
       }
-      setActiveStep(1); // Avança para a etapa 2
+      setActiveStep(1); 
     } else if (activeStep === 1) {
       if (!validateStep2()) {
         alert("Por favor, selecione um usuário responsável.");
@@ -126,7 +118,7 @@ const CadastroMaquina = () => {
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
       <MachineHeaderSection />
-      
+
       <RegistrationStepper activeStep={activeStep} />
 
       <Box
@@ -144,12 +136,12 @@ const CadastroMaquina = () => {
       >
         {activeStep === 0 && (
           <>
-            <MachineFormSection 
-              formData={formData} 
+            <MachineFormSection
+              formData={formData}
               onChange={handleChange}
               formErrors={formErrors}
             />
-            
+
             <Box sx={{ px: 3, mt: 4 }}>
               <Buttons
                 onNext={handleNext}
@@ -168,14 +160,21 @@ const CadastroMaquina = () => {
               Vinculação
             </Typography>
 
-            {/* Cliente */}
             <Box
               sx={{
-                bgcolor: "background.paper",
-                p: 2,
-                borderRadius: 2,
+                position: "relative",
+                pl: 2,
                 mb: 3,
-                border: `1px solid ${theme.palette.divider}`,
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  width: "4px",
+                  bgcolor: theme.palette.primary.main,
+                  borderRadius: "4px",
+                },
               }}
             >
               <Typography variant="subtitle1" fontWeight="bold">
@@ -189,7 +188,6 @@ const CadastroMaquina = () => {
               </Typography>
             </Box>
 
-            {/* Usuário Responsável */}
             <Box sx={{ mb: 3 }}>
               <Typography variant="subtitle1" fontWeight="bold">
                 Usuário Responsável *

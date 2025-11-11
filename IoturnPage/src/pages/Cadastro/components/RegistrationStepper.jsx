@@ -29,7 +29,7 @@ const CustomStepConnector = styled(StepConnector)(({ theme }) => ({
     border: 0,
     borderRadius: 2,
     backgroundColor: theme.palette.divider,
-    transition: "background-color 0.3s ease",
+    transition: "background-color 0.5s ease",
   },
   // Azul nas etapas ativas ou concluídas
   [`&.${stepConnectorClasses.active} .${stepConnectorClasses.line}`]: {

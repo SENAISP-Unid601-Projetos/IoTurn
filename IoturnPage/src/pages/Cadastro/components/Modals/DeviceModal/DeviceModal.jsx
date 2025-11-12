@@ -9,6 +9,7 @@ import Buttons from "../../../components/BottonsActions";
 import DispositivoFormSection from "./DeviceFormSection";
 import DispositivoInfoSection from "./DeviceInfoSection";
 import theme from "../../../../../theme";
+import ApiService from "../../../../../services/ApiServices";
 
 const DispositivoModal = ({ open, onClose }) => {
   const [formData, setFormData] = useState({
@@ -25,6 +26,7 @@ const DispositivoModal = ({ open, onClose }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Novo dispositivo:", formData);
+    ApiService.postRequest("devices/create", formData)
     onClose();
   };
 

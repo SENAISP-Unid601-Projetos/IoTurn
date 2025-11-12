@@ -12,6 +12,7 @@ import UserFormCredentials from "./UserFormCredentials";
 import UserFormPermissions from "./UserFormPermissions";
 import UserGuidelines from "./UserGuidelines";
 import theme from "../../../../../theme";
+import ApiService from "../../../../../services/ApiServices";
 
 const UserModal = ({ open, onClose }) => {
   const [formData, setFormData] = useState({
@@ -35,6 +36,7 @@ const UserModal = ({ open, onClose }) => {
       return;
     }
     console.log("Novo usuário:", formData);
+    ApiService.postRequest("users/crate", formData)
     onClose();
   };
 

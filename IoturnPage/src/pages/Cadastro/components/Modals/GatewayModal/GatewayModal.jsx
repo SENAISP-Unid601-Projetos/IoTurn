@@ -11,6 +11,7 @@ import GatewayFormSection from "./GatewayFormSection";
 import GatewayFunctionSection from "./GatewayFunctionSection";
 import GatewayGuidelinesSection from "./GatewayGuidelinesSection";
 import theme from "../../../../../theme";
+import ApiService from "../../../../../services/ApiServices";
 
 const GatewayModal = ({ open, onClose }) => {
   const [formData, setFormData] = useState({
@@ -27,6 +28,7 @@ const GatewayModal = ({ open, onClose }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Novo gateway:", formData);
+    ApiService.postRequest("gateways/create", formData)
     onClose();
   };
 

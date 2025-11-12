@@ -1,7 +1,7 @@
 import ApiService from "./ApiServices";
 import { formatTimestamp } from "../utils/formatters";
 
-const API_URL = "/machines/getAll/1";
+const API_URL = "/machines/getAll";
 
 const formatMachineData = (machine) => {
   const companyName = machine.client?.companyName || "–";
@@ -55,23 +55,14 @@ const formatMachineData = (machine) => {
 };
 
 export const fetchAllMachineData = async () => {
-  console.log("Buscando dados da nova API...");
   const rawData = await ApiService.getRequest(API_URL);
-  console.log("Dados brutos recebidos:", rawData);
-
   const formattedData = rawData.map(formatMachineData);
-
-  console.log("Dados formatados para o front-end:", formattedData);
   return formattedData;
 };
 
 export const fetchMachineById = async (id) => {
-  console.log(`Buscando dados da máquina ${id}...`);
   const rawData = await ApiService.getRequest(API_URL);
-  console.log("Dados brutos da máquina:", rawData);
-
   const formattedData = formatMachineData(rawData);
 
-  console.log("Dados formatados da máquina:", formattedData);
   return formattedData;
 };

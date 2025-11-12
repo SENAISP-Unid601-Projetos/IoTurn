@@ -5,8 +5,9 @@ const API_BASE_URL = import.meta.env.VITE_APP_API_URL; //Posso usar "||" para fa
 class ApiService {
   // Método GET
   static async getRequest(APIendpoint) {
-    const fullUrl = `${API_BASE_URL}${APIendpoint}`;
-    console.log(fullUrl);
+    const userId = JSON.parse(localStorage.getItem("login_info"));
+    const fullUrl = `${API_BASE_URL}${APIendpoint}/${userId.id}`;
+
     try {
       const response = await axios.get(fullUrl);
       return response.data;

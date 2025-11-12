@@ -3,9 +3,9 @@ import { Grid, Typography } from "@mui/material";
 import FormField from "../components/FormField";
 
 const statusOptions = [
-  { value: "Ativo", label: "Ativo" },
-  { value: "Inativo", label: "Inativo" },
-  { value: "Manutencao", label: "Em Manutenção" },
+  { value: "ACTIVE", label: "Ativo" },
+  { value: "CANCELED", label: "Inativo" },
+  { value: "SUSPENDED", label: "Em Manutenção" },
 ];
 
 const machineFields = [

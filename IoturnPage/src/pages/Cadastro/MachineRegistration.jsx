@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Container, } from "@mui/material";
+import { Box, Container } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import RegistrationStepper from "./components/RegistrationStepper";
 import theme from "../../theme";
@@ -14,10 +14,11 @@ import MachineStep1 from "./components/MachineSteps/MachineStep1";
 import MachineStep2 from "./components/MachineSteps/MachineStep2";
 import MachineStep3 from "./components/MachineSteps/MachineStep3";
 
-
 const CadastroMaquina = () => {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
+
+  const userId = JSON.parse(localStorage.getItem("login_info"));
 
   const [formErrors, setFormErrors] = useState({});
   const [formData, setFormData] = useState({
@@ -25,8 +26,8 @@ const CadastroMaquina = () => {
     serialNumber: "",
     manufacturer: "",
     model: "",
-    status: "Ativo",
-    clientId: "",
+    status: "ACTIVE",
+    clientId: userId.id,
     responsibleUserId: "",
     gatewayId: "",
     deviceId: "",
@@ -93,7 +94,7 @@ const CadastroMaquina = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
 
     if (formErrors[name]) {
-      const valueTrimmed = value.trim();
+      const valueTrimmed = String(value);
       if (valueTrimmed) {
         setFormErrors((prev) => ({ ...prev, [name]: false }));
       }
@@ -143,7 +144,8 @@ const CadastroMaquina = () => {
       setActiveStep(2);
     } else if (activeStep === 2) {
       console.log("Dados completos:", formData);
-      ApiService.postRequest("machines/crate", formData)
+      ApiService.postRequest("machines/crate", formData);
+      window.location.reload();
       navigate("/main/gerenciamento/maquinas");
     }
   };

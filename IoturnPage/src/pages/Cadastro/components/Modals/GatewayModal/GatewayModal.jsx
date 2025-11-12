@@ -13,11 +13,14 @@ import GatewayGuidelinesSection from "./GatewayGuidelinesSection";
 import theme from "../../../../../theme";
 import ApiService from "../../../../../services/ApiServices";
 
+const userId = JSON.parse(localStorage.getItem("login_info"));
+
 const GatewayModal = ({ open, onClose }) => {
   const [formData, setFormData] = useState({
+    clientId: userId.id,
     gatewayId: "",
     description: "",
-    status: "Offline",
+    status: "OFFLINE",
   });
 
   const handleChange = (e) => {
@@ -28,7 +31,8 @@ const GatewayModal = ({ open, onClose }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Novo gateway:", formData);
-    ApiService.postRequest("gateways/create", formData)
+    ApiService.postRequest("/gateways/create", formData);
+    window.location.reload();
     onClose();
   };
 
@@ -44,10 +48,11 @@ const GatewayModal = ({ open, onClose }) => {
           border: `1px solid ${theme.palette.divider}`,
           borderRadius: "16px",
           boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.5)",
-          "& .MuiDialogTitle-root, & .MuiDialogContent-root, & .MuiDialogActions-root": {
-            bgcolor: "#000 !important",
-            color: "#fff",
-          },
+          "& .MuiDialogTitle-root, & .MuiDialogContent-root, & .MuiDialogActions-root":
+            {
+              bgcolor: "#000 !important",
+              color: "#fff",
+            },
         },
       }}
     >

@@ -3,15 +3,15 @@ import { Grid } from "@mui/material";
 import FormField from "../../../components/FormField";
 
 const userTypes = [
-  { value: "visualizador", label: "Visualizador" },
-  { value: "tecnico", label: "Técnico" },
-  { value: "administrador", label: "Administrador" },
+  { value: "VIEWER", label: "Visualizador" },
+  { value: "TECHNICIAN", label: "Técnico" },
+  { value: "ADMIN", label: "Administrador" },
 ];
 
 const statusOptions = [
-  { value: "Ativo", label: "Ativo" },
-  { value: "Inativo", label: "Inativo" },
-  { value: "Suspenso", label: "Suspenso" },
+  { value: "ACTIVE", label: "Ativo" },
+  { value: "CANCELED", label: "Inativo" },
+  { value: "SUSPENDED", label: "Suspenso" },
 ];
 
 const UserFormPermissions = ({ formData, onChange }) => {

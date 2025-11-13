@@ -23,8 +23,6 @@ class ApiService {
     console.log(APIendpoint);
 
     const fullUrl = `${API_BASE_URL}${APIendpoint}`;
-    console.log(fullUrl);
-
     try {
       const response = await axios.post(fullUrl, data, {
         withCredentials: true,

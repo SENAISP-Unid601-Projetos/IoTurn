@@ -14,6 +14,7 @@ import {
 import { Zap, Mail, Lock, Eye, EyeOff, CheckCircle } from "lucide-react";
 import ApiService from "../services/ApiServices";
 import theme from "../theme";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -23,6 +24,7 @@ function Login() {
   const [passwordError, setPasswordError] = useState("");
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [isPasswordValid, setIsPasswordValid] = useState(false);
+  const changeLink = useNavigate();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event) => {

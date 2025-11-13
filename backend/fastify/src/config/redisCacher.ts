@@ -4,8 +4,5 @@ const redis = new Redis({
     host:'10.110.18.15',
     port:30379,
 });
-  host: 'localhost',
-  port: 6379,
-})
 
 export default redis

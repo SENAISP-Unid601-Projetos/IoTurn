@@ -25,6 +25,7 @@ function Login() {
   const [passwordError, setPasswordError] = useState("");
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [isPasswordValid, setIsPasswordValid] = useState(false);
+  const [responseStatus, setResponseStatus] = useState("");
   const changeLink = useNavigate();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -41,11 +42,14 @@ function Login() {
       };
 
       // Espera a resposta da API e recebe o token
-      const response = await ApiService.postRequest(
+      const response = await ApiService.postRequestComplete(
         "/clients/login",
         loginCredentials
       );
-      localStorage.setItem("login_info", JSON.stringify(response));
+
+      setResponseStatus(response.status);
+      localStorage.setItem("login_info", JSON.stringify(response.data));
+      window.location.href = "/main/maquinas";
       changeLink("/main/maquinas");
     } catch (error) {
       console.error("Erro ao tentar obter o cookie:", error);
@@ -77,6 +81,10 @@ function Login() {
     }
     if (!isPasswordValid) {
       setPasswordError("A senha deve ter no mínimo 8 caracteres.");
+    }
+    if (responseStatus !== 200) {
+      setPasswordError("Senha e email não coincidem");
+      setEmailError("Senha e email não coincidem");
     }
     if (isEmailValid && isPasswordValid) {
       const data = { email: email, password: password };

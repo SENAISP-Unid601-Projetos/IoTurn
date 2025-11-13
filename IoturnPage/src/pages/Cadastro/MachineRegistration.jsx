@@ -1,75 +1,172 @@
-import React, { useState } from "react";
-import { Box, Typography, Container, Grid } from "@mui/material";
-import { Settings } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Box, Container } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import Buttons from "../Cadastro/components/BottonsActions";
-import RegistrationStepper from "../Cadastro/components/RegistrationStepper";
+import RegistrationStepper from "./components/RegistrationStepper";
 import theme from "../../theme";
-import FormField from "./components/FormField";
-
-const statusOptions = [
-  { value: "Ativo", label: "Ativo" },
-  { value: "Inativo", label: "Inativo" },
-  { value: "Manutencao", label: "Em Manutenção" },
-];
+import MachineHeaderSection from "./components/MachineHeaderSection";
+import { fetchAllUserData } from "../../services/usersService";
+import { useDataManagement } from "../../hooks/useDataManagement";
+import { fetchAllGatewayData } from "../../services/GatewayService";
+import { fetchAllDeviceData } from "../../services/DeviceServices";
+import ApiService from "../../services/ApiServices";
+// import { getClientFromToken } from "../../../utils/auth"; // Arrumar o caminho que pega o token de cliente
+import MachineStep1 from "./components/MachineSteps/MachineStep1";
+import MachineStep2 from "./components/MachineSteps/MachineStep2";
+import MachineStep3 from "./components/MachineSteps/MachineStep3";
 
 const CadastroMaquina = () => {
   const navigate = useNavigate();
-  const [activeStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(0);
 
+  const userId = JSON.parse(localStorage.getItem("login_info"));
+
+  const [formErrors, setFormErrors] = useState({});
   const [formData, setFormData] = useState({
     name: "",
     serialNumber: "",
     manufacturer: "",
     model: "",
-    status: "Ativo",
+    status: "ACTIVE",
+    clientId: userId.id,
+    responsibleUserId: "",
+    gatewayId: "",
+    deviceId: "",
   });
+
+  const [clientData, setClientData] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [gateways, setGateways] = useState([]);
+  const [devices, setDevices] = useState([]);
+
+  const { filteredData: filteredUsers } = useDataManagement(
+    fetchAllUserData,
+    (user, term) =>
+      user.name?.toLowerCase().includes(term) ||
+      user.email?.toLowerCase().includes(term) ||
+      user.userType?.toLowerCase().includes(term)
+  );
+
+  const { filteredData: filteredGateways } = useDataManagement(
+    fetchAllGatewayData,
+    (gateway, term) =>
+      gateway.gatewayId?.toLowerCase().includes(term) ||
+      gateway.description?.toLowerCase().includes(term)
+  );
+
+  const { filteredData: filteredDevices } = useDataManagement(
+    fetchAllDeviceData,
+    (device, term) =>
+      device.nodeId?.toLowerCase().includes(term) ||
+      device.description?.toLowerCase().includes(term) ||
+      device.machineName?.toLowerCase().includes(term)
+  );
+
+  // useEffect(() => {
+  //   const clientFromToken = getClientFromToken();
+  //   if (clientFromToken) {
+  //     setClientData(clientFromToken);
+  //     setFormData((prev) => ({ ...prev, clientId: clientFromToken.id }));
+  //   } else {
+  //     console.warn("Cliente não encontrado no token");
+  //   }
+  // }, []);
+
+  useEffect(() => {
+    if (filteredUsers.length > 0) {
+      setUsers(filteredUsers);
+    }
+  }, [filteredUsers]);
+
+  useEffect(() => {
+    if (filteredGateways.length > 0) {
+      setGateways(filteredGateways);
+    }
+  }, [filteredGateways]);
+
+  useEffect(() => {
+    if (filteredDevices.length > 0) {
+      setDevices(filteredDevices);
+    }
+  }, [filteredDevices]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (formErrors[name]) {
+      const valueTrimmed = String(value);
+      if (valueTrimmed) {
+        setFormErrors((prev) => ({ ...prev, [name]: false }));
+      }
+    }
   };
 
-  const handleSubmit = (e) => {
+  const validateStep1 = () => {
+    const errors = {};
+    const requiredFields = [
+      "name",
+      "serialNumber",
+      "manufacturer",
+      "model",
+      "status",
+    ];
+
+    requiredFields.forEach((field) => {
+      if (!formData[field]?.trim()) {
+        errors[field] = true;
+      }
+    });
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const validateStep2 = () => {
+    const errors = {};
+    if (!formData.responsibleUserId?.trim()) {
+      errors.responsibleUserId = true;
+    }
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleNext = (e) => {
     e.preventDefault();
-    console.log("Dados da máquina:", formData);
-    navigate("/main/gerenciamento");
+    if (activeStep === 0) {
+      if (!validateStep1()) {
+        return;
+      }
+      setActiveStep(1);
+    } else if (activeStep === 1) {
+      if (!validateStep2()) {
+        return;
+      }
+      setActiveStep(2);
+    } else if (activeStep === 2) {
+      console.log("Dados completos:", formData);
+      ApiService.postRequest("machines/crate", formData);
+      window.location.reload();
+      navigate("/main/gerenciamento/maquinas");
+    }
+  };
+
+  const handleBack = () => {
+    if (activeStep > 0) {
+      setActiveStep(activeStep - 1);
+    } else {
+      navigate("/main/gerenciamento/maquinas");
+    }
   };
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "column",
-          alignItems: "center",
-          flexDirection: "column",
-          textAlign: "center",
-        }}
-      >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            mb: 1,
-          }}
-        >
-          <Settings color={theme.palette.primary.dark} size={30} />
-          <Typography variant="h4" component="h1" fontWeight="bold" sx={{}}>
-            Cadastro de Máquina
-          </Typography>
-        </Box>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 4}}>
-        Registre uma nova máquina e vincule um dispositivo IoT
-      </Typography>
-      </Box>
+      <MachineHeaderSection />
 
       <RegistrationStepper activeStep={activeStep} />
 
       <Box
         component="form"
-        onSubmit={handleSubmit}
+        onSubmit={handleNext}
         sx={{
           mt: 4,
           border: `1px solid ${theme.palette.divider}`,
@@ -80,78 +177,39 @@ const CadastroMaquina = () => {
           margin: "0 auto",
         }}
       >
-        <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
-          Informações básicas da máquina industrial
-        </Typography>
-
-        {/* O "Pai" que define o espaçamento */}
-        <Grid container spacing={4}>
-          <FormField
-            xs={12}
-            label="Nome da Máquina"
-            name="name"
-            value={formData.name}
+        {activeStep === 0 && (
+          <MachineStep1
+            formData={formData}
             onChange={handleChange}
-            placeholder="Ex: Torno CNC Setor A"
-            description="Identificação do equipamento"
-            required
+            formErrors={formErrors}
+            onBack={handleBack}
+            onNext={handleNext}
           />
+        )}
 
-          <FormField
-            xs={12}
-            label="Número de Série"
-            name="serialNumber"
-            value={formData.serialNumber}
+        {activeStep === 1 && (
+          <MachineStep2
+            formData={formData}
             onChange={handleChange}
-            placeholder="Ex: SN-2024-ABC-12345"
-            description="Número único do fabricante"
-            required
+            formErrors={formErrors}
+            users={users}
+            clientData={clientData}
+            onBack={handleBack}
+            onNext={handleNext}
           />
+        )}
 
-          <FormField
-            xs={12}
-            label="Fabricante"
-            name="manufacturer"
-            value={formData.manufacturer}
+        {activeStep === 2 && (
+          <MachineStep3
+            formData={formData}
             onChange={handleChange}
-            placeholder="Ex: Siemens"
-            description="Nome do fabricante"
-            sm={3}
+            formErrors={formErrors}
+            gateways={gateways}
+            devices={devices}
+            onBack={handleBack}
+            onNext={handleNext}
           />
-
-          <FormField
-            xs={12}
-            label="Modelo"
-            name="model"
-            value={formData.model}
-            onChange={handleChange}
-            placeholder="Ex: CNC-5000X"
-            description="Modelo do equipamento"
-            sm={3}
-          />
-
-          {/* Status (ocupa 50% e é um SELECT) */}
-          <FormField
-            label="Status"
-            name="status"
-            value={formData.status}
-            onChange={handleChange}
-            description="Situação operacional"
-            required
-            sm={3}
-            select
-            options={statusOptions}
-          />
-        </Grid>
-
-        <Box sx={{px: 3, mt: 4 }}>
-          <Buttons
-            onNext={handleSubmit}
-            cancelPath="/main/gerenciamento/maquinas"
-            nextLabel="Próximo"
-            showNextIcon={true}
-          />
-        </Box>
+        )}
       </Box>
     </Container>
   );

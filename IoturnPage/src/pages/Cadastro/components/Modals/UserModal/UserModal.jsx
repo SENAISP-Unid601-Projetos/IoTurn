@@ -12,15 +12,18 @@ import UserFormCredentials from "./UserFormCredentials";
 import UserFormPermissions from "./UserFormPermissions";
 import UserGuidelines from "./UserGuidelines";
 import theme from "../../../../../theme";
+import ApiService from "../../../../../services/ApiServices";
+
+const userId = JSON.parse(localStorage.getItem("login_info"));
 
 const UserModal = ({ open, onClose }) => {
   const [formData, setFormData] = useState({
-    fullName: "",
+    name: "",
     email: "",
     password: "",
-    confirmPassword: "",
-    userType: "visualizador",
-    status: "Ativo",
+    userType: "VIEWER",
+    status: "ACTIVE",
+    clientId: userId.id
   });
 
   const handleChange = (e) => {
@@ -35,6 +38,8 @@ const UserModal = ({ open, onClose }) => {
       return;
     }
     console.log("Novo usuário:", formData);
+    ApiService.postRequest("/users/create", formData);
+    window.location.reload();
     onClose();
   };
 
@@ -50,10 +55,11 @@ const UserModal = ({ open, onClose }) => {
           border: `1px solid ${theme.palette.divider}`,
           borderRadius: "16px",
           boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.5)",
-          "& .MuiDialogTitle-root, & .MuiDialogContent-root, & .MuiDialogActions-root": {
-            bgcolor: "#000 !important",
-            color: "#fff",
-          },
+          "& .MuiDialogTitle-root, & .MuiDialogContent-root, & .MuiDialogActions-root":
+            {
+              bgcolor: "#000 !important",
+              color: "#fff",
+            },
         },
       }}
     >

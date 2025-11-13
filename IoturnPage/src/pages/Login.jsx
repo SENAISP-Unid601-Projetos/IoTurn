@@ -13,7 +13,6 @@ import {
 } from "@mui/material";
 import { Zap, Mail, Lock, Eye, EyeOff, CheckCircle } from "lucide-react";
 import ApiService from "../services/ApiServices";
-import JWTToken from "../services/JWTToken";
 import theme from "../theme";
 import { useNavigate } from "react-router-dom";
 
@@ -31,26 +30,6 @@ function Login() {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
-
-  //WIP
-  async function getCookie() {
-    try {
-      const loginCredentials = {
-        email: email,
-        password: password,
-      };
-
-      // Espera a resposta da API e recebe o token
-      const response = await ApiService.postRequest(
-        "/clients/login",
-        loginCredentials
-      );
-      localStorage.setItem("login_info", JSON.stringify(response));
-      changeLink("/main/maquinas");
-    } catch (error) {
-      console.error("Erro ao tentar obter o cookie:", error);
-    }
-  }
 
   useEffect(() => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -80,9 +59,22 @@ function Login() {
     }
     if (isEmailValid && isPasswordValid) {
       const data = { email: email, password: password };
+      getLoginCookie(data);
     }
-    document.cookie = getCookie();
   };
+
+  async function getLoginCookie(data) {
+    try {
+      const salvaToken = await ApiService.postRequest("/clients/login", data);
+      console.log("Resposta do servidor:", salvaToken);
+
+      // Back tem que corrigir o cookie
+      document.cookie = data;
+      localStorage.setItem("login_info", JSON.stringify(salvaToken));
+    } catch (error) {
+      console.error("Erro ao fazer login:", error);
+    }
+  }
 
   const textFieldStyles = {
     "& .MuiOutlinedInput-root": {
@@ -211,7 +203,7 @@ function Login() {
               variant="contained"
               size="large"
               fullWidth
-              // href="/main/maquinas"
+              //   href="/main/maquinas"
               sx={{ py: 1.5 }}
               onClick={handleLogin}
             >

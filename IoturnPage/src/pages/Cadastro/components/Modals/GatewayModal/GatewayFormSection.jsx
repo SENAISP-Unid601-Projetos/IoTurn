@@ -3,9 +3,9 @@ import { Grid } from "@mui/material";
 import FormField from "../../../components/FormField";
 
 const statusOptions = [
-  { value: "Online", label: "Online" },
-  { value: "Offline", label: "Offline" },
-  { value: "Manutencao", label: "Em Manutenção" },
+  { value: "ONLINE", label: "Online" },
+  { value: "OFFLINE", label: "Offline" },
+  { value: "PROVISIONING", label: "Em Manutenção" },
 ];
 
 const GatewayFormSection = ({ formData, handleChange }) => (

@@ -93,7 +93,7 @@ https://v0.app/chat/remix-of-io-t-monitoring-platform-FeWj3fBorlR#lREKVKIJf0lIBT
     
     # --- LOOP PRINCIPAL ---
     print("Iniciando emulador MQTT...")
-while True:
-    simulate_and_publish_data()
-    client.loop()  # mantém a conexão MQTT viva
+    while True:
+        simulate_and_publish_data()
+        client.loop()  # mantém a conexão MQTT viva
     time.sleep(INTERVAL)

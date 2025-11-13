@@ -72,6 +72,10 @@ const CadastroMaquina = () => {
   // }, []);
 
   useEffect(() => {
+    console.log("usrId:", formData.responsibleUserId)
+  }, [formData.responsibleUserId])
+
+  useEffect(() => {
     if (filteredUsers.length > 0) {
       setUsers(filteredUsers);
     }

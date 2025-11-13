@@ -20,6 +20,7 @@ class ApiService {
   // Método POST
   static async postRequest(APIendpoint, data) {
     const fullUrl = `${API_BASE_URL}${APIendpoint}`;
+
     try {
       const response = await axios.post(fullUrl, data, {
         withCredentials: true,

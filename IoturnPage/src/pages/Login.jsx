@@ -15,6 +15,7 @@ import { Zap, Mail, Lock, Eye, EyeOff, CheckCircle } from "lucide-react";
 import ApiService from "../services/ApiServices";
 import JWTToken from "../services/JWTToken";
 import theme from "../theme";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -24,6 +25,7 @@ function Login() {
   const [passwordError, setPasswordError] = useState("");
   const [isEmailValid, setIsEmailValid] = useState(false);
   const [isPasswordValid, setIsPasswordValid] = useState(false);
+  const changeLink = useNavigate();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
   const handleMouseDownPassword = (event) => {
@@ -44,15 +46,7 @@ function Login() {
         loginCredentials
       );
       localStorage.setItem("login_info", JSON.stringify(response));
-
-      // Verifica se a resposta contém um token
-      if (response && response.token) {
-        // Armazenando o token diretamente no cookie
-        const cookie = JWTToken.setCookie("loginCookie", response.token, 7);
-        document.cookie = cookie;
-      } else {
-        console.error("Token não encontrado na resposta da API", response);
-      }
+      changeLink("/main/maquinas");
     } catch (error) {
       console.error("Erro ao tentar obter o cookie:", error);
     }
@@ -217,7 +211,7 @@ function Login() {
               variant="contained"
               size="large"
               fullWidth
-              href="/main/maquinas"
+              // href="/main/maquinas"
               sx={{ py: 1.5 }}
               onClick={handleLogin}
             >

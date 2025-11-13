@@ -45,8 +45,8 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
 # 3. O script de entrypoint (que está na pasta fastify)
-COPY --from=builder /app/backend/fastify/entrypoint.sh ./backend/fastify/entrypoint.sh
-RUN chmod +x ./backend/fastify/entrypoint.sh
+COPY backend/fastify/entrypoint.sh ./backend/fastify/entrypoint.sh
+RUN sed -i 's/\r$//' ./backend/fastify/entrypoint.sh && chmod +x ./backend/fastify/entrypoint.sh
 
 # Muda para o usuário seguro
 USER nonroot
@@ -56,4 +56,3 @@ EXPOSE 3000
 
 # Roda o script de entrypoint (o caminho agora é relativo à raiz /app)
 CMD ["./backend/fastify/entrypoint.sh"]
-

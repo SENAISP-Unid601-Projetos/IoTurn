@@ -25,15 +25,7 @@ dotenv.config()
 const fastify = Fastify({ logger: true })
 
 fastify.register(cors, {
-  origin: (origin, cb) => {
-    // Se não houver origin (ex: Postman, cURL), permite também
-    if (!origin) {
-      cb(null, true);
-      return;
-    }
-    // Permite qualquer origem da rede local
-    cb(null, origin);
-  },
+  origin: "http://localhost:5173",
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 })

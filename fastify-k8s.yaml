@@ -37,7 +37,7 @@ spec:
     spec:
       containers:
         - name: fastify-backend-container
-          image: pedroleme/fastify-backend:latest
+          image: pedroleme/fastify-api:latest
           imagePullPolicy: Always # Garante que o K8s sempre baixe a imagem mais recente
           ports:
             - containerPort: 3000 # A porta que seu app expõe (definida no Dockerfile)

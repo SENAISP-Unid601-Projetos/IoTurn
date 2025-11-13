@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Stream SSE</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            width: 600px;
+        }
+        h2 {
+            margin-top: 0;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        .form-group label {
+            font-weight: 600;
+            padding-top: 10px;
+        }
+        .form-group input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 12px 20px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        #connect-btn {
+            background-color: #28a745; /* Verde */
+        }
+        #connect-btn:hover {
+            background-color: #218838;
+        }
+        #disconnect-btn {
+            background-color: #dc3545; /* Vermelho */
+        }
+        #disconnect-btn:hover {
+            background-color: #c82333;
+        }
+        #disconnect-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #status {
+            margin-top: 10px;
+            font-style: italic;
+            color: #555;
+        }
+        #messages {
+            background-color: #2b2b2b;
+            color: #f1f1f1;
+            padding: 15px;
+            border-radius: 4px;
+            height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap; /* Mantém a formatação do JSON */
+            font-family: "Courier New", Courier, monospace;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Teste de Conexão SSE</h2>
+        
+        <div class="form-group">
+            <label for="user-id">ID do Usuário:</label>
+            <input type="text" id="user-id" placeholder="Digite o ID para conectar (ex: 123)">
+            <button id="connect-btn">Conectar</button>
+            <button id="disconnect-btn" disabled>Desconectar</button>
+        </div>
+
+        <div id="status">Status: Desconectado</div>
+
+        <h3>Log de Mensagens</h3>
+        <div id="messages">Aguardando conexão...</div>
+    </div>
+
+    <script>
+        // --- Configuração ---
+        // Altere se o seu backend não estiver rodando localmente na porta 3333
+        const API_BASE_URL = 'http://localhost:3000/machines'; 
+        // --- Fim da Configuração ---
+
+        let sseSource = null;
+
+        // Seletores do DOM
+        const connectBtn = document.getElementById('connect-btn');
+        const disconnectBtn = document.getElementById('disconnect-btn');
+        const userIdInput = document.getElementById('user-id');
+        const messagesDiv = document.getElementById('messages');
+        const statusDiv = document.getElementById('status');
+
+        /**
+         * Lida com o clique no botão Conectar
+         */
+        connectBtn.addEventListener('click', () => {
+            const userId = userIdInput.value;
+
+            if (!userId) {
+                alert("Por favor, insira um ID de usuário.");
+                return;
+            }
+
+            if (sseSource) {
+                logMessage("Já existe uma conexão ativa.");
+                return;
+            }
+
+            const url = `${API_BASE_URL}/stream/${userId}`;
+
+            try {
+                // 1. Cria a conexão
+                sseSource = new EventSource(url);
+                updateUI(true, userId);
+                logMessage(`Tentando conectar ao stream: ${url}`);
+
+                // 2. Evento 'open' (conexão estabelecida)
+                sseSource.onopen = () => {
+                    console.log("[SSE] Conexão estabelecida.");
+                    logMessage("--- Conexão estabelecida com o servidor ---");
+                };
+
+                // 3. Evento 'message' (mensagens padrão "data: ...")
+                sseSource.onmessage = (event) => {
+                    console.log("[SSE] Mensagem recebida:", event.data);
+                    try {
+                        // Tenta formatar o JSON para exibição
+                        const jsonData = JSON.parse(event.data);
+                        const prettyJson = JSON.stringify(jsonData, null, 2);
+                        logMessage(`\n${prettyJson}`);
+                    } catch (e) {
+                        // Se não for JSON, apenas exibe o texto
+                        logMessage(event.data);
+                    }
+                };
+
+                // 4. Evento customizado 'connected' (que você envia do backend)
+                sseSource.addEventListener('connected', (event) => {
+                    console.log("[SSE] Evento 'connected' recebido:", event.data);
+                    const data = JSON.parse(event.data);
+                    logMessage(`Servidor: ${data.message}`);
+                });
+
+                // 5. Evento 'error'
+                sseSource.onerror = (err) => {
+                    console.error("[SSE] Erro na conexão:", err);
+                    logMessage("!!! Erro na conexão com o stream. Verifique o console. !!!");
+                    
+                    // Se o erro fechar a conexão, limpamos
+                    if (sseSource.readyState === EventSource.CLOSED) {
+                        logMessage("--- Conexão perdida permanentemente ---");
+                        disconnectStream();
+                    }
+                };
+
+            } catch (err) {
+                console.error("Erro ao iniciar EventSource:", err);
+                logMessage(`Erro: ${err.message}`);
+                updateUI(false);
+            }
+        });
+
+        /**
+         * Lida com o clique no botão Desconectar
+         */
+        disconnectBtn.addEventListener('click', () => {
+            disconnectStream();
+        });
+
+        /**
+         * Função para fechar a conexão SSE
+         */
+        function disconnectStream() {
+            if (sseSource) {
+                sseSource.close();
+                sseSource = null;
+                console.log("[SSE] Conexão fechada pelo cliente.");
+                logMessage("--- Desconectado pelo usuário ---");
+                updateUI(false);
+            }
+        }
+
+        /**
+         * Atualiza a UI (botões e status)
+         */
+        function updateUI(isConnected, userId = '') {
+            if (isConnected) {
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+                userIdInput.disabled = true;
+                statusDiv.textContent = `Status: Conectado ao ID: ${userId}`;
+                messagesDiv.innerHTML = ''; // Limpa logs anteriores
+            } else {
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+                userIdInput.disabled = false;
+                statusDiv.textContent = 'Status: Desconectado';
+            }
+        }
+
+        /**
+         * Adiciona uma mensagem ao log na tela
+         */
+        function logMessage(text) {
+            const line = document.createElement('div');
+            // Adiciona um timestamp simples
+            const timestamp = new Date().toLocaleTimeString();
+            line.textContent = `[${timestamp}] ${text}`;
+            
+            messagesDiv.appendChild(line);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto-scroll
+        }
+
+    </script>
+</body>
+</html>

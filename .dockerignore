@@ -1,0 +1,13 @@
+# Ignora dependências locais, queremos que o Docker as instale
+node_modules
+
+# Ignora o código transpilado local
+dist
+
+# Ignora logs e arquivos de ambiente
+npm-debug.log
+.env
+.DS_Store
+
+# Ignora o controle de versão
+.git

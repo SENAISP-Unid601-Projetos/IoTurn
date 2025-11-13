@@ -48,7 +48,12 @@ export const clientsController = {
                 secure: false,
                 httpOnly: true,
                 sameSite: 'lax',
-            }).status(200).send({message:'Login realizado com sucesso'});
+            }).status(200).send({
+                message:'Login realizado com sucesso',
+                id: userExists.id,
+                companyName: userExists.companyName,
+                email: userExists.email,
+            });
         } catch (error) {
             console.error("Error in loginTempController:", error);
             reply.status(500).send({ message: 'Internal Server Error' });

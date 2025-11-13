@@ -25,6 +25,7 @@
     "typescript": "^5.8.3"
   },
   "scripts": {
-    "dev": "ts-node backend/fastify/server.ts"
+    "dev": "ts-node backend/fastify/server.ts",
+    "build": "tsc --skipLibCheck"
   }
 }

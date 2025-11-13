@@ -1,0 +1,99 @@
+# --- 1. SECRET ---
+# Armazena com segurança seus segredos da aplicação.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: fastify-backend-secret
+type: Opaque
+stringData:
+  # ATENÇÃO: Substitua pelas suas URLs e segredos reais.
+  DATABASE_URL: "postgres://ioturn601:senaicfp601@10.110.18.15:30432/ioturn"
+  JWT_SECRET: "gandalfdecalcinharosa"
+  # Se você já tiver os valores em base64, comente o 'stringData'
+  # e use 'data' como no exemplo abaixo:
+# data:
+  # DATABASE_URL: "SUA_STRING_BASE64_DO_BANCO_AQUI"
+  # JWT_SECRET: "SUA_STRING_BASE64_DO_JWT_AQUI"
+
+---
+
+# --- 2. DEPLOYMENT ---
+# Gerencia os pods que executam sua imagem Docker.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastify-backend-deployment
+  labels:
+    app: fastify-backend
+spec:
+  replicas: 2 # Começa com 2 instâncias para alta disponibilidade
+  selector:
+    matchLabels:
+      app: fastify-backend
+  template:
+    metadata:
+      labels:
+        app: fastify-backend
+    spec:
+      containers:
+        - name: fastify-backend-container
+          image: pedroleme/fastify-api:latest
+          imagePullPolicy: Always # Garante que o K8s sempre baixe a imagem mais recente
+          ports:
+            - containerPort: 3000 # A porta que seu app expõe (definida no Dockerfile)
+          env:
+            - name: NODE_ENV
+              value: "production"
+            
+            # Puxa a DATABASE_URL do Secret
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: fastify-backend-secret # Nome do Secret criado acima
+                  key: DATABASE_URL             # Chave dentro do Secret
+            
+            # Puxa o JWT_SECRET do Secret
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: fastify-backend-secret # Nome do Secret criado acima
+                  key: JWT_SECRET               # Chave dentro do Secret
+          
+          # Liveness e Readiness Probes são recomendados para produção
+          # Eles verificam se seu app está saudável
+          readinessProbe:
+            # CORREÇÃO: Alterado de httpGet para tcpSocket, já que /health não existe.
+            # Isso apenas verifica se a porta 3000 está aceitando conexões.
+            tcpSocket:
+              port: 3000
+            initialDelaySeconds: 15 # Espera 15s antes de verificar pela primeira vez
+            periodSeconds: 10
+          livenessProbe:
+            # CORREÇÃO: Alterado de httpGet para tcpSocket.
+            # Se a porta parar de responder, o K8s reiniciará o container.
+            tcpSocket:
+              port: 3000
+            initialDelaySeconds: 30 # Espera 30s antes de verificar pela primeira vez
+            periodSeconds: 15
+
+---
+
+# --- 3. SERVICE (NodePort) ---
+# Expõe seu Deployment em uma porta estática em cada Nó do cluster.
+# Ótimo para testes locais (Minikube).
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastify-backend-service
+spec:
+  # ALTERAÇÃO: Trocado de LoadBalancer para NodePort
+  type: NodePort
+  # type: LoadBalancer # Cria um IP externo em provedores de nuvem (GKE, AKS, EKS)
+  selector:
+    app: fastify-backend # Seleciona os pods do seu Deployment
+  ports:
+    - protocol: TCP
+      port: 80 # Porta interna do cluster
+      targetPort: 3000 # Porta do container (onde o app está rodando)
+      nodePort: 30080 # Opcional: Especifique uma porta (na faixa 30000-32767).
+

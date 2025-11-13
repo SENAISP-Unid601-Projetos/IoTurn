@@ -9,4 +9,4 @@ joblib
 requests
 matplotlib
 seaborn
-cuid
+hdbscan

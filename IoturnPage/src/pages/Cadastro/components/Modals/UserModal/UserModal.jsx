@@ -37,7 +37,7 @@ const UserModal = ({ open, onClose }) => {
       alert("As senhas não coincidem!");
       return;
     }
-    console.log("Novo usuário:", formData);
+    console.log(formData);
     ApiService.postRequest("/users/create", formData);
     window.location.reload();
     onClose();

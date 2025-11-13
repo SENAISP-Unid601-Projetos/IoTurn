@@ -33,6 +33,23 @@ class ApiService {
       throw error;
     }
   }
+
+  // Método PUT
+  static async putRequest(APIendpoint, data){
+
+    const userId = JSON.parse(localStorage.getItem("login_info"));
+    const fullUrl = `${API_BASE_URL}${APIendpoint}/${userId.id}`; 
+    
+      try{
+        const response = await axios.put(fullUrl, data,{
+          withCredentials: true,
+        });
+        return response.data;
+      } catch(error) {
+        console.error(`Erro ao enivar a requisição PUT para ${fullUrl}.`,error);
+        throw error;
+      }
+  }
 }
 
 export default ApiService;

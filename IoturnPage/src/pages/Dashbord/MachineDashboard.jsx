@@ -27,6 +27,7 @@ import DynamicChart from "./components/DynamicChart";
 
 const MAX_DATA_POINTS = 30;
 
+// Gera os gráficos valores minimos e max.
 const generateMockDataPoint = (lastValue, min, max) => {
   let newValue = lastValue + (Math.random() - 0.5) * (max / 10);
   if (newValue < min) newValue = min;
@@ -45,6 +46,8 @@ const getInitialChartData = (val, min, max) => {
     data.push({ x: new Date().getTime() - (MAX_DATA_POINTS - i) * 1000, y });
     lastVal = y;
   }
+  // exemplo
+  // data = {machineId: 1, rpm: 1175.25, timeStampRpm: '2025-11-13T19:45:46.362Z'}
   return data;
 };
 
@@ -68,6 +71,7 @@ const MachineDashboard = () => {
   const [oleoData, setOleoData] = useState([]);
   const [correnteData, setCorrenteData] = useState([]);
 
+  // Um loop infinito após a inicialização enviando constantemente valores para os useStates initialCharData,
   useEffect(() => {
     const loadMachineData = async () => {
       if (!machineId) return;
@@ -76,12 +80,38 @@ const MachineDashboard = () => {
         const data = await fetchMachineById(machineId);
         setMachine(data);
         setSelectedMachine(data.id);
-        setRpmData(getInitialChartData(data.metrics.rpm.value, data.metrics.rpm.min, data.metrics.rpm.max));
-        setTempData(getInitialChartData(data.metrics.temp.value, data.metrics.temp.min, data.metrics.temp.max));
-        setOleoData(getInitialChartData(data.metrics.oleo.value, data.metrics.oleo.min, data.metrics.oleo.max));
-        setCorrenteData(
-          getInitialChartData(data.metrics.corrente.value, data.metrics.corrente.min, data.metrics.corrente.max)
+
+        // Gráficos
+        setRpmData(
+          getInitialChartData(
+            data.metrics.rpm.value,
+            data.metrics.rpm.min,
+            data.metrics.rpm.max
+          )
         );
+
+        setTempData(
+          getInitialChartData(
+            data.metrics.temp.value,
+            data.metrics.temp.min,
+            data.metrics.temp.max
+          )
+        );
+        setOleoData(
+          getInitialChartData(
+            data.metrics.oleo.value,
+            data.metrics.oleo.min,
+            data.metrics.oleo.max
+          )
+        );
+        setCorrenteData(
+          getInitialChartData(
+            data.metrics.corrente.value,
+            data.metrics.corrente.min,
+            data.metrics.corrente.max
+          )
+        );
+
         setError(null);
       } catch (e) {
         console.error("Falha ao carregar dados da máquina:", e);
@@ -93,19 +123,18 @@ const MachineDashboard = () => {
     loadMachineData();
   }, [machineId]);
 
-  // 3. Hook de Efeito para gerenciar a conexão SSE
+  // 3. Hook de Efeito para gerenciar a conexão SSE realiza a ignição do programa
   useEffect(() => {
-    console.log("a");
     if (!machineId) return;
 
-    const url = `http://10.110.12.13:3000/machines/stream/${machineId}`;
-    console.log("url", url);
+    const url = `${
+      import.meta.env.VITE_APP_API_URL
+    }/machines/stream/${machineId}`;
     let sseSource = new EventSource(url);
 
     sseSource.onmessage = (event) => {
       try {
         const newData = JSON.parse(event.data);
-        console.log(newData);
 
         // MODIFICAÇÃO: Mescla o estado anterior com os novos dados
         setMachineData((prevData) => ({
@@ -330,7 +359,7 @@ const MachineDashboard = () => {
         >
           <DynamicChart
             title="RPM"
-            seriesData={rpmData}
+            seriesData={rpmData} //WIP
             yMin={machine.metrics.rpm.min}
             yMax={machine.metrics.rpm.max}
             unit=""

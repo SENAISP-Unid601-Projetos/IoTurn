@@ -35,10 +35,9 @@ class ApiService {
   }
 
   // Método PUT
-  static async putRequest(APIendpoint, data){
+  static async putRequest(APIendpoint, data,){
 
-    const userId = JSON.parse(localStorage.getItem("login_info"));
-    const fullUrl = `${API_BASE_URL}${APIendpoint}/${userId.id}`; 
+    const fullUrl = `${API_BASE_URL}${APIendpoint}`; 
     
       try{
         const response = await axios.put(fullUrl, data,{

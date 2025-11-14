@@ -9,7 +9,7 @@ const UserFormPersonalData = ({ formData, onChange }) => {
         <FormField
           label="Nome Completo"
           name="name"
-          value={formData.fullName}
+          value={formData.name}
           onChange={onChange}
           placeholder="Ex: João Silva"
           required

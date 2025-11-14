@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Box, Container } from "@mui/material";
+import { Box, Container, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import RegistrationStepper from "./components/RegistrationStepper";
 import theme from "../../theme";
 import MachineHeaderSection from "./components/MachineHeaderSection";
 import { fetchAllUserData } from "../../services/usersService";
@@ -9,14 +8,14 @@ import { useDataManagement } from "../../hooks/useDataManagement";
 import { fetchAllGatewayData } from "../../services/GatewayService";
 import { fetchAllDeviceData } from "../../services/DeviceServices";
 import ApiService from "../../services/ApiServices";
-// import { getClientFromToken } from "../../../utils/auth"; // Arrumar o caminho que pega o token de cliente
-import MachineStep1 from "./components/MachineSteps/MachineStep1";
-import MachineStep2 from "./components/MachineSteps/MachineStep2";
-import MachineStep3 from "./components/MachineSteps/MachineStep3";
+
+// Componentes dos campos do formulário e botões
+import MachineFormSection from "./components/MachineFormSection";
+import FormField from "./components/FormField";
+import Buttons from "./components/BottonsActions";
 
 const CadastroMaquina = () => {
   const navigate = useNavigate();
-  const [activeStep, setActiveStep] = useState(0);
 
   const userId = JSON.parse(localStorage.getItem("login_info"));
 
@@ -33,11 +32,13 @@ const CadastroMaquina = () => {
     deviceId: "",
   });
 
+  // Os dados para os campos opcionais ainda são buscados
   const [clientData, setClientData] = useState(null);
   const [users, setUsers] = useState([]);
   const [gateways, setGateways] = useState([]);
   const [devices, setDevices] = useState([]);
 
+  // Hooks para buscar dados dos campos opcionais (sem alterações)
   const { filteredData: filteredUsers } = useDataManagement(
     fetchAllUserData,
     (user, term) =>
@@ -61,20 +62,7 @@ const CadastroMaquina = () => {
       device.machineName?.toLowerCase().includes(term)
   );
 
-  // useEffect(() => {
-  //   const clientFromToken = getClientFromToken();
-  //   if (clientFromToken) {
-  //     setClientData(clientFromToken);
-  //     setFormData((prev) => ({ ...prev, clientId: clientFromToken.id }));
-  //   } else {
-  //     console.warn("Cliente não encontrado no token");
-  //   }
-  // }, []);
-
-  useEffect(() => {
-    console.log("usrId:", formData.responsibleUserId)
-  }, [formData.responsibleUserId])
-
+  // UseEffects para popular os seletores (sem alterações)
   useEffect(() => {
     if (filteredUsers.length > 0) {
       setUsers(filteredUsers);
@@ -93,6 +81,7 @@ const CadastroMaquina = () => {
     }
   }, [filteredDevices]);
 
+  // HandleChange (sem alterações)
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -105,7 +94,8 @@ const CadastroMaquina = () => {
     }
   };
 
-  const validateStep1 = () => {
+  // Validação focada apenas nos campos obrigatórios
+  const validateForm = () => {
     const errors = {};
     const requiredFields = [
       "name",
@@ -125,52 +115,72 @@ const CadastroMaquina = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const validateStep2 = () => {
-    const errors = {};
-    if (!formData.responsibleUserId?.trim()) {
-      errors.responsibleUserId = true;
-    }
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const handleNext = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (activeStep === 0) {
-      if (!validateStep1()) {
-        return;
-      }
-      setActiveStep(1);
-    } else if (activeStep === 1) {
-      if (!validateStep2()) {
-        return;
-      }
-      setActiveStep(2);
-    } else if (activeStep === 2) {
-      console.log("Dados completos:", formData);
-      ApiService.postRequest("machines/crate", formData);
-      window.location.reload();
-      navigate("/main/gerenciamento/maquinas");
+
+    if (!validateForm()) {
+      return;
     }
+
+    const payload = { ...formData };
+
+    const optionalFields = ["responsibleUserId", "gatewayId", "deviceId"];
+
+    optionalFields.forEach((field) => {
+      if (payload[field] === "" || payload[field] === null) {
+        delete payload[field];
+      }
+    });
+    console.log("Dados enviados para API:", payload);
+    ApiService.postRequest("/machines/create", payload);
+
+    navigate("/main/gerenciamento/maquinas");
   };
 
-  const handleBack = () => {
-    if (activeStep > 0) {
-      setActiveStep(activeStep - 1);
-    } else {
-      navigate("/main/gerenciamento/maquinas");
-    }
+  const handleCancel = () => {
+    navigate("/main/gerenciamento/maquinas");
   };
+
+  // Função auxiliar para renderizar títulos de seção
+  const renderSectionTitle = (title, description) => (
+    <Box
+      sx={{
+        position: "relative",
+        pl: 2,
+        mb: 3,
+        mt: 4,
+        "&::before": {
+          content: '""',
+          position: "absolute",
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: "4px",
+          bgcolor: theme.palette.primary.main,
+          borderRadius: "4px",
+        },
+      }}
+    >
+      <Typography variant="h6" fontWeight="bold">
+        {title}
+      </Typography>
+      {description && (
+        <Typography variant="caption" color="text.secondary">
+          {description}
+        </Typography>
+      )}
+    </Box>
+  );
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
       <MachineHeaderSection />
 
-      <RegistrationStepper activeStep={activeStep} />
+      {/* O RegistrationStepper foi removido */}
 
       <Box
         component="form"
-        onSubmit={handleNext}
+        onSubmit={handleSubmit}
         sx={{
           mt: 4,
           border: `1px solid ${theme.palette.divider}`,
@@ -181,39 +191,76 @@ const CadastroMaquina = () => {
           margin: "0 auto",
         }}
       >
-        {activeStep === 0 && (
-          <MachineStep1
-            formData={formData}
-            onChange={handleChange}
-            formErrors={formErrors}
-            onBack={handleBack}
-            onNext={handleNext}
-          />
-        )}
+        {/* Seção 1: Informações Obrigatórias */}
+        <MachineFormSection
+          formData={formData}
+          onChange={handleChange}
+          formErrors={formErrors}
+        />
 
-        {activeStep === 1 && (
-          <MachineStep2
-            formData={formData}
+        {/* Seção 2: Vinculação (Opcional) */}
+        {renderSectionTitle("Vinculação (Opcional)")}
+        <Box sx={{ mb: 3, px: 1 }}>
+          <FormField
+            label="Usuário Responsável"
+            description="Técnico ou administrador que gerenciará esta máquina"
+            placeholder="Selecione um usuário"
+            name="responsibleUserId"
+            value={formData.responsibleUserId}
             onChange={handleChange}
-            formErrors={formErrors}
-            users={users}
-            clientData={clientData}
-            onBack={handleBack}
-            onNext={handleNext}
+            select
+            options={users.map((user) => ({
+              value: user.id,
+              label: `${user.name} (${user.userType.toUpperCase()})`,
+            }))}
           />
-        )}
+        </Box>
 
-        {activeStep === 2 && (
-          <MachineStep3
-            formData={formData}
+        {/* Seção 3: Dispositivos IoT (Opcional) */}
+        {renderSectionTitle("Dispositivo IoT (Opcional)")}
+
+        <Box sx={{ mb: 3, px: 1 }}>
+          <FormField
+            label="Gateway Responsável"
+            description="Gateway ESP32 que gerenciará este sensor"
+            placeholder="Selecione um gateway"
+            name="gatewayId"
+            value={formData.gatewayId}
             onChange={handleChange}
-            formErrors={formErrors}
-            gateways={gateways}
-            devices={devices}
-            onBack={handleBack}
-            onNext={handleNext}
+            select
+            options={gateways.map((gateway) => ({
+              value: gateway.gatewayId,
+              label: `${gateway.gatewayId} • ${gateway.status}`,
+            }))}
           />
-        )}
+        </Box>
+
+        <Box sx={{ mb: 3, px: 1 }}>
+          <FormField
+            label="Dispositivo IoT"
+            description="Selecione um sensor Heltec V2 disponível para vinculação"
+            placeholder="Selecione um dispositivo"
+            name="deviceId"
+            value={formData.deviceId}
+            onChange={handleChange}
+            select
+            options={devices.map((device) => ({
+              value: device.nodeId,
+              label: `${device.nodeId} • ${device.status}`,
+            }))}
+          />
+        </Box>
+
+        {/* Botões de Ação */}
+        <Box sx={{ px: 1, mt: 4 }}>
+          <Buttons
+            onNext={handleSubmit}
+            onCancel={handleCancel}
+            nextLabel="Salvar Máquina"
+            cancelLabel="Cancelar"
+            showNextIcon={false}
+          />
+        </Box>
       </Box>
     </Container>
   );

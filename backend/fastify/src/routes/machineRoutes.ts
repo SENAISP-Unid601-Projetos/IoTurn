@@ -1,53 +1,52 @@
+// machineRoutes.ts
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { machineController } from "../controller/machineController";
-import redis from "../config/redisCacher";
+// REMOVIDO: import redis from "../config/redisCacher";
+import { sseManager } from "../services/sseManeger"; // <-- IMPORTE O NOVO MANAGER
 
 export async function machineRoutes(fastify: FastifyInstance) {
+    
     fastify.post('/create', machineController.createMachineController)
     fastify.get('/getAll/:id', machineController.getAllUsersMachineController)
     fastify.put('/update/:id', machineController.updateMachine)
     fastify.delete('/delete/:id', machineController.softDelete)
     fastify.get('/getMachine/:clientId/:machineId', machineController.getMachineByClientAndIdController)
-    fastify.get('/stream/:id', async (request: FastifyRequest, reply: FastifyReply) => {
     
+    /**
+     * ROTA SSE REFEITA (AGORA CORRETA)
+     */
+    fastify.get('/stream/:id', async (request: FastifyRequest, reply: FastifyReply) => {
+        
+        // 1. Configurar os headers
         const HEADERS = {
             'Content-Type': 'text/event-stream',
             'Connection': 'keep-alive',
             'Cache-Control': 'no-cache',
-            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Origin': '*', // Mantenha se precisar de CORS
         };
         reply.raw.writeHead(200, HEADERS);
 
+        // 2. Obter o ID do usuário
         const params = request.params as { id: string };
         const user = params.id;
         if (!user) {
             return reply.raw.end(); 
         }
 
-        const subscriber = redis.duplicate(); 
-        const channel = `machineOwnerChannel-${user}`;
+        // 3. Adicionar o cliente (reply) ao Manager
+        // O sseManager vai cuidar de associar este 'reply' ao 'user'
+        sseManager.addClient(user, reply);
 
-        subscriber.subscribe(channel, (err) => {
-            if (err) {
-                console.error(`Erro ao se inscrever no canal Redis: ${channel}`, err.message);
-                return reply.raw.end();
-            } else {
-                console.log(`[SSE] Usuário ${user} inscrito com sucesso no canal: ${channel}`);
-                reply.raw.write(`event: connected\ndata: ${JSON.stringify({ message: "Conectado ao stream" })}\n\n`);
-            }
-        });
+        // 4. Enviar mensagem de conexão (só para este cliente)
+        console.log(`[SSE] Usuário ${user} conectado ao stream.`);
+        reply.raw.write(`event: connected\ndata: ${JSON.stringify({ message: "Conectado ao stream" })}\n\n`);
 
-        subscriber.on('message', (subscribedChannel, message) => {
-            if (subscribedChannel === channel) {
-                reply.raw.write(`data: ${message}\n\n`);
-            }
-        });
-
+        // 5. Remover o cliente do Manager ao desconectar
         request.raw.on('close', () => {
-            console.log(`[SSE] Usuário ${user} desconectado. Fechando inscrição do canal: ${channel}`);
-            subscriber.removeAllListeners('message');
-            subscriber.unsubscribe(channel);
-            subscriber.quit();
+            console.log(`[SSE] Usuário ${user} desconectado.`);
+            sseManager.removeClient(user, reply);
+            
+            // Garante que a resposta seja finalizada se ainda não foi
             if (!reply.raw.writableEnded) {
                 reply.raw.end();
             }

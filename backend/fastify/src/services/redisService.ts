@@ -59,13 +59,4 @@ export const redisService = {
             }
         });
     },
-    subscribeToMachineChannel:async (channel: string): Promise<void> =>{
-        redis.subscribe(channel, (err)=>{
-            if(err){
-                throw new Error("Erro ao se inscrever no canal Redis: " + err.message);
-            } else {
-                console.log(`Inscrito com sucesso no canal Redis: ${channel}`);
-            }
-        });
-    }
 }

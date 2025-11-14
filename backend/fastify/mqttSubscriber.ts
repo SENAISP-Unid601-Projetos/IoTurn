@@ -33,12 +33,15 @@ mqttClient.on('message',async (topic, message) => {
   try {
     const payload = message.toString();
     const topicParts = topic.split('/');
-    
     const machineIdStr = topicParts[2];
     const sensorType = topicParts[4];
-    const numericMachineId: number = parseInt(machineIdStr);
+    const numericMachineId: number = +machineIdStr;
     const payloadJson = JSON.parse(payload)
+    console.log(payloadJson);
+    
     const numericPayload = parseFloat(payloadJson);
+    console.log(numericPayload);
+    
     let dataPoint: NewDataPoint = {
       machineId: numericMachineId
     }

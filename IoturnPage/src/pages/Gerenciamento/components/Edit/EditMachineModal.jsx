@@ -7,7 +7,6 @@ import {
   DialogContent,
   Button,
   CircularProgress,
-  Alert,
 } from "@mui/material";
 import theme from "../../../../theme";
 import MachineFormSection from "../../../Cadastro/components/MachineFormSection";
@@ -42,6 +41,16 @@ const EditMachineModal = ({ open, onClose, machineData, onMachineUpdated }) => {
   const handleSave = async () => {
     setLoading(true);
     setError(null);
+
+    const payload = { ...formData };
+    const optionalFields = ["responsibleUserId", "gatewayId", "deviceId"];
+
+    optionalFields.forEach((field) => {
+      if (payload[field] === "" || payload[field] === null) {
+        delete payload[field];
+      }
+    });
+
     try {
       const endpoint = `/machines/update/${machineData.id}`;
       console.log(formData);

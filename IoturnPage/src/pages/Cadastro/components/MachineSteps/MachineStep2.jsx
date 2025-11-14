@@ -7,7 +7,6 @@ import theme from "../../../../theme";
 const MachineStep2 = ({
   formData,
   onChange,
-  formErrors,
   users,
   clientData,
   onBack,

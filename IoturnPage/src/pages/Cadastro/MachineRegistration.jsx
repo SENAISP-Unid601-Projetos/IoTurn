@@ -64,6 +64,12 @@ const CadastroMaquina = () => {
 
   // UseEffects para popular os seletores 
   useEffect(() => {
+    if (!clientData) {
+      setClientData(clientId)
+    }
+  });
+
+  useEffect(() => {
     if (filteredUsers.length > 0) {
       setUsers(filteredUsers);
     }

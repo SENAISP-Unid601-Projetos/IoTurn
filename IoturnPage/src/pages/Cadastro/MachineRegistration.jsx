@@ -17,7 +17,8 @@ import Buttons from "./components/BottonsActions";
 const CadastroMaquina = () => {
   const navigate = useNavigate();
 
-  const userId = JSON.parse(localStorage.getItem("login_info"));
+  const clientId = JSON.parse(localStorage.getItem("login_info"));
+  const userId = async () => await fetchAllUserData()
 
   const [formErrors, setFormErrors] = useState({});
   const [formData, setFormData] = useState({
@@ -26,7 +27,7 @@ const CadastroMaquina = () => {
     manufacturer: "",
     model: "",
     status: "ACTIVE",
-    clientId: userId.id,
+    clientId: clientId.id,
     responsibleUserId: "",
     gatewayId: "",
     deviceId: "",
@@ -38,13 +39,14 @@ const CadastroMaquina = () => {
   const [gateways, setGateways] = useState([]);
   const [devices, setDevices] = useState([]);
 
-  // Hooks para buscar dados dos campos opcionais (sem alterações)
+  // Hooks para buscar dados dos campos opcionais
   const { filteredData: filteredUsers } = useDataManagement(
     fetchAllUserData,
     (user, term) =>
+      user.id ||
       user.name?.toLowerCase().includes(term) ||
-      user.email?.toLowerCase().includes(term) ||
-      user.userType?.toLowerCase().includes(term)
+      // user.email?.toLowerCase().includes(term) ||
+      user.type?.toLowerCase().includes(term)
   );
 
   const { filteredData: filteredGateways } = useDataManagement(
@@ -133,7 +135,6 @@ const CadastroMaquina = () => {
     });
     console.log("Dados enviados para API:", payload);
     ApiService.postRequest("/machines/create", payload);
-
     navigate("/main/gerenciamento/maquinas");
   };
 
@@ -211,7 +212,7 @@ const CadastroMaquina = () => {
             select
             options={users.map((user) => ({
               value: user.id,
-              label: `${user.name} (${user.userType.toUpperCase()})`,
+              label: `${user.name} (${user.type.toUpperCase()})`,
             }))}
           />
         </Box>
@@ -229,7 +230,7 @@ const CadastroMaquina = () => {
             onChange={handleChange}
             select
             options={gateways.map((gateway) => ({
-              value: gateway.gatewayId,
+              value: gateway.id,
               label: `${gateway.gatewayId} • ${gateway.status}`,
             }))}
           />
@@ -245,7 +246,7 @@ const CadastroMaquina = () => {
             onChange={handleChange}
             select
             options={devices.map((device) => ({
-              value: device.nodeId,
+              value: device.id,
               label: `${device.nodeId} • ${device.status}`,
             }))}
           />

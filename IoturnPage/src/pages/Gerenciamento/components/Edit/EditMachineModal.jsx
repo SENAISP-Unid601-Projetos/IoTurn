@@ -42,6 +42,7 @@ const EditMachineModal = ({ open, onClose, machineData, onMachineUpdated }) => {
     setLoading(true);
     setError(null);
 
+    {/* Trata os campos como opcionais */}
     const payload = { ...formData };
     const optionalFields = ["responsibleUserId", "gatewayId", "deviceId"];
 
@@ -105,6 +106,7 @@ const EditMachineModal = ({ open, onClose, machineData, onMachineUpdated }) => {
               Informações da Máquina
             </Typography>
 
+            {/* Chamando os inputs do stage 1 */}
             <MachineFormSection
               formData={formData}
               onChange={handleChange}
@@ -112,10 +114,7 @@ const EditMachineModal = ({ open, onClose, machineData, onMachineUpdated }) => {
             />
           </Box>
         </Box>
-
-        
       
-
         <DialogActions
           sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}
         >

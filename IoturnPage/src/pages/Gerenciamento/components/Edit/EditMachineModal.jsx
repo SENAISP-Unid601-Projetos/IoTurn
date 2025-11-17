@@ -7,15 +7,19 @@ import {
   DialogContent,
   Button,
   CircularProgress,
+  Alert,
 } from "@mui/material";
-import theme from "../../../../theme";
+import theme from "../../../../theme"; // 👈 Seu theme (usado no PaperProps)
 import MachineFormSection from "../../../Cadastro/components/MachineFormSection";
 import ApiService from "../../../../services/ApiServices";
+import FormField from "../../../Cadastro/components/FormField";
+import { fetchAllUserData } from "../../../../services/usersService";
 
 const EditMachineModal = ({ open, onClose, machineData, onMachineUpdated }) => {
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     if (machineData) {
@@ -30,6 +34,17 @@ const EditMachineModal = ({ open, onClose, machineData, onMachineUpdated }) => {
         deviceId: machineData.deviceId || "",
       });
       setError(null);
+
+      const fetchUsers = async () => {
+        try {
+          const usersData = await fetchAllUserData();
+          setUsers(usersData || []);
+        } catch (fetchError) {
+          console.error("Falha ao carregar usuários:", fetchError);
+          setError("Falha ao carregar lista de usuários.");
+        }
+      };
+      fetchUsers();
     }
   }, [machineData, open]);
 
@@ -41,13 +56,8 @@ const EditMachineModal = ({ open, onClose, machineData, onMachineUpdated }) => {
   const handleSave = async () => {
     setLoading(true);
     setError(null);
-
-    {
-      /* Trata os campos como opcionais */
-    }
     const payload = { ...formData };
     const optionalFields = ["responsibleUserId", "gatewayId", "deviceId"];
-
     optionalFields.forEach((field) => {
       if (payload[field] === "" || payload[field] === null) {
         delete payload[field];
@@ -56,10 +66,7 @@ const EditMachineModal = ({ open, onClose, machineData, onMachineUpdated }) => {
 
     try {
       const endpoint = `/machines/update/${machineData.id}`;
-      console.log("Enviando Payload:", payload);
-      //console.log(formData);
       const updatedData = await ApiService.putRequest(endpoint, payload);
-
       setLoading(false);
       onMachineUpdated(updatedData);
       onClose();
@@ -76,6 +83,7 @@ const EditMachineModal = ({ open, onClose, machineData, onMachineUpdated }) => {
       onClose={onClose}
       maxWidth="sm"
       fullWidth
+      // 👇 CORREÇÃO: Seu estilo PRETO de volta
       PaperProps={{
         sx: {
           bgcolor: "#000 !important",
@@ -95,6 +103,8 @@ const EditMachineModal = ({ open, onClose, machineData, onMachineUpdated }) => {
         </Typography>
 
         <Box sx={{ mt: 3, mb: 3, overflowY: "auto", maxHeight: "70vh", pr: 1 }}>
+          
+          {/* Seção 1: Informações da Máquina */}
           <Box
             sx={{
               position: "relative",
@@ -108,15 +118,48 @@ const EditMachineModal = ({ open, onClose, machineData, onMachineUpdated }) => {
             <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
               Informações da Máquina
             </Typography>
-
-            {/* Chamando os inputs do stage 1 */}
             <MachineFormSection
               formData={formData}
               onChange={handleChange}
               formErrors={{}}
             />
           </Box>
+
+          {/* Seção 2: Vinculação (Usuário) */}
+          <Box
+            sx={{
+              position: "relative",
+              pl: 2,
+              mb: 3,
+              pb: 3,
+              border: `1px solid ${theme.palette.divider}`,
+              borderRadius: 2,
+            }}
+          >
+            <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
+              Vinculação
+            </Typography>
+            <FormField
+              label="Usuário Responsável (opcional)"
+              name="responsibleUserId"
+              value={formData.responsibleUserId}
+              onChange={handleChange}
+              select
+              options={users.map((user) => ({
+                value: user.id,
+                label: `${user.name} (${user.type.toUpperCase()})`,
+              }))}
+              placeholder="Selecione um usuário"
+            />
+          </Box>
         </Box>
+
+        {/* Alerta de Erro */}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
 
         <DialogActions
           sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}

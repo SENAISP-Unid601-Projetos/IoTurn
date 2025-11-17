@@ -2,6 +2,7 @@ import { subscribe } from "diagnostics_channel";
 import { NewDataPoint } from "../../mqttSubscriber";
 import redis from "../config/redisCacher";
 import { machineRepository } from "../infrastructure/repository/machineRepository";
+import { ClusterPredictionResponse } from "./unifiedMachineStateService";
 
 export const redisService = {
     saveCache: async (
@@ -56,6 +57,19 @@ export const redisService = {
                 throw new Error("Erro ao publicar mensagem no canal Redis: " + err.message);
             } else {
                 console.log(`Mensagem publicada com sucesso no canal Redis: machineOwnerChannel-${clientId}`);
+            }
+        });
+    },
+    publishMessageToCluster: async(machineId: number, data: ClusterPredictionResponse): Promise<void> =>{
+        const {clientId} = await machineRepository.findById(machineId);
+        if(!clientId){
+            throw new Error("Usuário da máquina não encontrada");
+        }
+        redis.publish(`machineOwnerChannel-${clientId}-cluster`, JSON.stringify(data), (err)=>{
+            if(err){
+                throw new Error("Erro ao publicar mensagem no canal Redis: " + err.message);
+            } else {
+                console.log(`Mensagem publicada com sucesso no canal Redis: machineOwnerChannel-${clientId}-inference`);
             }
         });
     },

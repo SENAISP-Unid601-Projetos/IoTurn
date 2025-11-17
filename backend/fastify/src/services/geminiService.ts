@@ -253,46 +253,47 @@ export const geminiService = {
     clusterPrediction: number,
     clusterStrength: number
   ): Promise<string> => {
-    const { model } = await initGemini();
-    const context = `
-      Você é Lia, uma IA especialista em análise industrial e manutenção preditiva.
-      Sua função é gerar insights com base em leituras de sensores e predições de cluster,mas não repita os valores na sua resposta.
+    // const { model } = await initGemini();
+    // const context = `
+    //   Você é Lia, uma IA especialista em análise industrial e manutenção preditiva.
+    //   Sua função é gerar insights com base em leituras de sensores e predições de cluster,mas não repita os valores na sua resposta.
 
-      Definições dos Clusters:
-      -1: Ruído ou condição desconhecida
-      0: Máquina em repouso
-      1: Aquecimento inicial (RPM baixo, temperatura subindo)
-      2: Operação estável
-      3: Alta carga (corrente e RPM elevados)
-      4: Sobreaquecimento ou condição crítica
+    //   Definições dos Clusters:
+    //   -1: Ruído ou condição desconhecida
+    //   0: Máquina em repouso
+    //   1: Aquecimento inicial (RPM baixo, temperatura subindo)
+    //   2: Operação estável
+    //   3: Alta carga (corrente e RPM elevados)
+    //   4: Sobreaquecimento ou condição crítica
 
-      Campos disponíveis no log:
-      - timestamp
-      - current (corrente em A)
-      - rpm
-      - oilTemperature (°C)
-      - oilLevel (%)
+    //   Campos disponíveis no log:
+    //   - timestamp
+    //   - current (corrente em A)
+    //   - rpm
+    //   - oilTemperature (°C)
+    //   - oilLevel (%)
 
-      **REGRA CRÍTICA:** explique o que está acontecendo referindo-se aos **nomes das métricas** (ex: "Temperatura do Óleo", "Nível da Corrente"), mas **NÃO inclua os valores numéricos** (ex: "95°C", "11A"). Os valores exatos já serão exibidos na interface do usuário.
-    `;
+    //   **REGRA CRÍTICA:** explique o que está acontecendo referindo-se aos **nomes das métricas** (ex: "Temperatura do Óleo", "Nível da Corrente"), mas **NÃO inclua os valores numéricos** (ex: "95°C", "11A"). Os valores exatos já serão exibidos na interface do usuário.
+    // `;
 
-    const prompt = `
-      ${context}
+    // const prompt = `
+    //   ${context}
 
-      Dados recebidos:
-      \`\`\`json
-      ${JSON.stringify(logData, null, 2)}
-      \`\`\`
+    //   Dados recebidos:
+    //   \`\`\`json
+    //   ${JSON.stringify(logData, null, 2)}
+    //   \`\`\`
 
-      Predição do cluster: ${clusterPrediction}
-      Força: ${clusterStrength}%
+    //   Predição do cluster: ${clusterPrediction}
+    //   Força: ${clusterStrength}%
 
-      Gere um insight claro para o operador da máquina, explicando o que está acontecendo e qual ação tomar.
-      Use linguagem técnica simples e baseada em diagnósticos reais de operação industrial.
-    `;
+    //   Gere um insight claro para o operador da máquina, explicando o que está acontecendo e qual ação tomar.
+    //   Use linguagem técnica simples e baseada em diagnósticos reais de operação industrial.
+    // `;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    return response.text();
+    // const result = await model.generateContent(prompt);
+    // const response = await result.response;
+    //return response.text();
+    return "Insight gerado pelo Gemini.";
   },
 };

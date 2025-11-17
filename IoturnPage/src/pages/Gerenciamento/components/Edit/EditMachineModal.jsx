@@ -42,7 +42,9 @@ const EditMachineModal = ({ open, onClose, machineData, onMachineUpdated }) => {
     setLoading(true);
     setError(null);
 
-    {/* Trata os campos como opcionais */}
+    {
+      /* Trata os campos como opcionais */
+    }
     const payload = { ...formData };
     const optionalFields = ["responsibleUserId", "gatewayId", "deviceId"];
 
@@ -54,8 +56,9 @@ const EditMachineModal = ({ open, onClose, machineData, onMachineUpdated }) => {
 
     try {
       const endpoint = `/machines/update/${machineData.id}`;
-      console.log(formData);
-      const updatedData = await ApiService.putRequest(endpoint, formData);
+      console.log("Enviando Payload:", payload);
+      //console.log(formData);
+      const updatedData = await ApiService.putRequest(endpoint, payload);
 
       setLoading(false);
       onMachineUpdated(updatedData);
@@ -114,7 +117,7 @@ const EditMachineModal = ({ open, onClose, machineData, onMachineUpdated }) => {
             />
           </Box>
         </Box>
-      
+
         <DialogActions
           sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}
         >

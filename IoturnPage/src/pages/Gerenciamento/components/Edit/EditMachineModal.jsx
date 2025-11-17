@@ -14,18 +14,15 @@ import MachineFormSection from "../../../Cadastro/components/MachineFormSection"
 import ApiService from "../../../../services/ApiServices";
 import FormField from "../../../Cadastro/components/FormField";
 import { fetchAllUserData } from "../../../../services/usersService";
-
-// 👇 PASSO 1: Importar os serviços do Gateway e Device
 import { fetchAllGatewayData } from "../../../../services/GatewayService";
 import { fetchAllDeviceData } from "../../../../services/DeviceServices";
+import { FolderCog } from "lucide-react";
 
 const EditMachineModal = ({ open, onClose, machineData, onMachineUpdated }) => {
   const [formData, setFormData] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [users, setUsers] = useState([]);
-
-  // 👇 PASSO 2: Adicionar states para gateways e devices
   const [gateways, setGateways] = useState([]);
   const [devices, setDevices] = useState([]);
 
@@ -43,10 +40,8 @@ const EditMachineModal = ({ open, onClose, machineData, onMachineUpdated }) => {
       });
       setError(null);
 
-      // 👇 PASSO 3: Buscar todos os dados (usuários, gateways, devices)
       const fetchDropdownData = async () => {
         try {
-          // Busca tudo em paralelo para ser mais rápido
           const [usersData, gatewaysData, devicesData] = await Promise.all([
             fetchAllUserData(),
             fetchAllGatewayData(),
@@ -71,7 +66,6 @@ const EditMachineModal = ({ open, onClose, machineData, onMachineUpdated }) => {
   };
 
   const handleSave = async () => {
-    // ... (Sua lógica de 'handleSave' com 'payload' e 'delete' está perfeita)
     setLoading(true);
     setError(null);
     const payload = { ...formData };
@@ -94,9 +88,6 @@ const EditMachineModal = ({ open, onClose, machineData, onMachineUpdated }) => {
       console.error(err);
     }
   };
-  
-  // (Lógica para o 'Box de Info' do Step 3)
-  const selectedDeviceId = formData.deviceId;
 
   return (
     <Dialog
@@ -117,48 +108,118 @@ const EditMachineModal = ({ open, onClose, machineData, onMachineUpdated }) => {
         },
       }}
     >
-      <DialogContent>
-        <Typography variant="h6" fontWeight="bold">
+      <DialogContent sx={{ p: 3 }}>
+        <Box sx={{ mb: 3 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              p: 2,
+              borderBottom: `1px solid ${theme.palette.divider}`,
+            }}
+          >
+            <FolderCog size={32} color={theme.palette.primary.main} />
+            <Box>
+              <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+                Editar Máquina
+              </Typography>
+              <Typography variant="h7">
+                Atualize as informações da máquina: {machineData?.name}
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+
+        <Typography variant="h7" fontWeight="bold">
           Editar Máquina: {machineData?.name}
         </Typography>
 
-        <Box sx={{ mt: 3, mb: 3, overflowY: "auto", maxHeight: "70vh", pr: 1 }}>
-          
-          {/* Seção 1: Informações da Máquina */}
+        <Box sx={{ mt: 3, mb: 3, pr: 1 }}>
           <Box
             sx={{
               position: "relative",
               pl: 2,
               mb: 3,
               pb: 3,
-              border: `1px solid ${theme.palette.divider}`,
+              borderBottom: `1px solid ${theme.palette.divider}`,
               borderRadius: 2,
             }}
           >
-            <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
-              Informações da Máquina
-            </Typography>
-            <MachineFormSection
-              formData={formData}
-              onChange={handleChange}
-              formErrors={{}}
-            />
+            <Box
+              sx={{
+                position: "relative",
+                pl: 2,
+                "&: :before": {
+                  content: '""',
+                  position: "absolute",
+                  left: 0,
+                  top: 9,
+                  bottom: 9,
+                  width: "4px",
+                  bgcolor: theme.palette.primary.main,
+                  borderRadius: "4px",
+                },
+              }}
+            >
+              <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
+                Identificação da Máquina
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Informações básicas para identificação do equipamento industrial
+              </Typography>
+            </Box>
+
+            <Box
+              sx={{
+                "& .MuiTypography-h6": {
+                  display: "none",
+                },
+              }}
+            >
+              <MachineFormSection
+                formData={formData}
+                onChange={handleChange}
+                formErrors={{}}
+              />
+            </Box>
           </Box>
 
-          {/* Seção 2: Vinculação (Usuário) */}
           <Box
             sx={{
               position: "relative",
               pl: 2,
               mb: 3,
               pb: 3,
-              border: `1px solid ${theme.palette.divider}`,
-              borderRadius: 2,
+              gap: (theme) => theme.spacing(2),
+              display: "flex",
+              flexDirection: "column",
             }}
           >
-            <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
-              Vinculação
-            </Typography>
+            <Box
+              sx={{
+                position: "relative",
+                pl: 2,
+                "&: :before": {
+                  content: '""',
+                  position: "absolute",
+                  left: 0,
+                  top: 9,
+                  bottom: 9,
+                  width: "4px",
+                  bgcolor: theme.palette.primary.main,
+                  borderRadius: "4px",
+                },
+              }}
+            >
+              <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
+                Vinculação e Responsabilidade
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Associe a máquina ao gateway, dispositivo IoT e usuário
+                responsável
+              </Typography>
+            </Box>
             <FormField
               label="Usuário Responsável (opcional)"
               name="responsibleUserId"
@@ -171,24 +232,6 @@ const EditMachineModal = ({ open, onClose, machineData, onMachineUpdated }) => {
               }))}
               placeholder="Selecione um usuário"
             />
-          </Box>
-
-          {/* 👇 PASSO 4: Adicionar o JSX da Seção 3 (IoT) */}
-          <Box
-            sx={{
-              position: "relative",
-              pl: 2,
-              mb: 3,
-              pb: 3,
-              border: `1px solid ${theme.palette.divider}`,
-              borderRadius: 2,
-            }}
-          >
-            <Typography variant="h6" fontWeight="bold" sx={{ mb: 1 }}>
-              Dispositivo IoT
-            </Typography>
-            
-            {/* Campo Gateway (do Step 3) */}
             <FormField
               label="Gateway Responsável (opcional)"
               name="gatewayId"
@@ -196,13 +239,12 @@ const EditMachineModal = ({ open, onClose, machineData, onMachineUpdated }) => {
               onChange={handleChange}
               select
               options={gateways.map((gateway) => ({
-                value: gateway.id, // (Baseado no seu Step 3)
+                value: gateway.id,
                 label: `${gateway.gatewayId} • ${gateway.status}`,
               }))}
               placeholder="Selecione um gateway"
             />
 
-            {/* Campo Device (do Step 3) */}
             <FormField
               label="Dispositivo IoT (opcional)"
               name="deviceId"
@@ -210,52 +252,63 @@ const EditMachineModal = ({ open, onClose, machineData, onMachineUpdated }) => {
               onChange={handleChange}
               select
               options={devices.map((device) => ({
-                value: device.id, // (Baseado no seu Step 3)
+                value: device.id,
                 label: `${device.nodeId} • ${device.status}`,
               }))}
               placeholder="Selecione um dispositivo"
             />
-
-            {/* Box de info (do Step 3) */}
-            {selectedDeviceId && (
-              <Box
-                sx={{
-                  bgcolor: theme.palette.background.default,
-                  p: 2,
-                  borderRadius: 2,
-                  mt: 2,
-                  border: `1px solid ${theme.palette.divider}`,
-                }}
-              >
-                <Typography variant="subtitle1" fontWeight="bold">
-                  Dispositivo Selecionado
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  ID: {selectedDeviceId}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Status: Pronto para vinculação
-                </Typography>
-              </Box>
-            )}
           </Box>
         </Box>
 
-        {/* Alerta de Erro */}
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-
         <DialogActions
-          sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            width: "100%",
+            p: 2,
+            pt: 0,
+          }}
         >
-          <Button onClick={onClose} disabled={loading} color="secondary">
+          <Button
+            variant="outlined"
+            onClick={onClose}
+            disabled={loading}
+            sx={{
+              borderRadius: "12px",
+              textTransform: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              backgroundColor: theme.palette.background.default,
+              color: theme.palette.text.primary,
+              borderColor: theme.palette.divider,
+              "&:hover": {
+                backgroundColor: theme.palette.background.paper,
+                borderColor: theme.palette.primary.main,
+              },
+            }}
+          >
             Cancelar
           </Button>
-          <Button variant="contained" onClick={handleSave} disabled={loading}>
-            {loading ? <CircularProgress size={24} /> : "Salvar Alterações"}
+
+          <Button
+            variant="contained"
+            onClick={handleSave}
+            disabled={loading}
+            sx={{
+              borderRadius: "12px",
+              textTransform: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              minWidth: "160px", 
+            }}
+          >
+            {loading ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Salvar Alterações"
+            )}
           </Button>
         </DialogActions>
       </DialogContent>

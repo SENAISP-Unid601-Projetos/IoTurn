@@ -15,8 +15,14 @@ const filterCallback = (machine, term) =>
   machine.manufacturer?.toLowerCase().includes(term);
 
 const GerenciamentoMaquinas = () => {
-  const { filteredData, loading, error, searchTerm, setSearchTerm } =
-    useDataManagement(fetchAllMachineData, filterCallback);
+  const { 
+    filteredData,
+    loading,
+    error,
+    searchTerm,
+    setSearchTerm,
+    refetchData 
+  } = useDataManagement(fetchAllMachineData, filterCallback);
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingMachine, setEditingMachine] = useState(null);
@@ -42,6 +48,10 @@ const GerenciamentoMaquinas = () => {
   const handleMachineUpdated = (updatedMachine) => {
     console.log("Máquina atualizada:", updatedMachine);
     setEditModalOpen(false);
+
+    if(refetchData){
+      refetchData();
+    }
   };
 
   const renderAddButton = () => (

@@ -26,14 +26,13 @@ import MetricCard from "./components/MetricCard";
 import DynamicChart from "./components/DynamicChart";
 
 const MAX_DATA_POINTS = 30;
-
-// Gera os gráficos valores minimos e max.
 const generateMockDataPoint = (lastValue, min, max) => {
   let newValue = lastValue + (Math.random() - 0.5) * (max / 10);
   if (newValue < min) newValue = min;
   if (newValue > max) newValue = max;
+
   return {
-    x: new Date().getTime(),
+    x: new Date().getTime(), // 10 min antes
     y: parseFloat(newValue.toFixed(2)),
   };
 };
@@ -41,13 +40,19 @@ const generateMockDataPoint = (lastValue, min, max) => {
 const getInitialChartData = (val, min, max) => {
   let data = [];
   let lastVal = val;
+
   for (let i = 0; i < MAX_DATA_POINTS; i++) {
     const { y } = generateMockDataPoint(lastVal, min, max);
-    data.push({ x: new Date().getTime() - (MAX_DATA_POINTS - i) * 1000, y });
+
+    data.push({
+      // também ajustado para 10 min antes
+      x: new Date().getTime() - (MAX_DATA_POINTS - i) * 1000,
+      y,
+    });
+
     lastVal = y;
   }
-  // exemplo
-  // data = {machineId: 1, rpm: 1175.25, timeStampRpm: '2025-11-13T19:45:46.362Z'}
+
   return data;
 };
 
@@ -66,10 +71,24 @@ const MachineDashboard = () => {
   const [period, setPeriod] = useState("last_hour");
   const [selectedMachine, setSelectedMachine] = useState(machineId);
 
+  // RPM
   const [rpmData, setRpmData] = useState([]);
+  const [rpmDataMax, setRpmDataMax] = useState(3000);
+  const [rpmDataMin, setRpmDataMin] = useState(0);
+  // TEMP
   const [tempData, setTempData] = useState([]);
+  const [tempDataMax, setTempDataMax] = useState([100]);
+  const [tempDataMin, setTempDataMin] = useState([0]);
+
+  // OLEO
   const [oleoData, setOleoData] = useState([]);
+  const [oleoDataMax, setOleoDataMax] = useState([100]);
+  const [oleoDataMin, setOleoDataMin] = useState([0]);
+
+  // CORRENTE
   const [correnteData, setCorrenteData] = useState([]);
+  const [correnteDataMax, setCorrenteDataMax] = useState([100]);
+  const [correnteDataMin, setCorrenteDataMin] = useState([0]);
 
   // Um loop infinito após a inicialização enviando constantemente valores para os useStates initialCharData,
   useEffect(() => {
@@ -83,14 +102,11 @@ const MachineDashboard = () => {
 
         // Gráficos
         setRpmData(
-          getInitialChartData(
-            data.metrics.rpm.value,
-            data.metrics.rpm.min,
-            data.metrics.rpm.max
-          )
+          getInitialChartData(data.metrics.rpm.value, rpmDataMin, rpmDataMax)
         );
 
         setTempData(
+          // Os valores data.metrics.temp.min e data.metrics.temp.max não existem e devem ser substituidos por outra lógica
           getInitialChartData(
             data.metrics.temp.value,
             data.metrics.temp.min,
@@ -147,7 +163,24 @@ const MachineDashboard = () => {
             x: new Date(newData.timeStampRpm).getTime(),
             y: newData.rpm,
           };
-          setRpmData((prev) => [...prev.slice(1), dataPoint]);
+
+          setRpmData((prev) => {
+            console.log(prev);
+            console.log(dataPoint);
+
+            const last = prev[prev.length - 1];
+
+            // Se já existir e for igual ao último ou tempo menor, não insere
+            if (
+              (last && last.x === dataPoint.x && last.y === dataPoint.y) ||
+              last.x >= dataPoint.x
+            ) {
+              return prev;
+            }
+
+            // Senão, insere removendo o primeiro (slice(1))
+            return [...prev.slice(1), dataPoint];
+          });
         }
 
         if (newData.temperatura !== undefined && newData.timeStampTemperatura) {
@@ -360,8 +393,8 @@ const MachineDashboard = () => {
           <DynamicChart
             title="RPM"
             seriesData={rpmData} //WIP
-            yMin={machine.metrics.rpm.min}
-            yMax={machine.metrics.rpm.max}
+            yMin={0}
+            yMax={3000}
             unit=""
           />
         </Box>

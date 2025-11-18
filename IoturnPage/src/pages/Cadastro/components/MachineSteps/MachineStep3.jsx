@@ -51,7 +51,7 @@ const MachineStep3 = ({
         onChange={onChange}
         select
         options={gateways.map((gateway) => ({
-          value: gateway.gatewayId,
+          value: gateway.id,
           label: `${gateway.gatewayId} • ${gateway.status}`,
         }))}
         error={formErrors.gatewayId}
@@ -75,7 +75,7 @@ const MachineStep3 = ({
         onChange={onChange}
         select
         options={devices.map((device) => ({
-          value: device.nodeId,
+          value: device.id,
           label: `${device.nodeId} • ${device.status}`,
         }))}
         error={formErrors.deviceId}

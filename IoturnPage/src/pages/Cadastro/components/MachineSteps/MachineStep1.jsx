@@ -1,10 +1,10 @@
 import React from "react";
 import { Box } from "@mui/material";
-import Buttons from "../BottonsActions"; 
+import Buttons from "../BottonsActions";
 import MachineFormSection from "../MachineFormSection";
 
 const MachineStep1 = ({ formData, onChange, formErrors, onBack, onNext }) => (
-  <>
+  <Box>
     <MachineFormSection
       formData={formData}
       onChange={onChange}
@@ -20,7 +20,7 @@ const MachineStep1 = ({ formData, onChange, formErrors, onBack, onNext }) => (
         showNextIcon={true}
       />
     </Box>
-  </>
+  </Box>
 );
 
 export default MachineStep1;

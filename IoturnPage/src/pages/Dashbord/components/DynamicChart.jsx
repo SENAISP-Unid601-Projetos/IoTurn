@@ -51,17 +51,16 @@ const DynamicChart = ({
 
     const options = {
       chart: {
+        toolbar: {
+          show: false,
+          offsetX: 0,
+          offsetY: 0,
+        },
         animations: {
-          enabled: true,
-          easing: "linear", // Movimento linear constante
-          speed: 8000, // Velocidade da animação
-          animateGradually: {
-            enabled: false, // IMPORTANTE: Desabilita para animação imediata
-            delay: 15000,
-          },
+          enabled: false,
+          easing: "linear",
           dynamicAnimation: {
-            enabled: true, // Habilita animação para dados dinâmicos
-            speed: 1000, // Velocidade da animação dinâmica
+            speed: 10000,
           },
         },
       },
@@ -74,7 +73,7 @@ const DynamicChart = ({
       colors: [chartColor],
       stroke: {
         curve: "smooth",
-        width: 2,
+        width: 3, // Aumentei para melhor visualização durante animação
       },
       dataLabels: {
         enabled: false,
@@ -88,20 +87,23 @@ const DynamicChart = ({
         },
       },
       markers: {
-        size: 3,
+        size: 4,
         strokeColors: chartColor,
-        strokeWidth: 1,
-        fillOpacity: 0.8,
+        strokeWidth: 2,
+        fillOpacity: 1,
         hover: {
-          size: 10,
-          strokeWidth: 2,
+          size: 8,
+          strokeWidth: 3,
         },
       },
       xaxis: {
         type: "datetime",
         range: XAXIS_RANGE,
         labels: {
-          style: { colors: theme.palette.text.secondary },
+          style: {
+            colors: theme.palette.text.secondary,
+            fontSize: "11px",
+          },
           datetimeUTC: false,
           format: "HH:mm:ss",
           datetimeFormatter: {
@@ -117,11 +119,14 @@ const DynamicChart = ({
         },
       },
       yaxis: {
-        min: Math.max(0, yMin - 5), // Margem mínima
-        max: yMax > 0 ? yMax * 1.1 : 100, // Margem máxima de 10%
+        min: Math.max(0, yMin - 5),
+        max: yMax > 0 ? yMax * 1.1 : 100,
         tickAmount: 5,
         labels: {
-          style: { colors: theme.palette.text.secondary },
+          style: {
+            colors: theme.palette.text.secondary,
+            fontSize: "11px",
+          },
           formatter: (val) => {
             if (val === null || val === undefined) return "0" + unit;
             return `${val % 1 === 0 ? val : val.toFixed(1)}${unit}`;

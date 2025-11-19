@@ -343,42 +343,54 @@ const MachineDashboard = () => {
 
       {/* Métricas */}
       <Box sx={{ display: "flex", flexWrap: "wrap", mx: -1.5 }}>
+        {/* RPM */}
         <MetricWrapper>
           <MetricCard
             title="RPM"
             icon={GaugeCircle}
-            value={machineData.rpm ?? machine.metrics.rpm.value}
-            {...machine.metrics.rpm}
+            value={machineData.rpm ?? machine.metrics?.rpm?.value}
+            unit={machine.metrics?.rpm?.unit}
+            min={machine.metrics?.rpm?.min}
+            max={machine.metrics?.rpm?.max}
             status="good"
           />
         </MetricWrapper>
 
+        {/* Temperatura */}
         <MetricWrapper>
           <MetricCard
             title="Temperatura"
             icon={Thermometer}
-            value={machineData.temperatura ?? machine.metrics.temp.value}
-            {...machine.metrics.temp}
+            value={machineData.temperatura ?? machine.metrics?.temp?.value}
+            unit={machine.metrics?.temp?.unit}
+            min={machine.metrics?.temp?.min}
+            max={machine.metrics?.temp?.max}
             status="warning"
           />
         </MetricWrapper>
 
+        {/* Nível de Óleo */}
         <MetricWrapper>
           <MetricCard
             title="Nível de Óleo"
             icon={Droplets}
-            value={machineData.nivel ?? machine.metrics.oleo.value}
-            {...machine.metrics.oleo}
+            value={machineData.nivel ?? machine.metrics?.oleo?.value}
+            unit={machine.metrics?.oleo?.unit}
+            min={machine.metrics?.oleo?.min}
+            max={machine.metrics?.oleo?.max}
             status="good"
           />
         </MetricWrapper>
 
+        {/* Corrente */}
         <MetricWrapper>
           <MetricCard
             title="Corrente"
             icon={Zap}
-            value={machineData.corrente ?? machine.metrics.corrente.value}
-            {...machine.metrics.corrente}
+            value={machineData.corrente ?? machine.metrics?.corrente?.value}
+            unit={machine.metrics?.corrente?.unit}
+            min={machine.metrics?.corrente?.min}
+            max={machine.metrics?.corrente?.max}
             status="danger"
           />
         </MetricWrapper>

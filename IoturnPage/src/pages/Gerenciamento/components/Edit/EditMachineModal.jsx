@@ -7,7 +7,6 @@ import {
   DialogContent,
   Button,
   CircularProgress,
-  Alert,
 } from "@mui/material";
 import theme from "../../../../theme";
 import MachineFormSection from "../../../Cadastro/components/MachineFormSection";

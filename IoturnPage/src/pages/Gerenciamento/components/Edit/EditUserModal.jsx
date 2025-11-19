@@ -7,7 +7,6 @@ import {
   DialogContent,
   Button,
   CircularProgress,
-  Alert,
 } from "@mui/material";
 import theme from "../../../../theme"; 
 import ApiService from "../../../../services/ApiServices"; 
@@ -54,7 +53,6 @@ const EditUserModal = ({ open, onClose, userData, onUserUpdated }) => {
     setLoading(true);
     setError(null);
 
-    // Payload conforme o schema Zod
     const payload = {
       name: formData.name,
       email: formData.email,
@@ -63,7 +61,6 @@ const EditUserModal = ({ open, onClose, userData, onUserUpdated }) => {
     };
 
     try {
-      // Ajuste a rota conforme sua API
       const endpoint = `/users/update/${userData.id}`;
       
       console.log("Enviando Payload:", payload);
@@ -100,7 +97,6 @@ const EditUserModal = ({ open, onClose, userData, onUserUpdated }) => {
     >
       <DialogContent sx={{ p: 3 }}>
         
-        {/* --- CABEÇALHO --- */}
         <Box sx={{ mb: 3 }}>
           <Box
             sx={{
@@ -123,10 +119,8 @@ const EditUserModal = ({ open, onClose, userData, onUserUpdated }) => {
           </Box>
         </Box>
 
-        {/* --- CONTEÚDO DO FORMULÁRIO --- */}
         <Box sx={{ mt: 3, mb: 3, pr: 1 }}>
           
-          {/* Bloco 1: Dados Pessoais */}
           <Box
             sx={{
               position: "relative",
@@ -180,7 +174,6 @@ const EditUserModal = ({ open, onClose, userData, onUserUpdated }) => {
             </Box>
           </Box>
 
-          {/* Bloco 2: Permissões e Status */}
           <Box
             sx={{
               position: "relative",
@@ -238,14 +231,6 @@ const EditUserModal = ({ open, onClose, userData, onUserUpdated }) => {
           </Box>
         </Box>
 
-        {/* ALERTA DE ERRO */}
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-
-        {/* BOTÕES */}
         <DialogActions
           sx={{
             display: "flex",

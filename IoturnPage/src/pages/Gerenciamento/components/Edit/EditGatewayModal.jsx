@@ -7,7 +7,6 @@ import {
   DialogContent,
   Button,
   CircularProgress,
-  Alert,
 } from "@mui/material";
 import theme from "../../../../theme"; 
 import ApiService from "../../../../services/ApiServices"; 
@@ -181,12 +180,6 @@ const EditGatewayModal = ({ open, onClose, gatewayData, onGatewayUpdated }) => {
             </Box>
           </Box>
         </Box>
-
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
 
         <DialogActions
           sx={{

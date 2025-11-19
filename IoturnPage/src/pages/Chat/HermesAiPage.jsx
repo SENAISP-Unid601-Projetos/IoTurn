@@ -73,9 +73,8 @@ export default function HermesAIPage() {
         setIsLoading(true);
 
         try {
-            const data = await ApiService.postRequest("/ask", {
+            const data = await ApiService.postRequest("/hermes/ask", {
                 message: content,
-                history: messages.slice(-5),
             });
 
             setLoadingProgress(100);
@@ -251,9 +250,8 @@ export default function HermesAIPage() {
 
                                 {/* Feedback */}
                                 {message.role === "assistant" && (
-                                    <Box
+                                    <Box style={{ display: message.content !== 'Desculpe, ocorreu um erro ao processar sua pergunta. Por favor, tente novamente.' ? 'flex' : 'none'}}
                                         sx={{
-                                            display: "flex",
                                             alignItems: "center",
                                             gap: 0.5,
                                             mt: 1.5,
@@ -262,7 +260,7 @@ export default function HermesAIPage() {
                                         }}
                                     >
                                         <Typography variant="caption" color="text.secondary" mr={1}>
-                                            Útil?
+                                            A mensagem foi útil?
                                         </Typography>
                                         <IconButton
                                             size="small"

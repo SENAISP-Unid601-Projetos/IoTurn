@@ -62,12 +62,12 @@ const CadastroMaquina = () => {
       device.machineName?.toLowerCase().includes(term)
   );
 
-  // UseEffects para popular os seletores 
+  // UseEffects para popular os seletores
   useEffect(() => {
     if (!clientData) {
       setClientData(clientId)
     }
-  });
+  }, [clientData, clientId]);
 
   useEffect(() => {
     if (filteredUsers.length > 0) {

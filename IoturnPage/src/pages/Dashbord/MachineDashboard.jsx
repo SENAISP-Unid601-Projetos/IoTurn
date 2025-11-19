@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Box,
@@ -21,34 +21,6 @@ import DynamicChart from "./components/DynamicChart";
 // Configurações
 // ------------------------------------------------------
 const MAX_DATA_POINTS = 30;
-
-const generateMockPoint = (last, min, max) => {
-  let next = last + (Math.random() - 0.5) * (max / 10);
-  next = Math.min(Math.max(next, min), max);
-
-  return {
-    x: Date.now(),
-    y: parseFloat(next.toFixed(2)),
-  };
-};
-
-const buildInitialChart = (initialValue, min, max) => {
-  const data = [];
-  let last = initialValue;
-
-  for (let i = 0; i < MAX_DATA_POINTS; i++) {
-    const { y } = generateMockPoint(last, min, max);
-
-    data.push({
-      x: Date.now() - (MAX_DATA_POINTS - i) * 1000,
-      y,
-    });
-
-    last = y;
-  }
-
-  return data;
-};
 
 // ------------------------------------------------------
 // Dashboard
@@ -81,11 +53,42 @@ const MachineDashboard = () => {
   const [correnteData, setCorrenteData] = useState([]);
 
   const [rpmMax, setRpmMax] = useState(3000);
-  const [tempMax, setTempMax] = useState(3000);
-  const [oleoMax, setOleoMax] = useState(3000);
-  const [correnteMax, setCorrenteMax] = useState(3000);
+  const [tempMax, setTempMax] = useState(100);
+  const [oleoMax, setOleoMax] = useState(100);
+  const [correnteMax, setCorrenteMax] = useState(50);
 
-  const calcMax = (arr) => (arr.length ? Math.max(...arr.map((p) => p.y)) : 0);
+  // Referência para o offset de tempo
+  const timeOffsetRef = useRef(0);
+
+  // ------------------------------------------------------
+  // Detecção e correção do offset de tempo
+  // ------------------------------------------------------
+  const calculateTimeOffset = (serverTimestamp) => {
+    const serverTime = new Date(serverTimestamp).getTime();
+    const localTime = Date.now();
+    return localTime - serverTime;
+  };
+
+  const getAdjustedTimestamp = (serverTimestamp) => {
+    if (!serverTimestamp) return Date.now();
+
+    const serverTime = new Date(serverTimestamp).getTime();
+    // Se for um timestamp inválido, usa o tempo local
+    if (isNaN(serverTime)) return Date.now();
+
+    // Aplica o offset calculado
+    return serverTime + timeOffsetRef.current;
+  };
+
+  // ------------------------------------------------------
+  // Atualização em tempo real do tamanho dos gráficos
+  // ------------------------------------------------------
+  const calcMax = (arr) => {
+    if (arr.length === 0) return 0;
+    const max = Math.max(...arr.map((p) => p.y));
+    // Adiciona uma margem de 10% para melhor visualização
+    return max * 1.1;
+  };
 
   useEffect(() => setRpmMax(calcMax(rpmData)), [rpmData]);
   useEffect(() => setTempMax(calcMax(tempData)), [tempData]);
@@ -101,19 +104,15 @@ const MachineDashboard = () => {
     const load = async () => {
       try {
         setLoading(true);
-
         const data = await fetchMachineById(machineId);
         setMachine(data);
         setSelectedMachine(data.id);
 
-        const { metrics } = data;
-
-        setRpmData(buildInitialChart(metrics.rpm.value, 0, rpmMax));
-        setTempData(buildInitialChart(metrics.temp.value, 0, tempMax));
-        setOleoData(buildInitialChart(metrics.oleo.value, 0, oleoMax));
-        setCorrenteData(
-          buildInitialChart(metrics.corrente.value, 0, correnteMax)
-        );
+        // Inicializa os gráficos vazios
+        setRpmData([]);
+        setTempData([]);
+        setOleoData([]);
+        setCorrenteData([]);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -125,7 +124,7 @@ const MachineDashboard = () => {
   }, [machineId]);
 
   // ------------------------------------------------------
-  // SSE
+  // SSE - Recebimento de dados em tempo real
   // ------------------------------------------------------
   useEffect(() => {
     if (!machineId) return;
@@ -138,14 +137,43 @@ const MachineDashboard = () => {
     source.onmessage = (event) => {
       try {
         const incoming = JSON.parse(event.data);
-
         setMachineData((prev) => ({ ...prev, ...incoming }));
 
+        // Calcula o offset na primeira mensagem válida
+        if (timeOffsetRef.current === 0) {
+          const timestamp =
+            incoming.timeStampRpm ||
+            incoming.timeStampTemperatura ||
+            incoming.timeStampNivel ||
+            incoming.timeStampCorrente;
+
+          if (timestamp) {
+            timeOffsetRef.current = calculateTimeOffset(timestamp);
+          }
+        }
+
         const addPoint = (timestamp, value, setter) => {
-          const point = { x: new Date(timestamp).getTime(), y: value };
-          setter((prev) => [...prev.slice(1), point]);
+          if (timestamp == null || value == null) return;
+
+          const adjustedTimestamp = getAdjustedTimestamp(timestamp);
+
+          const point = {
+            x: adjustedTimestamp,
+            y: parseFloat(value),
+          };
+
+          setter((prev) => {
+            // Verifica se já existe um ponto idêntico (ou mesmo timestamp)
+            const exists = prev.some((p) => p.x === point.x && p.y === point.y);
+            if (exists) {
+              return prev; // Não adiciona duplicado
+            }
+            const newData = [...prev, point];
+            return newData.slice(-MAX_DATA_POINTS);
+          });
         };
 
+        // Adiciona pontos aos gráficos com timestamps corrigidos
         if (incoming.rpm && incoming.timeStampRpm)
           addPoint(incoming.timeStampRpm, incoming.rpm, setRpmData);
 
@@ -172,9 +200,30 @@ const MachineDashboard = () => {
       }
     };
 
-    source.onerror = () => source.close();
+    source.onerror = (err) => {
+      console.error("Erro na conexão SSE:", err);
+      source.close();
+    };
+
     return () => source.close();
   }, [machineId]);
+
+  // ------------------------------------------------------
+  // Função para forçar recálculo do offset
+  // ------------------------------------------------------
+  const recalculateTimeOffset = () => {
+    // Busca o último timestamp disponível de qualquer métrica
+    const lastTimestamp =
+      machineData.timeStampRpm ||
+      machineData.timeStampTemperatura ||
+      machineData.timeStampNivel ||
+      machineData.timeStampCorrente;
+
+    if (lastTimestamp) {
+      timeOffsetRef.current = calculateTimeOffset(lastTimestamp);
+      setLastUpdated(new Date().toLocaleTimeString());
+    }
+  };
 
   // ------------------------------------------------------
   // UI: estados iniciais
@@ -218,16 +267,31 @@ const MachineDashboard = () => {
           </Typography>
           <Typography variant="caption" color="text.secondary">
             Atualizado às: {lastUpdated}
+            {timeOffsetRef.current !== 0 && (
+              <span style={{ marginLeft: 8 }}>
+                (Offset: {Math.round(timeOffsetRef.current / 1000)}s)
+              </span>
+            )}
           </Typography>
         </Box>
 
-        <Button
-          variant="outlined"
-          sx={{ borderRadius: 2 }}
-          onClick={() => navigate("/main/maquinas")}
-        >
-          Início
-        </Button>
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={recalculateTimeOffset}
+            title="Recalcular diferença de tempo"
+          >
+            Sincronizar Tempo
+          </Button>
+          <Button
+            variant="outlined"
+            sx={{ borderRadius: 2 }}
+            onClick={() => navigate("/main/maquinas")}
+          >
+            Início
+          </Button>
+        </Box>
       </Box>
 
       <Divider sx={{ my: 2 }} />
@@ -327,7 +391,7 @@ const MachineDashboard = () => {
             title="RPM"
             seriesData={rpmData}
             yMin={0}
-            yMax={rpmMax}
+            yMax={rpmMax || 3000}
           />
         </ChartWrapper>
 
@@ -336,7 +400,7 @@ const MachineDashboard = () => {
             title="Temperatura"
             seriesData={tempData}
             yMin={0}
-            yMax={tempMax}
+            yMax={tempMax || 100}
             unit="°C"
           />
         </ChartWrapper>
@@ -346,7 +410,7 @@ const MachineDashboard = () => {
             title="Nível de Óleo"
             seriesData={oleoData}
             yMin={0}
-            yMax={oleoMax}
+            yMax={oleoMax || 100}
             unit="%"
           />
         </ChartWrapper>
@@ -356,7 +420,7 @@ const MachineDashboard = () => {
             title="Corrente"
             seriesData={correnteData}
             yMin={0}
-            yMax={correnteMax}
+            yMax={correnteMax || 50}
             unit="A"
           />
         </ChartWrapper>

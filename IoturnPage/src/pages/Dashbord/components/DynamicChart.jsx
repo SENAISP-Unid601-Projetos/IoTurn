@@ -4,7 +4,7 @@ import { Box, Typography, Paper, useTheme, alpha } from "@mui/material";
 
 // Constantes do gráfico
 const MAX_DATA_POINTS = 30;
-const XAXIS_RANGE = 30000;
+const XAXIS_RANGE = 30000; // 30 segundos
 
 const DynamicChart = ({
   seriesData,
@@ -16,44 +16,87 @@ const DynamicChart = ({
   const theme = useTheme();
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
+  const lastProcessedData = useRef([]);
 
-  // Cor primária do tema (Azul)
+  // Cor primária do tema
   const chartColor = theme.palette.primary.main;
+
+  // Função para processar e deduplicar os dados
+  const processSeriesData = (data) => {
+    if (!data || data.length === 0) return [];
+
+    // Remove pontos duplicados baseado no timestamp
+    const uniqueData = [];
+    const timestampMap = new Map();
+
+    data.forEach((point) => {
+      // Agrupa por timestamp (arredondado para evitar micro-diferenças)
+      const roundedTime = Math.floor(point.x / 1000) * 1000; // Arredonda para segundos
+      if (!timestampMap.has(roundedTime)) {
+        timestampMap.set(roundedTime, point);
+      }
+    });
+
+    // Converte de volta para array e ordena por timestamp
+    return Array.from(timestampMap.values())
+      .sort((a, b) => a.x - b.x)
+      .slice(-MAX_DATA_POINTS); // Mantém apenas os últimos pontos
+  };
 
   useEffect(() => {
     if (!chartRef.current) return;
 
+    const processedData = processSeriesData(seriesData);
+    lastProcessedData.current = processedData;
+
     const options = {
       chart: {
-        background: "transparent",
-        type: "area",
-        height: 300,
-        zoom: { enabled: false },
-        toolbar: { show: false },
         animations: {
           enabled: true,
-          easing: "linear",
-          dynamicAnimation: { speed: 1000 },
+          easing: "linear", // Movimento linear constante
+          speed: 8000, // Velocidade da animação
+          animateGradually: {
+            enabled: false, // IMPORTANTE: Desabilita para animação imediata
+            delay: 15000,
+          },
+          dynamicAnimation: {
+            enabled: true, // Habilita animação para dados dinâmicos
+            speed: 1000, // Velocidade da animação dinâmica
+          },
         },
       },
-      dataLabels: { enabled: false },
-      stroke: { curve: "smooth", width: 2 },
-      series: [{ name: title, data: seriesData }],
+      series: [
+        {
+          name: title,
+          data: processedData,
+        },
+      ],
       colors: [chartColor],
+      stroke: {
+        curve: "smooth",
+        width: 2,
+      },
+      dataLabels: {
+        enabled: false,
+      },
       fill: {
-        type: "gradient",
         gradient: {
-          shade: "dark",
           type: "vertical",
           shadeIntensity: 0.5,
-          gradientToColors: [alpha(chartColor, 0.05)],
+          gradientToColors: [alpha(chartColor, 0.1)],
           inverseColors: false,
-          opacityFrom: 0.6,
-          opacityTo: 0.1,
-          stops: [0, 90, 100],
         },
       },
-      markers: { size: 0, strokeWidth: 0, hover: { size: 5 } },
+      markers: {
+        size: 3,
+        strokeColors: chartColor,
+        strokeWidth: 1,
+        fillOpacity: 0.8,
+        hover: {
+          size: 10,
+          strokeWidth: 2,
+        },
+      },
       xaxis: {
         type: "datetime",
         range: XAXIS_RANGE,
@@ -61,27 +104,59 @@ const DynamicChart = ({
           style: { colors: theme.palette.text.secondary },
           datetimeUTC: false,
           format: "HH:mm:ss",
+          datetimeFormatter: {
+            hour: "HH:mm:ss",
+            minute: "HH:mm:ss",
+            second: "HH:mm:ss",
+          },
         },
         axisBorder: { show: false },
         axisTicks: { show: false },
+        tooltip: {
+          enabled: false,
+        },
       },
       yaxis: {
-        min: yMin,
-        max: yMax,
+        min: Math.max(0, yMin - 5), // Margem mínima
+        max: yMax > 0 ? yMax * 1.1 : 100, // Margem máxima de 10%
         tickAmount: 5,
         labels: {
           style: { colors: theme.palette.text.secondary },
-          formatter: (val) => `${Math.floor(val)}${unit}`,
+          formatter: (val) => {
+            if (val === null || val === undefined) return "0" + unit;
+            return `${val % 1 === 0 ? val : val.toFixed(1)}${unit}`;
+          },
         },
+        forceNiceScale: true,
       },
       grid: {
         show: true,
-        borderColor: theme.palette.divider,
+        borderColor: alpha(theme.palette.divider, 0.3),
         strokeDashArray: 3,
+        xaxis: {
+          lines: {
+            show: true,
+          },
+        },
+        yaxis: {
+          lines: {
+            show: true,
+          },
+        },
       },
       tooltip: {
-        theme: "dark",
-        x: { format: "HH:mm:ss" },
+        theme: theme.palette.mode,
+        x: {
+          format: "HH:mm:ss",
+        },
+        y: {
+          formatter: (val) => {
+            return val !== null && val !== undefined ? `${val}${unit}` : "N/A";
+          },
+        },
+      },
+      legend: {
+        show: false,
       },
     };
 
@@ -94,28 +169,78 @@ const DynamicChart = ({
         chartInstance.current = null;
       }
     };
-  }, [
-    theme.palette.primary.main,
-    theme.palette.divider,
-    theme.palette.text.secondary,
-  ]);
+  }, [title, theme]);
 
   // Efeito para atualizar os dados da série
   useEffect(() => {
-    if (chartInstance.current && seriesData.length > 0) {
-      chartInstance.current.updateSeries([{ data: seriesData }]);
+    if (!chartInstance.current || !seriesData || seriesData.length === 0) {
+      return;
     }
-  }, [seriesData]);
 
-  // Efeito para atualizar o Y-axis
+    const processedData = processSeriesData(seriesData);
+
+    // Verifica se os dados realmente mudaram
+    const currentDataString = JSON.stringify(processedData);
+    const lastDataString = JSON.stringify(lastProcessedData.current);
+
+    if (currentDataString === lastDataString) {
+      return;
+    }
+
+    lastProcessedData.current = processedData;
+
+    try {
+      // Atualiza os dados da série
+      chartInstance.current.updateSeries(
+        [
+          {
+            name: title,
+            data: processedData,
+          },
+        ],
+        true
+      );
+
+      // Ajusta dinamicamente o eixo Y baseado nos dados
+      if (processedData.length > 0) {
+        const values = processedData
+          .map((p) => p.y)
+          .filter((val) => !isNaN(val));
+        if (values.length > 0) {
+          const dataMin = Math.min(...values);
+          const dataMax = Math.max(...values);
+          const padding = Math.max((dataMax - dataMin) * 0.1, 1); // 10% de padding ou pelo menos 1
+
+          chartInstance.current.updateOptions(
+            {
+              yaxis: {
+                min: Math.max(0, dataMin - padding),
+                max: dataMax + padding,
+              },
+            },
+            false,
+            true
+          );
+        }
+      }
+    } catch (error) {
+      console.error(`Erro ao atualizar gráfico ${title}:`, error);
+    }
+  }, [seriesData, title]);
+
+  // Efeito para atualizar o Y-axis com limites externos
   useEffect(() => {
     if (chartInstance.current) {
-      chartInstance.current.updateOptions({
-        yaxis: {
-          min: yMin,
-          max: yMax,
+      chartInstance.current.updateOptions(
+        {
+          yaxis: {
+            min: Math.max(0, yMin - 5),
+            max: yMax > 0 ? yMax * 1.1 : 100,
+          },
         },
-      });
+        false,
+        true
+      );
     }
   }, [yMin, yMax]);
 
@@ -124,10 +249,12 @@ const DynamicChart = ({
       elevation={0}
       sx={{
         p: 2.5,
-        // ATUALIZADO: Fundo preto padrão do tema
         bgcolor: "background.default",
         border: `1px solid ${theme.palette.divider}`,
         borderRadius: 3,
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       <Typography
@@ -138,11 +265,18 @@ const DynamicChart = ({
           display: "flex",
           alignItems: "center",
           gap: 1,
+          color: theme.palette.text.primary,
         }}
       >
         {title}
       </Typography>
-      <Box ref={chartRef} />
+      <Box
+        ref={chartRef}
+        sx={{
+          flex: 1,
+          minHeight: 300,
+        }}
+      />
     </Paper>
   );
 };

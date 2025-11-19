@@ -13,8 +13,6 @@ const DynamicChart = ({
   yMin = 0,
   yMax = 100,
 }) => {
-  console.log(seriesData);
-
   const theme = useTheme();
   const chartRef = useRef(null);
   const chartInstance = useRef(null);

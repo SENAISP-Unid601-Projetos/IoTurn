@@ -1,448 +1,381 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
-  Grid,
   Button,
-  IconButton,
   CircularProgress,
   Alert,
   Select,
   MenuItem,
   FormControl,
-  useTheme,
   Divider,
 } from "@mui/material";
-import {
-  RefreshCw,
-  GaugeCircle,
-  Thermometer,
-  Droplets,
-  Zap,
-} from "lucide-react";
+import { GaugeCircle, Thermometer, Droplets, Zap } from "lucide-react";
+
 import { fetchMachineById } from "../../services/machineService";
 import MetricCard from "./components/MetricCard";
 import DynamicChart from "./components/DynamicChart";
 
+// ------------------------------------------------------
+// Configurações
+// ------------------------------------------------------
 const MAX_DATA_POINTS = 30;
-const generateMockDataPoint = (lastValue, min, max) => {
-  let newValue = lastValue + (Math.random() - 0.5) * (max / 10);
-  if (newValue < min) newValue = min;
-  if (newValue > max) newValue = max;
+
+const generateMockPoint = (last, min, max) => {
+  let next = last + (Math.random() - 0.5) * (max / 10);
+  next = Math.min(Math.max(next, min), max);
 
   return {
-    x: new Date().getTime(), // 10 min antes
-    y: parseFloat(newValue.toFixed(2)),
+    x: Date.now(),
+    y: parseFloat(next.toFixed(2)),
   };
 };
 
-const getInitialChartData = (val, min, max) => {
-  let data = [];
-  let lastVal = val;
+const buildInitialChart = (initialValue, min, max) => {
+  const data = [];
+  let last = initialValue;
 
   for (let i = 0; i < MAX_DATA_POINTS; i++) {
-    const { y } = generateMockDataPoint(lastVal, min, max);
+    const { y } = generateMockPoint(last, min, max);
 
     data.push({
-      // também ajustado para 10 min antes
-      x: new Date().getTime() - (MAX_DATA_POINTS - i) * 1000,
+      x: Date.now() - (MAX_DATA_POINTS - i) * 1000,
       y,
     });
 
-    lastVal = y;
+    last = y;
   }
 
   return data;
 };
 
+// ------------------------------------------------------
+// Dashboard
+// ------------------------------------------------------
 const MachineDashboard = () => {
   const { machineId } = useParams();
   const navigate = useNavigate();
-  const theme = useTheme();
+
+  // Dados da máquina
+  const [machine, setMachine] = useState(null);
   const [machineData, setMachineData] = useState({});
 
-  const [machine, setMachine] = useState(null);
+  // Status
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [lastUpdated, setLastUpdated] = useState(
-    new Date().toLocaleTimeString()
-  );
+
+  // Filtros
   const [period, setPeriod] = useState("last_hour");
   const [selectedMachine, setSelectedMachine] = useState(machineId);
 
-  // RPM
+  // Atualização SSE
+  const [lastUpdated, setLastUpdated] = useState(
+    new Date().toLocaleTimeString()
+  );
+
+  // Gráficos
   const [rpmData, setRpmData] = useState([]);
-  const [rpmDataMax, setRpmDataMax] = useState(3000);
-  const [rpmDataMin, setRpmDataMin] = useState(0);
-  // TEMP
   const [tempData, setTempData] = useState([]);
-  const [tempDataMax, setTempDataMax] = useState([100]);
-  const [tempDataMin, setTempDataMin] = useState([0]);
-
-  // OLEO
   const [oleoData, setOleoData] = useState([]);
-  const [oleoDataMax, setOleoDataMax] = useState([100]);
-  const [oleoDataMin, setOleoDataMin] = useState([0]);
-
-  // CORRENTE
   const [correnteData, setCorrenteData] = useState([]);
-  const [correnteDataMax, setCorrenteDataMax] = useState([100]);
-  const [correnteDataMin, setCorrenteDataMin] = useState([0]);
 
-  // Um loop infinito após a inicialização enviando constantemente valores para os useStates initialCharData,
+  const [rpmMax, setRpmMax] = useState(3000);
+  const [tempMax, setTempMax] = useState(3000);
+  const [oleoMax, setOleoMax] = useState(3000);
+  const [correnteMax, setCorrenteMax] = useState(3000);
+
+  const calcMax = (arr) => (arr.length ? Math.max(...arr.map((p) => p.y)) : 0);
+
+  useEffect(() => setRpmMax(calcMax(rpmData)), [rpmData]);
+  useEffect(() => setTempMax(calcMax(tempData)), [tempData]);
+  useEffect(() => setOleoMax(calcMax(oleoData)), [oleoData]);
+  useEffect(() => setCorrenteMax(calcMax(correnteData)), [correnteData]);
+
+  // ------------------------------------------------------
+  // Carregamento inicial
+  // ------------------------------------------------------
   useEffect(() => {
-    const loadMachineData = async () => {
-      if (!machineId) return;
+    if (!machineId) return;
+
+    const load = async () => {
       try {
         setLoading(true);
+
         const data = await fetchMachineById(machineId);
         setMachine(data);
         setSelectedMachine(data.id);
 
-        // Gráficos
-        setRpmData(
-          getInitialChartData(data.metrics.rpm.value, rpmDataMin, rpmDataMax)
-        );
+        const { metrics } = data;
 
-        setTempData(
-          // Os valores data.metrics.temp.min e data.metrics.temp.max não existem e devem ser substituidos por outra lógica
-          getInitialChartData(
-            data.metrics.temp.value,
-            data.metrics.temp.min,
-            data.metrics.temp.max
-          )
-        );
-        setOleoData(
-          getInitialChartData(
-            data.metrics.oleo.value,
-            data.metrics.oleo.min,
-            data.metrics.oleo.max
-          )
-        );
+        setRpmData(buildInitialChart(metrics.rpm.value, 0, rpmMax));
+        setTempData(buildInitialChart(metrics.temp.value, 0, tempMax));
+        setOleoData(buildInitialChart(metrics.oleo.value, 0, oleoMax));
         setCorrenteData(
-          getInitialChartData(
-            data.metrics.corrente.value,
-            data.metrics.corrente.min,
-            data.metrics.corrente.max
-          )
+          buildInitialChart(metrics.corrente.value, 0, correnteMax)
         );
-
-        setError(null);
-      } catch (e) {
-        console.error("Falha ao carregar dados da máquina:", e);
-        setError(e.message);
+      } catch (err) {
+        setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-    loadMachineData();
+
+    load();
   }, [machineId]);
 
-  // 3. Hook de Efeito para gerenciar a conexão SSE realiza a ignição do programa
+  // ------------------------------------------------------
+  // SSE
+  // ------------------------------------------------------
   useEffect(() => {
     if (!machineId) return;
 
     const url = `${
       import.meta.env.VITE_APP_API_URL
     }/machines/stream/${machineId}`;
-    let sseSource = new EventSource(url);
+    const source = new EventSource(url);
 
-    sseSource.onmessage = (event) => {
+    source.onmessage = (event) => {
       try {
-        const newData = JSON.parse(event.data);
+        const incoming = JSON.parse(event.data);
 
-        // MODIFICAÇÃO: Mescla o estado anterior com os novos dados
-        setMachineData((prevData) => ({
-          ...prevData,
-          ...newData,
-        }));
+        setMachineData((prev) => ({ ...prev, ...incoming }));
 
-        if (newData.rpm !== undefined && newData.timeStampRpm) {
-          const dataPoint = {
-            x: new Date(newData.timeStampRpm).getTime(),
-            y: newData.rpm,
-          };
+        const addPoint = (timestamp, value, setter) => {
+          const point = { x: new Date(timestamp).getTime(), y: value };
+          setter((prev) => [...prev.slice(1), point]);
+        };
 
-          setRpmData((prev) => {
-            console.log(prev);
-            console.log(dataPoint);
+        if (incoming.rpm && incoming.timeStampRpm)
+          addPoint(incoming.timeStampRpm, incoming.rpm, setRpmData);
 
-            const last = prev[prev.length - 1];
+        if (incoming.temperatura && incoming.timeStampTemperatura)
+          addPoint(
+            incoming.timeStampTemperatura,
+            incoming.temperatura,
+            setTempData
+          );
 
-            // Se já existir e for igual ao último ou tempo menor, não insere
-            if (
-              (last && last.x === dataPoint.x && last.y === dataPoint.y) ||
-              last.x >= dataPoint.x
-            ) {
-              return prev;
-            }
+        if (incoming.nivel && incoming.timeStampNivel)
+          addPoint(incoming.timeStampNivel, incoming.nivel, setOleoData);
 
-            // Senão, insere removendo o primeiro (slice(1))
-            return [...prev.slice(1), dataPoint];
-          });
-        }
-
-        if (newData.temperatura !== undefined && newData.timeStampTemperatura) {
-          const dataPoint = {
-            x: new Date(newData.timeStampTemperatura).getTime(),
-            y: newData.temperatura,
-          };
-          setTempData((prev) => [...prev.slice(1), dataPoint]);
-        }
-
-        if (newData.nivel !== undefined && newData.timeStampNivel) {
-          const dataPoint = {
-            x: new Date(newData.timeStampNivel).getTime(),
-            y: newData.nivel,
-          };
-          setOleoData((prev) => [...prev.slice(1), dataPoint]);
-        }
-
-        if (newData.corrente !== undefined && newData.timeStampCorrente) {
-          const dataPoint = {
-            x: new Date(newData.timeStampCorrente).getTime(),
-            y: newData.corrente,
-          };
-          setCorrenteData((prev) => [...prev.slice(1), dataPoint]);
-        }
+        if (incoming.corrente && incoming.timeStampCorrente)
+          addPoint(
+            incoming.timeStampCorrente,
+            incoming.corrente,
+            setCorrenteData
+          );
 
         setLastUpdated(new Date().toLocaleTimeString());
-      } catch (e) {
-        console.error("Falha ao processar dado do SSE:", e);
+      } catch (err) {
+        console.error("Erro no SSE:", err);
       }
-    };
-    sseSource.onerror = (err) => {
-      console.error("Erro no EventSource:", err);
-      sseSource.close();
     };
 
-    // Função de limpeza: Fecha a conexão ao sair da página
-    return () => {
-      if (sseSource) {
-        sseSource.close();
-      }
-    };
+    source.onerror = () => source.close();
+    return () => source.close();
   }, [machineId]);
 
-  if (loading) {
+  // ------------------------------------------------------
+  // UI: estados iniciais
+  // ------------------------------------------------------
+  if (loading)
     return (
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
           height: "80vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
         <CircularProgress />
       </Box>
     );
-  }
-  if (error) {
-    return (
-      <Alert severity="error">
-        Falha ao carregar dados da máquina: {error}
-      </Alert>
-    );
-  }
-  if (!machine) {
-    return <Typography>Máquina não encontrada.</Typography>;
-  }
 
+  if (error)
+    return <Alert severity="error">Erro ao carregar máquina: {error}</Alert>;
+
+  if (!machine) return <Typography>Máquina não encontrada.</Typography>;
+
+  // ------------------------------------------------------
+  // Render
+  // ------------------------------------------------------
   return (
     <Box>
+      {/* Topo */}
       <Box
         sx={{
+          mb: 2,
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          mb: 2,
         }}
       >
         <Box>
-          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+          <Typography variant="h5" fontWeight={700}>
             Monitoramento IoT
           </Typography>
           <Typography variant="caption" color="text.secondary">
             Atualizado às: {lastUpdated}
           </Typography>
         </Box>
-        <Box sx={{ display: "flex", gap: 1 }}>
-          <Button
-            variant="outlined"
-            sx={{ borderRadius: 2 }}
-            onClick={() => navigate("/main/maquinas")}
-          >
-            Início
-          </Button>
-        </Box>
+
+        <Button
+          variant="outlined"
+          sx={{ borderRadius: 2 }}
+          onClick={() => navigate("/main/maquinas")}
+        >
+          Início
+        </Button>
       </Box>
+
       <Divider sx={{ my: 2 }} />
-      <Box sx={{ display: "flex", gap: 4, alignItems: "center", mb: 2 }}>
+
+      {/* Filtros */}
+      <Box sx={{ display: "flex", gap: 4, mb: 2 }}>
+        {/* Seleção máquina */}
         <FormControl>
-          <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5 }}>
+          <Typography variant="caption" color="text.secondary">
             Máquinas Monitoradas
           </Typography>
+
           <Select
-            value={selectedMachine}
-            onChange={(e) => navigate(`/main/dashboard/${e.target.value}`)}
             size="small"
             sx={{ minWidth: 200, borderRadius: 2 }}
+            value={selectedMachine}
+            onChange={(e) => navigate(`/main/dashboard/${e.target.value}`)}
           >
             <MenuItem value={machine.id}>
-              {machine.name} - {machine.serialNumber}
+              {machine.name} – {machine.serialNumber}
             </MenuItem>
           </Select>
         </FormControl>
+
+        {/* Período */}
         <FormControl>
-          <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5 }}>
+          <Typography variant="caption" color="text.secondary">
             Período de Análise
           </Typography>
+
           <Select
-            value={period}
-            onChange={(e) => setPeriod(e.target.value)}
             size="small"
             sx={{ minWidth: 150, borderRadius: 2 }}
+            value={period}
+            onChange={(e) => setPeriod(e.target.value)}
           >
-            <MenuItem value="last_15m">Últimos 15min</MenuItem>
+            <MenuItem value="last_15m">Últimos 15 min</MenuItem>
             <MenuItem value="last_hour">Última hora</MenuItem>
-            <MenuItem value="last_6h">Últimas 6h</MenuItem>
-            <MenuItem value="last_24h">Últimas 24h</MenuItem>
+            <MenuItem value="last_6h">Últimas 6 h</MenuItem>
+            <MenuItem value="last_24h">Últimas 24 h</MenuItem>
             <MenuItem value="last_7d">Últimos 7 dias</MenuItem>
           </Select>
         </FormControl>
       </Box>
-      <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2, mt: 3 }}>
+
+      <Typography variant="h4" fontWeight={700} sx={{ mb: 3 }}>
         {machine.name}
       </Typography>
 
-      <Box
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          mx: -1.5,
-          mb: 3,
-          alignItems: "flex-start",
-        }}
-      >
-        <Box sx={{ width: "25%", p: 1.5 }}>
+      {/* Métricas */}
+      <Box sx={{ display: "flex", flexWrap: "wrap", mx: -1.5 }}>
+        <MetricWrapper>
           <MetricCard
             title="RPM"
             icon={GaugeCircle}
             value={machineData.rpm ?? machine.metrics.rpm.value}
-            unit={machine.metrics.rpm.unit}
-            min={machine.metrics.rpm.min}
-            med={machine.metrics.rpm.med}
-            max={machine.metrics.rpm.max}
+            {...machine.metrics.rpm}
             status="good"
           />
-        </Box>
-        <Box sx={{ width: "25%", p: 1.5 }}>
+        </MetricWrapper>
+
+        <MetricWrapper>
           <MetricCard
             title="Temperatura"
             icon={Thermometer}
             value={machineData.temperatura ?? machine.metrics.temp.value}
-            unit={machine.metrics.temp.unit}
-            min={machine.metrics.temp.min}
-            med={machine.metrics.temp.med}
-            max={machine.metrics.temp.max}
+            {...machine.metrics.temp}
             status="warning"
           />
-        </Box>
-        <Box sx={{ width: "25%", p: 1.5 }}>
+        </MetricWrapper>
+
+        <MetricWrapper>
           <MetricCard
             title="Nível de Óleo"
             icon={Droplets}
             value={machineData.nivel ?? machine.metrics.oleo.value}
-            unit={machine.metrics.oleo.unit}
-            min={machine.metrics.oleo.min}
-            med={machine.metrics.oleo.med}
-            max={machine.metrics.oleo.max}
+            {...machine.metrics.oleo}
             status="good"
           />
-        </Box>
-        <Box sx={{ width: "25%", p: 1.5 }}>
+        </MetricWrapper>
+
+        <MetricWrapper>
           <MetricCard
             title="Corrente"
             icon={Zap}
             value={machineData.corrente ?? machine.metrics.corrente.value}
-            unit={machine.metrics.corrente.unit}
-            min={machine.metrics.corrente.min}
-            med={machine.metrics.corrente.med}
-            max={machine.metrics.corrente.max}
+            {...machine.metrics.corrente}
             status="danger"
           />
-        </Box>
+        </MetricWrapper>
       </Box>
 
-      <Box
-        sx={{
-          display: "flex",
-          flexWrap: "wrap",
-          mx: -1.5,
-          alignItems: "flex-start",
-        }}
-      >
-        <Box
-          sx={{
-            width: { xs: "100%", sm: "50%", md: "50%", lg: "25%" },
-            p: 1.5,
-          }}
-        >
+      {/* Gráficos */}
+      <Box sx={{ display: "flex", flexWrap: "wrap", mx: -1.5 }}>
+        <ChartWrapper>
           <DynamicChart
             title="RPM"
-            seriesData={rpmData} //WIP
+            seriesData={rpmData}
             yMin={0}
-            yMax={3000}
-            unit=""
+            yMax={rpmMax}
           />
-        </Box>
-        <Box
-          sx={{
-            width: { xs: "100%", sm: "50%", md: "50%", lg: "25%" },
-            p: 1.5,
-          }}
-        >
+        </ChartWrapper>
+
+        <ChartWrapper>
           <DynamicChart
             title="Temperatura"
             seriesData={tempData}
-            yMin={machine.metrics.temp.min}
-            yMax={machine.metrics.temp.max}
+            yMin={0}
+            yMax={tempMax}
             unit="°C"
           />
-        </Box>
-        <Box
-          sx={{
-            width: { xs: "100%", sm: "50%", md: "50%", lg: "25%" },
-            p: 1.5,
-          }}
-        >
+        </ChartWrapper>
+
+        <ChartWrapper>
           <DynamicChart
             title="Nível de Óleo"
             seriesData={oleoData}
-            yMin={machine.metrics.oleo.min}
-            yMax={machine.metrics.oleo.max}
+            yMin={0}
+            yMax={oleoMax}
             unit="%"
           />
-        </Box>
-        <Box
-          sx={{
-            width: { xs: "100%", sm: "50%", md: "50%", lg: "25%" },
-            p: 1.5,
-          }}
-        >
+        </ChartWrapper>
+
+        <ChartWrapper>
           <DynamicChart
             title="Corrente"
             seriesData={correnteData}
-            yMin={machine.metrics.corrente.min}
-            yMax={machine.metrics.corrente.max}
+            yMin={0}
+            yMax={correnteMax}
             unit="A"
           />
-        </Box>
+        </ChartWrapper>
       </Box>
     </Box>
   );
 };
+
+// ------------------------------------------------------
+// Subcomponentes auxiliares
+// ------------------------------------------------------
+const MetricWrapper = ({ children }) => (
+  <Box sx={{ width: "25%", p: 1.5 }}>{children}</Box>
+);
+
+const ChartWrapper = ({ children }) => (
+  <Box sx={{ width: { xs: "100%", sm: "50%", lg: "25%" }, p: 1.5 }}>
+    {children}
+  </Box>
+);
 
 export default MachineDashboard;

@@ -73,22 +73,40 @@ export default function HermesAIPage() {
         setIsLoading(true);
 
         try {
-            const data = await ApiService.postRequest("/hermes/ask", {
+            const apiResponse = await ApiService.postRequest("/hermes/ask", {
                 message: content,
             });
 
             setLoadingProgress(100);
 
+            let aiResponseContent = "Desculpe, não consegui processar sua pergunta.";
+            const cacheId = apiResponse.cacheId;
+
+            if (apiResponse && apiResponse.data) {
+                try {
+                    const parsedData = JSON.parse(apiResponse.data);
+
+                    if (typeof parsedData === 'string') {
+                        aiResponseContent = parsedData;
+                    } else if (parsedData && parsedData.resposta) {
+                        aiResponseContent = parsedData.resposta;
+                    }
+                } catch (parseError) {
+                    console.error("Falha ao parsear o campo de dados do Hermes:", parseError);
+                }
+            }
+
             const assistantMessage = {
                 id: `assistant-${Date.now()}`,
                 role: "assistant",
-                content:
-                    data?.response || "Desculpe, não consegui processar sua pergunta.",
+                content: aiResponseContent,
                 timestamp: new Date(),
+                cacheId: cacheId,
             };
+
             setMessages((prev) => [...prev, assistantMessage]);
         } catch (error) {
-            console.error("[v0] Hermes AI error:", error);
+            console.error("Hermes AI error:", error);
             const errorMessage = {
                 id: `error-${Date.now()}`,
                 role: "assistant",
@@ -102,19 +120,49 @@ export default function HermesAIPage() {
         }
     };
 
-    const handleFeedback = async (messageId, feedback) => {
-        const newFeedback = feedbacks[messageId] === feedback ? null : feedback;
-        setFeedbacks((prev) => ({ ...prev, [messageId]: newFeedback }));
 
-        if (newFeedback) {
+    const handleFeedback = async (messageId, feedback) => {
+        const currentFeedbackData = feedbacks[messageId];
+
+        if (currentFeedbackData && currentFeedbackData.locked) {
+            return;
+        }
+
+        const feedbackValue = feedback === 'positive' ? 1 : 0;
+        const newFeedbackValue = feedback; 
+        
+        if (currentFeedbackData?.value === feedback) {
+             return;
+        }
+
+        setFeedbacks((prev) => ({ 
+            ...prev, 
+            [messageId]: { value: newFeedbackValue, locked: false } 
+        }));
+        
+        const message = messages.find(m => m.id === messageId);
+        const keyReturned = message?.cacheId;
+
+        if (keyReturned) {
             try {
                 await ApiService.postRequest("/feedback", {
-                    messageId,
-                    feedback: newFeedback,
-                    timestamp: new Date().toISOString(),
+                    feedback: feedbackValue,
+                    keyReturned: keyReturned,
                 });
+                
+                setFeedbacks((prev) => ({ 
+                    ...prev, 
+                    [messageId]: { value: newFeedbackValue, locked: true } 
+                }));
+                
             } catch (error) {
-                console.error("[v0] Failed to send feedback:", error);
+                console.error("Failed to send feedback:", error);
+                
+                setFeedbacks((prev) => {
+                    const newState = { ...prev };
+                    delete newState[messageId];
+                    return newState;
+                });
             }
         }
     };
@@ -122,8 +170,6 @@ export default function HermesAIPage() {
     const handleSuggestionClick = (question) => {
         setInput(question);
     };
-
-    // --- Layout Principal (JSX) ---
 
     return (
         <Box
@@ -199,104 +245,111 @@ export default function HermesAIPage() {
                 <Box sx={{ flexGrow: 1 }}>
                     {messages.length === 0 && !isLoading && <ChatEmptyState onSuggestionClick={handleSuggestionClick} />}
 
-                    {messages.map((message) => (
-                        <Box
-                            key={message.id}
-                            sx={{
-                                display: "flex",
-                                justifyContent:
-                                    message.role === "user" ? "flex-end" : "flex-start",
-                                mb: 2,
-                            }}
-                        >
-                            {message.role === "assistant" && (
-                                <Avatar
-                                    sx={{
-                                        bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                        color: theme.palette.primary.main,
-                                        width: 40,
-                                        height: 40,
-                                        mr: 1.5,
-                                        flexShrink: 0,
-                                    }}
-                                >
-                                    <Bot size={20} />
-                                </Avatar>
-                            )}
-                            <Paper
-                                elevation={0}
+                    {messages.map((message) => {
+                        const feedbackData = feedbacks[message.id];
+                        const isLocked = feedbackData?.locked;
+                        
+                        return (
+                            <Box
+                                key={message.id}
                                 sx={{
-                                    p: 1.5,
-                                    bgcolor:
-                                        message.role === "user"
-                                            ? "primary.main"
-                                            : "background.paper",
-                                    color:
-                                        message.role === "user" ? "white" : "text.primary",
-                                    borderRadius: 3,
-                                    border:
-                                        message.role === "assistant"
-                                            ? `1px solid ${theme.palette.divider}`
-                                            : "none",
-                                    maxWidth: "85%",
+                                    display: "flex",
+                                    justifyContent:
+                                        message.role === "user" ? "flex-end" : "flex-start",
+                                    mb: 2,
                                 }}
                             >
-                                <Typography
-                                    variant="body1"
-                                    sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-                                >
-                                    {message.content}
-                                </Typography>
-
-                                {/* Feedback */}
                                 {message.role === "assistant" && (
-                                    <Box style={{ display: message.content !== 'Desculpe, ocorreu um erro ao processar sua pergunta. Por favor, tente novamente.' ? 'flex' : 'none'}}
+                                    <Avatar
                                         sx={{
-                                            alignItems: "center",
-                                            gap: 0.5,
-                                            mt: 1.5,
-                                            pt: 1,
-                                            borderTop: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
+                                            bgcolor: alpha(theme.palette.primary.main, 0.1),
+                                            color: theme.palette.primary.main,
+                                            width: 40,
+                                            height: 40,
+                                            mr: 1.5,
+                                            flexShrink: 0,
                                         }}
                                     >
-                                        <Typography variant="caption" color="text.secondary" mr={1}>
-                                            A mensagem foi útil?
-                                        </Typography>
-                                        <IconButton
-                                            size="small"
-                                            onClick={() => handleFeedback(message.id, "positive")}
-                                            sx={{
-                                                color:
-                                                    feedbacks[message.id] === "positive"
-                                                        ? "success.main"
-                                                        : "text.secondary",
-                                                "&:hover": {
-                                                    bgcolor: alpha(theme.palette.success.main, 0.1),
-                                                },
-                                            }}
-                                        >
-                                            <ThumbsUp size={16} />
-                                        </IconButton>
-                                        <IconButton
-                                            size="small"
-                                            onClick={() => handleFeedback(message.id, "negative")}
-                                            sx={{
-                                                color:
-                                                    feedbacks[message.id] === "negative"
-                                                        ? "error.main"
-                                                        : "text.secondary",
-                                                "&:hover": {
-                                                    bgcolor: alpha(theme.palette.error.main, 0.1),
-                                                },
-                                            }}
-                                        >
-                                            <ThumbsDown size={16} />
-                                        </IconButton>
-                                    </Box>
+                                        <Bot size={20} />
+                                    </Avatar>
                                 )}
-                            </Paper>
-                        </Box>
-                    ))}
+                                <Paper
+                                    elevation={0}
+                                    sx={{
+                                        p: 1.5,
+                                        bgcolor:
+                                            message.role === "user"
+                                                ? "primary.main"
+                                                : "background.paper",
+                                        color:
+                                            message.role === "user" ? "white" : "text.primary",
+                                        borderRadius: 3,
+                                        border:
+                                            message.role === "assistant"
+                                                ? `1px solid ${theme.palette.divider}`
+                                                : "none",
+                                        maxWidth: "85%",
+                                    }}
+                                >
+                                    <Typography
+                                        variant="body1"
+                                        sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
+                                    >
+                                        {message.content}
+                                    </Typography>
+
+                                    {/* Feedback */}
+                                    {message.role === "assistant" && (
+                                        <Box style={{ display: message.content !== 'Desculpe, ocorreu um erro ao processar sua pergunta. Por favor, tente novamente.' ? 'flex' : 'none' }}
+                                            sx={{
+                                                alignItems: "center",
+                                                gap: 0.5,
+                                                mt: 1.5,
+                                                pt: 1,
+                                                borderTop: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
+                                            }}
+                                        >
+                                            <Typography variant="caption" color="text.secondary" mr={1}>
+                                                A mensagem foi útil?
+                                            </Typography>
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => handleFeedback(message.id, "positive")}
+                                                disabled={isLocked}
+                                                sx={{
+                                                    color:
+                                                        feedbackData?.value === "positive"
+                                                            ? "success.main"
+                                                            : "text.secondary",
+                                                    "&:hover": {
+                                                        bgcolor: alpha(theme.palette.success.main, 0.1),
+                                                    },
+                                                }}
+                                            >
+                                                <ThumbsUp size={16} />
+                                            </IconButton>
+                                            <IconButton
+                                                size="small"
+                                                onClick={() => handleFeedback(message.id, "negative")}
+                                                disabled={isLocked}
+                                                sx={{
+                                                    color:
+                                                        feedbackData?.value === "negative"
+                                                            ? "error.main"
+                                                            : "text.secondary",
+                                                    "&:hover": {
+                                                        bgcolor: alpha(theme.palette.error.main, 0.1),
+                                                    },
+                                                }}
+                                            >
+                                                <ThumbsDown size={16} />
+                                            </IconButton>
+                                        </Box>
+                                    )}
+                                </Paper>
+                            </Box>
+                        );
+                    })}
 
                     {isLoading && messages.length > 0 && <ChatLoadingIndicator />}
                     <div ref={messagesEndRef} />

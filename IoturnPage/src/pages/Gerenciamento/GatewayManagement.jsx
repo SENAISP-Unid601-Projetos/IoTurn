@@ -5,6 +5,7 @@ import { useDataManagement } from "../../hooks/useDataManagement";
 import { fetchAllGatewayData } from "../../services/GatewayService";
 import GatewayModal from "../Cadastro/components/Modals/GatewayModal/GatewayModal";
 import StatusChip from "../../components/StatusChip"; 
+
 const filterCallback = (gateway, term) =>
   gateway.gatewayId?.toLowerCase().includes(term) ||
   gateway.description?.toLowerCase().includes(term);

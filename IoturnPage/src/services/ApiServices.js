@@ -10,6 +10,7 @@ class ApiService {
 
     try {
       const response = await axios.get(fullUrl);
+      console.log(response.data)
       return response.data;
     } catch (error) {
       console.error(`Erro ao enviar requisição GET para ${fullUrl}: `, error);

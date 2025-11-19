@@ -53,7 +53,7 @@ export const userController = {
       }
 
       const result = await userService.findAllUsersActive(params.data.clientId)
-
+      console.log(result)
       // Garantindo que id esteja presente no response
       return reply.status(200).send(result)
     } catch (error) {

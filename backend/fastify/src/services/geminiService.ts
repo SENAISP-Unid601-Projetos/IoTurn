@@ -190,7 +190,7 @@ async function initGemini() {
 }
 
 export const geminiService = {
-  askGeminiSQL: async (userMessage: string): Promise<string> => {
+  askGeminiSQL: async (userMessage: string, id: number): Promise<string> => {
     const { model } = await initGemini();
     const schemaContext = getSchemaContext();
 
@@ -201,10 +201,12 @@ export const geminiService = {
       
       Regras:
       - Gere APENAS a query SQL.
+      - Consulte APENAS dados do id passado.
       - NÃO use colunas de ID no SELECT.
       - Se a pergunta for ambígua ou você não tiver contexto suficiente para criar a query, responda APENAS com o seguinte formato JSON: {"error": "MOTIVO DO ERRO AQUI"}
 
       Pergunta do usuário: "${userMessage}"
+      ID do usuario: "${id}"
     `;
 
     const result = await model.generateContent(prompt);

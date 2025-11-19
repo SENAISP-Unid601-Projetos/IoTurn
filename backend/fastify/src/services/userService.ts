@@ -16,12 +16,14 @@ export const userService = {
     clientId: number
   ): Promise<{ id: number; name: string; type: string }[]> => {
     const result = await userRepository.findAllUsersActive(clientId)
-
-    // Garantindo que cada usuário contenha o id
     return result.map((user) => ({
       id: user.id,
       name: user.name,
-      type: user.userType, // ou user.type dependendo do seu schema
+      email: user.email,
+      type: user.userType,
+      status: user.status,
+      createdAt: user.createdAt,
+      companyName: user.client.companyName // ou user.type dependendo do seu schema
     }))
   },
 

@@ -9,6 +9,12 @@ export const geminiController = {
     askGeminiController: async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
         try {
             const { message } = request.body as { message: string };
+            const params = request.params as { id?: string } | undefined;
+            const idParam = params?.id;
+            const id: number = idParam ? parseInt(idParam, 10) : NaN;
+            if (isNaN(id)) {
+                return reply.status(400).send({ error: 'ID de rota inválido ou ausente.' });
+            }
             let moment: string;
 
             if (!message) {
@@ -18,7 +24,7 @@ export const geminiController = {
             }
 
             
-            const geminiSqlResponseString = await geminiService.askGeminiSQL(message);
+            const geminiSqlResponseString = await geminiService.askGeminiSQL(message,id);
             const geminiSqlResponse = JSON.parse(geminiSqlResponseString);
 
             

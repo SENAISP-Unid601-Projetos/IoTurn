@@ -141,7 +141,8 @@ const CadastroMaquina = () => {
     navigate("/main/gerenciamento/maquinas");
   };
 
-  const handleNext = () => {
+  const handleNext = e => {
+    if (e) e.preventDefault();
     if (validateForm(activeStep)) {
       if (activeStep === 2) {
         handleSubmit();

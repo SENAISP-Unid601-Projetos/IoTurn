@@ -8,8 +8,8 @@ const UserFormPersonalData = ({ formData, onChange }) => {
       <Grid item xs={12}>
         <FormField
           label="Nome Completo"
-          name="fullName"
-          value={formData.fullName}
+          name="name"
+          value={formData.name}
           onChange={onChange}
           placeholder="Ex: João Silva"
           required

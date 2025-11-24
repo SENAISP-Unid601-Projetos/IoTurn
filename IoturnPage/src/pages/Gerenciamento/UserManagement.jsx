@@ -5,6 +5,7 @@ import { useDataManagement } from "../../hooks/useDataManagement";
 import { fetchAllUserData } from "../../services/usersService";
 import { formatTimestamp } from "../../utils/formatters";
 import UserModal from "../Cadastro/components/Modals/UserModal/UserModal";
+import EditUserModal from "../Gerenciamento/components/Edit/EditUserModal";
 import StatusChip from "../../components/StatusChip";
 
 const filterCallback = (user, term) =>
@@ -13,10 +14,33 @@ const filterCallback = (user, term) =>
   user.userType?.toLowerCase().includes(term);
 
 const GerenciamentoUsers = () => {
+<<<<<<< HEAD
   const { filteredData, loading, error, searchTerm, setSearchTerm } =
     useDataManagement(fetchAllUserData, filterCallback);
+=======
+  const {
+    filteredData,
+    loading,
+    error,
+    searchTerm,
+    setSearchTerm,
+    refetchData,
+  } = useDataManagement(fetchAllUserData, filterCallback);
+>>>>>>> d21f46f8213880161322c599df2c1f464d2fb1ba
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+
+  const handleEditClick = (user) => {
+    setEditingUser(user);
+    setEditModalOpen(true);
+  };
+
+  const handleUserUpdated = () => {
+    setEditModalOpen(false);
+    if (refetchData) refetchData();
+  };
 
   const columns = [
     { header: "Nome", field: "name" },
@@ -49,13 +73,25 @@ const GerenciamentoUsers = () => {
         loading={loading}
         error={error}
         onAdd={() => setModalOpen(true)}
-        onEdit={(user) => console.log("Editar usuário", user)}
+        onEdit={handleEditClick}
         onDelete={(user) => console.log("Deletar usuário", user)}
         searchTerm={searchTerm}
         onSearchChange={(e) => setSearchTerm(e.target.value)}
         addButtonLabel="+ Novo Usuário"
       />
+<<<<<<< HEAD
       <UserModal open={modalOpen} onClose={() => setModalOpen(false)} />
+=======
+
+      <UserModal open={modalOpen} onClose={() => setModalOpen(false)} />
+
+      <EditUserModal
+        open={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        userData={editingUser}
+        onUserUpdated={handleUserUpdated}
+      />
+>>>>>>> d21f46f8213880161322c599df2c1f464d2fb1ba
     </>
   );
 };

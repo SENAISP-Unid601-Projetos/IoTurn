@@ -20,7 +20,7 @@ const formatMachineData = (machine) => {
     metrics: {
       rpm: {
         name: "RPM",
-        value: machine.lastRpm?.rpm ?? 0,
+        value: 0,
         unit: "",
         min: machine.lastRpm?.min ?? 0,
         med: machine.lastRpm?.med ?? 0,
@@ -28,7 +28,7 @@ const formatMachineData = (machine) => {
       },
       temp: {
         name: "Temperatura",
-        value: machine.lastOilTemperature?.temperature ?? 0,
+        value: 0,
         unit: "°C",
         min: machine.lastOilTemperature?.min ?? 0,
         med: machine.lastOilTemperature?.med ?? 0,
@@ -36,7 +36,7 @@ const formatMachineData = (machine) => {
       },
       oleo: {
         name: "Nível de Óleo",
-        value: machine.lastOilLevel?.level ?? 0,
+        value: 0,
         unit: "%",
         min: machine.lastOilLevel?.min ?? 0,
         med: machine.lastOilLevel?.med ?? 0,
@@ -44,7 +44,7 @@ const formatMachineData = (machine) => {
       },
       corrente: {
         name: "Corrente",
-        value: machine.lastCurrent?.current ?? 0,
+        value: 0,
         unit: "A",
         min: machine.lastCurrent?.min ?? 0,
         med: machine.lastCurrent?.med ?? 0,

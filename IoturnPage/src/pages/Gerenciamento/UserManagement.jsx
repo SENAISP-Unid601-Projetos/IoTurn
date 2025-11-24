@@ -14,6 +14,10 @@ const filterCallback = (user, term) =>
   user.userType?.toLowerCase().includes(term);
 
 const GerenciamentoUsers = () => {
+<<<<<<< HEAD
+  const { filteredData, loading, error, searchTerm, setSearchTerm } =
+    useDataManagement(fetchAllUserData, filterCallback);
+=======
   const {
     filteredData,
     loading,
@@ -22,6 +26,7 @@ const GerenciamentoUsers = () => {
     setSearchTerm,
     refetchData,
   } = useDataManagement(fetchAllUserData, filterCallback);
+>>>>>>> d21f46f8213880161322c599df2c1f464d2fb1ba
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -74,6 +79,9 @@ const GerenciamentoUsers = () => {
         onSearchChange={(e) => setSearchTerm(e.target.value)}
         addButtonLabel="+ Novo Usuário"
       />
+<<<<<<< HEAD
+      <UserModal open={modalOpen} onClose={() => setModalOpen(false)} />
+=======
 
       <UserModal open={modalOpen} onClose={() => setModalOpen(false)} />
 
@@ -83,6 +91,7 @@ const GerenciamentoUsers = () => {
         userData={editingUser}
         onUserUpdated={handleUserUpdated}
       />
+>>>>>>> d21f46f8213880161322c599df2c1f464d2fb1ba
     </>
   );
 };

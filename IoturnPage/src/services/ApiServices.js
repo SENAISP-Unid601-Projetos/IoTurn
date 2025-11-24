@@ -10,7 +10,6 @@ class ApiService {
 
     try {
       const response = await axios.get(fullUrl);
-      console.log(response.data);
       return response.data;
     } catch (error) {
       console.error(`Erro ao enviar requisição GET para ${fullUrl}: `, error);
@@ -20,10 +19,8 @@ class ApiService {
 
   // Método POST
   static async postRequest(APIendpoint, data) {
-    console.log(API_BASE_URL);
-    console.log(APIendpoint);
-
     const fullUrl = `${API_BASE_URL}${APIendpoint}`;
+
     try {
       const response = await axios.post(fullUrl, data, {
         withCredentials: true,

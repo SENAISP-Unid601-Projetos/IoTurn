@@ -19,6 +19,7 @@
     "framer-motion": "^12.23.12",
     "lucide-react": "^0.544.0",
     "mqtt": "^5.14.0",
+    "paho-mqtt": "^1.1.0",
     "react": "^19.1.0",
     "react-apexcharts": "^1.7.0",
     "react-dom": "^19.1.0",

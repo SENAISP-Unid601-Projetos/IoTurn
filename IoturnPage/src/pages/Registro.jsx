@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import ApiService from "../services/ApiServices";
 import theme from "../theme";
+import { useNavigate } from "react-router-dom";
 
 //Aqui vai se fazer o registro dos clientes isso é empresas.
 
@@ -44,6 +45,7 @@ function Registro() {
   const [adress, setAddress] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const changeLink = useNavigate();
 
   // Constantes de validação
   const [extraPassword, setExtraPassword] = useState("");
@@ -88,25 +90,25 @@ function Registro() {
 
   //CNPJ validation
   useEffect(() => {
-    const regex =
-      /([0-9]{2}[\.]?[0-9]{3}[\.]?[0-9]{3}[\/]?[0-9]{4}[-]?[0-9]{2})|([0-9]{3}[\.]?[0-9]{3}[\.]?[0-9]{3}[-]?[0-9]{2})/;
-    if (regex.test(cnpj)) {
-      setIsCnpjValid(true);
-      setCnpjError("Campo CNPJ Incorreto");
-    } else {
+    const regex = /^\d{14}$/;
+    if (cnpj.length === 0) {
       setIsCnpjValid(false);
       setCnpjError("");
+    } else if (regex.test(cnpj) && !cnpj.length !== 0) {
+      setIsCnpjValid(true);
+      setCnpjError("");
+    } else {
+      setIsCnpjValid(false);
+      setCnpjError("Campo CNPJ Incorreto");
     }
   }, [cnpj]);
 
   // PostRequest
-  const handleLogin = () => {
-    if (!isEmailValid) {
-      setEmailError("Por favor, insira um email válido.");
-    }
-    if (!isPasswordValid) {
+  const handleLogin = async () => {
+    if (!isEmailValid) setEmailError("Por favor, insira um email válido.");
+    if (!isPasswordValid)
       setPasswordError("A senha deve ter no mínimo 8 caracteres.");
-    }
+    if (!isCnpjValid) setCnpjError("Campo CNPJ Incorreto");
     if (isEmailValid && isPasswordValid && isCnpjValid) {
       const registrationData = {
         companyName: empresa,
@@ -116,7 +118,17 @@ function Registro() {
         email: email,
         password: password,
       };
-      ApiService.postRequest("/clients/create", registrationData);
+
+      try {
+        await ApiService.postRequest("/clients/create", registrationData);
+      } catch (error) {
+        if (error.status === 409) {
+          setIsEmailValid(false);
+          setEmailError("e-mail ou CNPJ já cadastrados");
+        } else {
+          changeLink("/login");
+        }
+      }
     }
 
     // WIP fazer post para clientes em clients/create
@@ -199,10 +211,12 @@ function Registro() {
             {/* WIP especificar CNPJ trocando função isEmailValid*/}
             {/* Campo CNPJ */}
             <TextField
-              label="CNPJ"
+              label="CNPJ (Apenas números)"
               fullWidth
               sx={textFieldStyles}
               value={cnpj}
+              error={!!cnpjError}
+              helperText={cnpjError}
               onChange={(e) => setCnpj(e.target.value)}
               InputProps={{
                 startAdornment: (
@@ -354,7 +368,7 @@ function Registro() {
               variant="contained"
               size="large"
               fullWidth
-              href="/main/maquinas"
+              // href="/main/maquinas"
               sx={{ py: 1.5 }}
               onClick={handleLogin}
             >

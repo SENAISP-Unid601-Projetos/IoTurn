@@ -2,7 +2,6 @@ import axios from "axios";
 
 const API_BASE_URL = import.meta.env.VITE_APP_API_URL; //Posso usar "||" para fallback
 
-
 class ApiService {
   // Método GET
   static async getRequest(APIendpoint) {
@@ -28,6 +27,7 @@ class ApiService {
       });
       return response.data;
     } catch (error) {
+      
       console.error(`Erro ao enviar a requisição POST para ${fullUrl}:`, error);
       throw error;
     }

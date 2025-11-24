@@ -13,13 +13,8 @@ const filterCallback = (user, term) =>
   user.userType?.toLowerCase().includes(term);
 
 const GerenciamentoUsers = () => {
-  const {
-    filteredData,
-    loading,
-    error,
-    searchTerm,
-    setSearchTerm,
-  } = useDataManagement(fetchAllUserData, filterCallback);
+  const { filteredData, loading, error, searchTerm, setSearchTerm } =
+    useDataManagement(fetchAllUserData, filterCallback);
 
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -27,17 +22,17 @@ const GerenciamentoUsers = () => {
     { header: "Nome", field: "name" },
     { header: "Email", field: "email" },
     { header: "Cargo", field: "userType" },
-    { 
-      header: "Status", 
-      render: (user) => <StatusChip status={user.status} /> 
+    {
+      header: "Status",
+      render: (user) => <StatusChip status={user.status} />,
     },
-    { 
-      header: "Data Criação", 
-      render: (user) => formatTimestamp(user.createdAt) 
+    {
+      header: "Data Criação",
+      render: (user) => formatTimestamp(user.createdAt),
     },
-    { 
-      header: "Cliente", 
-      render: (user) => user.client?.companyName || "–"
+    {
+      header: "Cliente",
+      render: (user) => user.client?.companyName || "–",
     },
   ];
 
@@ -60,10 +55,7 @@ const GerenciamentoUsers = () => {
         onSearchChange={(e) => setSearchTerm(e.target.value)}
         addButtonLabel="+ Novo Usuário"
       />
-      <UserModal 
-        open={modalOpen} 
-        onClose={() => setModalOpen(false)} 
-      />
+      <UserModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </>
   );
 };

@@ -17,28 +17,75 @@ import ApiService from "../../../../../services/ApiServices";
 const userId = JSON.parse(localStorage.getItem("login_info"));
 
 const UserModal = ({ open, onClose }) => {
+  const [formPsswd, setFormPsswd] = useState({ status: false, response: "" });
+  const [formErrors, setFormErrors] = useState({});
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
+    confirmPassword: "",
     userType: "VIEWER",
     status: "ACTIVE",
-    clientId: userId.id
+    clientId: userId.id,
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (formErrors[name]) {
+      setFormErrors((prev) => ({ ...prev, [name]: false }));
+    }
+    if (name === "password" || name === "confirmPassword") {
+      setFormPsswd({ status: false, response: "" });
+      setFormErrors((prev) => ({
+        ...prev,
+        password: false,
+        confirmPassword: false,
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    const requiredFields = ["name", "email", "password", "confirmPassword"];
+
+    requiredFields.forEach((field) => {
+      if (!formData[field] || String(formData[field]).trim() === "") {
+        errors[field] = "Campo obrigatório";
+      }
+    });
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert("As senhas não coincidem!");
+
+    if (!validateForm()) {
       return;
     }
-    console.log(formData);
-    ApiService.postRequest("/users/create", formData);
+
+    if (formData.password !== formData.confirmPassword) {
+      const passwordMismatchError = "As senhas não coincidem!";
+
+      setFormPsswd({ status: true, response: passwordMismatchError });
+
+      setFormErrors((prev) => ({
+        ...prev,
+        password: passwordMismatchError,
+        confirmPassword: passwordMismatchError,
+      }));
+      return;
+    }
+
+    setFormPsswd({ status: false, response: "" });
+
+    const payload = { ...formData };
+    delete payload.confirmPassword;
+
+    ApiService.postRequest("/users/create", payload);
     window.location.reload();
     onClose();
   };
@@ -98,7 +145,11 @@ const UserModal = ({ open, onClose }) => {
           <Typography variant="caption" color="text.secondary">
             Informações básicas de identificação do usuário
           </Typography>
-          <UserFormPersonalData formData={formData} onChange={handleChange} />
+          <UserFormPersonalData
+            formData={formData}
+            onChange={handleChange}
+            formErrors={formErrors}
+          />
         </Box>
 
         {/* Credenciais de Acesso */}
@@ -109,7 +160,12 @@ const UserModal = ({ open, onClose }) => {
           <Typography variant="caption" color="text.secondary">
             Defina a senha de acesso ao sistema (mínimo 8 caracteres)
           </Typography>
-          <UserFormCredentials formData={formData} onChange={handleChange} />
+          <UserFormCredentials
+            formData={formData}
+            onChange={handleChange}
+            psswdBody={formPsswd}
+            formErrors={formErrors}
+          />
         </Box>
 
         {/* Permissões e Vinculação */}

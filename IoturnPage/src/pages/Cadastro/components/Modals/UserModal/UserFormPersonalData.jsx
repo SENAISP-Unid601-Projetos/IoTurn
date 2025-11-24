@@ -2,7 +2,7 @@ import React from "react";
 import { Grid } from "@mui/material";
 import FormField from "../../../components/FormField";
 
-const UserFormPersonalData = ({ formData, onChange }) => {
+const UserFormPersonalData = ({ formData, onChange, formErrors }) => {
   return (
     <Grid container spacing={3}>
       <Grid item xs={12}>
@@ -11,6 +11,8 @@ const UserFormPersonalData = ({ formData, onChange }) => {
           name="name"
           value={formData.name}
           onChange={onChange}
+          error={!!formErrors.name}
+          helperText={formErrors.name || ""}
           placeholder="Ex: João Silva"
           required
         />
@@ -21,6 +23,8 @@ const UserFormPersonalData = ({ formData, onChange }) => {
           name="email"
           value={formData.email}
           onChange={onChange}
+          error={!!formErrors.email}
+          helperText={formErrors.email || ""}
           placeholder="Ex: joao.silva@empresa.com"
           required
         />

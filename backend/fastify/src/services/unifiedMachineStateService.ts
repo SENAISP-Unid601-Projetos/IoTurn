@@ -17,6 +17,17 @@ const TTLS = {
   oilTemperature: { milliseconds: 300000 }, // 5 minutos
   oilLevel: { milliseconds: 3600000 }, // 1 hora
 };
+export interface ClusterPredictionResponse {
+  machineId: number;
+  current: number;
+  rpm: number;
+  oilTemperature: number;
+  oilLevel: number;
+  predicted_cluster: number;
+  prediction_strength: number;
+  timestamp: Date;
+  log: string;
+}
 
 async function getAndValidateMetric<T extends keyof typeof TTLS>(
   metricName: T,
@@ -178,6 +189,27 @@ export const unifiedMachineStateService = {
           createState.clusterStrength!,
         );
         //RabbitMQ
+        if(newState.clusterPredict === -1){
+          try {
+            const log = await logDiagnosisService.logGeneration(getState,createState.clusterPredict!,createState.clusterStrength!);
+            const responseBodyMessage = {
+              machineId: getState.machineId,
+              current: getState.corrente,
+              rpm: getState.rpm,
+              oilTemperature: getState.temperatura,
+              oilLevel: getState.nivel,
+              predicted_cluster: log.clusterPredict,
+              prediction_strength:log.clusterStrength,
+              timestamp: getState.timestamp,
+              log: log.insight,
+            }
+            
+            redisService.publishMessageToCluster(getState.machineId,responseBodyMessage);
+
+          } catch (error) {
+            throw new Error("Erro ao gerar log de diagnóstico: " + (error as Error).message);
+          }
+        }
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {

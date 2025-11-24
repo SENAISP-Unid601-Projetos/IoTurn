@@ -17,6 +17,7 @@ const TOPIC = 'ioturn/maquinas/+/dt/+';
   timeStampNivel?: Date;
   rpm?: number;
   timeStampRpm?: Date;
+  log?:string;
 }
 // Subscreve aos tópicos
 mqttClient.subscribe(TOPIC, { qos: 0 }, (err, granted) => {
@@ -91,7 +92,7 @@ mqttClient.on('message',async (topic, message) => {
         break;
     }
     //console.log(dataPoint)
-    //unifiedMachineStateService.unifiedState(dataPoint);
+    unifiedMachineStateService.unifiedState(dataPoint);
     redisService.publishMessageToMachine(numericMachineId, dataPoint);
   } catch (error) {
     console.error('[ERRO DE PARSE MQTT]:', error)

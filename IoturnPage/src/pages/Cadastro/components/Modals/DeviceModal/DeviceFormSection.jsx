@@ -3,9 +3,9 @@ import { Grid } from "@mui/material";
 import FormField from "../../../components/FormField";
 
 const statusOptions = [
-  { value: "Provisionamento", label: "Provisionamento" },
-  { value: "Ativo", label: "Ativo" },
-  { value: "Inativo", label: "Inativo" },
+  { value: "PROVISIONING", label: "Provisionamento" },
+  { value: "ONLINE", label: "Ativo" },
+  { value: "OFFLINE", label: "Inativo" },
 ];
 
 const DispositivoFormSection = ({ formData, handleChange }) => (

@@ -1,27 +1,19 @@
 import { Button, Box } from "@mui/material";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import theme from "../../../theme";
 
 const Buttons = ({
   onNext,
-  cancelPath,      
+  onCancel,
   nextLabel = "Próximo",
   cancelLabel = "Cancelar",
   showNextIcon = false,
 }) => {
-  const navigate = useNavigate();
-
-  const handleCancel = () => {
-    if (cancelPath) navigate(cancelPath);
-    else navigate(-1); 
-  };
-
   return (
     <Box display="flex" justifyContent="space-between" width="100%" padding={2} pt={0}>
       <Button
         variant="outlined"
-        onClick={handleCancel} 
+        onClick={onCancel}
         sx={{
           borderRadius: "12px",
           textTransform: "none",
@@ -42,6 +34,7 @@ const Buttons = ({
       </Button>
 
       <Button
+        type="submit" 
         variant="contained"
         onClick={onNext}
         sx={{

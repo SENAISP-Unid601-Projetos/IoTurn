@@ -1,20 +1,19 @@
 import React, { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogActions,
-  Box,
-} from "@mui/material";
+import { Dialog, DialogContent, DialogActions, Box } from "@mui/material";
 import Buttons from "../../../components/BottonsActions";
 import DispositivoFormSection from "./DeviceFormSection";
 import DispositivoInfoSection from "./DeviceInfoSection";
 import theme from "../../../../../theme";
+import ApiService from "../../../../../services/ApiServices";
+
+const userId = JSON.parse(localStorage.getItem("login_info"));
 
 const DispositivoModal = ({ open, onClose }) => {
   const [formData, setFormData] = useState({
+    clientId: userId.id,
     nodeId: "",
     description: "",
-    status: "Provisionamento",
+    status: "PROVISIONING",
   });
 
   const handleChange = (e) => {
@@ -25,6 +24,8 @@ const DispositivoModal = ({ open, onClose }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Novo dispositivo:", formData);
+    ApiService.postRequest("/devices/create", formData);
+    window.location.reload();
     onClose();
   };
 
@@ -40,27 +41,28 @@ const DispositivoModal = ({ open, onClose }) => {
           border: `1px solid ${theme.palette.divider}`,
           borderRadius: "16px",
           boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.5)",
-          "& .MuiDialogTitle-root, & .MuiDialogContent-root, & .MuiDialogActions-root": {
-            bgcolor: "#000 !important",
-          },
+          "& .MuiDialogTitle-root, & .MuiDialogContent-root, & .MuiDialogActions-root":
+            {
+              bgcolor: "#000 !important",
+            },
         },
       }}
     >
       <DialogContent>
         <DispositivoInfoSection />
-        <Box 
-          component="form" 
-          onSubmit={handleSubmit} 
-          sx={{ 
-            borderTop: `1px solid ${theme.palette.divider}`, 
-            borderBottom: `1px solid ${theme.palette.divider}`, 
-            pt: 3, 
-            pb: 3 
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{
+            borderTop: `1px solid ${theme.palette.divider}`,
+            borderBottom: `1px solid ${theme.palette.divider}`,
+            pt: 3,
+            pb: 3,
           }}
         >
-          <DispositivoFormSection 
-            formData={formData} 
-            handleChange={handleChange} 
+          <DispositivoFormSection
+            formData={formData}
+            handleChange={handleChange}
           />
         </Box>
       </DialogContent>

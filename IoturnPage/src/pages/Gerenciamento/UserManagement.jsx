@@ -5,6 +5,7 @@ import { useDataManagement } from "../../hooks/useDataManagement";
 import { fetchAllUserData } from "../../services/usersService";
 import { formatTimestamp } from "../../utils/formatters";
 import UserModal from "../Cadastro/components/Modals/UserModal/UserModal";
+import EditUserModal from "../Gerenciamento/components/Edit/EditUserModal";
 import StatusChip from "../../components/StatusChip";
 
 const filterCallback = (user, term) =>
@@ -19,25 +20,38 @@ const GerenciamentoUsers = () => {
     error,
     searchTerm,
     setSearchTerm,
+    refetchData,
   } = useDataManagement(fetchAllUserData, filterCallback);
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+
+  const handleEditClick = (user) => {
+    setEditingUser(user);
+    setEditModalOpen(true);
+  };
+
+  const handleUserUpdated = () => {
+    setEditModalOpen(false);
+    if (refetchData) refetchData();
+  };
 
   const columns = [
     { header: "Nome", field: "name" },
     { header: "Email", field: "email" },
     { header: "Cargo", field: "userType" },
-    { 
-      header: "Status", 
-      render: (user) => <StatusChip status={user.status} /> 
+    {
+      header: "Status",
+      render: (user) => <StatusChip status={user.status} />,
     },
-    { 
-      header: "Data Criação", 
-      render: (user) => formatTimestamp(user.createdAt) 
+    {
+      header: "Data Criação",
+      render: (user) => formatTimestamp(user.createdAt),
     },
-    { 
-      header: "Cliente", 
-      render: (user) => user.client?.companyName || "–"
+    {
+      header: "Cliente",
+      render: (user) => user.client?.companyName || "–",
     },
   ];
 
@@ -54,15 +68,20 @@ const GerenciamentoUsers = () => {
         loading={loading}
         error={error}
         onAdd={() => setModalOpen(true)}
-        onEdit={(user) => console.log("Editar usuário", user)}
+        onEdit={handleEditClick}
         onDelete={(user) => console.log("Deletar usuário", user)}
         searchTerm={searchTerm}
         onSearchChange={(e) => setSearchTerm(e.target.value)}
         addButtonLabel="+ Novo Usuário"
       />
-      <UserModal 
-        open={modalOpen} 
-        onClose={() => setModalOpen(false)} 
+
+      <UserModal open={modalOpen} onClose={() => setModalOpen(false)} />
+
+      <EditUserModal
+        open={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        userData={editingUser}
+        onUserUpdated={handleUserUpdated}
       />
     </>
   );

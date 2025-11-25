@@ -40,12 +40,12 @@ const sidebarItems = [
         icon: <ListIcon size={17} />,
         path: "/main/maquinas",
       },
+      {
+        text: "Análise de Cluster",
+        icon: <LayoutGrid size={18} />,
+        path: "/main/clusters",
+      },
     ],
-  },
-  {
-    text: "Análise de Cluster",
-    icon: <LayoutGrid size={18} />,
-    path: "/main/clusters",
   },
   {
     text: "Hermes AI",

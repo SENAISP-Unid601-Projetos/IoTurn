@@ -102,7 +102,7 @@ const DynamicChart = ({
         range: XAXIS_RANGE,
         labels: {
           style: {
-            colors: theme.palette.text.secondary,
+            colors: theme.palette.text.primary,
             fontSize: "11px",
           },
           datetimeUTC: false,

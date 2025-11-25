@@ -40,12 +40,40 @@ const MetricCard = ({
   title,
   value,
   unit,
-  min,
-  med,
-  max,
+  // Os props min, med, max foram mantidos na desestruturação (como 'external')
+  // mas serão substituídos pelos valores calculados a partir de dataSeries.
+  min: externalMin,
+  med: externalMed,
+  max: externalMax,
+  dataSeries = [], // 🟢 NOVO PROP: Array de dados para cálculo
   status = "default",
 }) => {
   const theme = useTheme();
+
+  // 1. EXTRAIR VALORES NUMÉRICOS DA SÉRIE
+  const numericValues = dataSeries
+    // Mapeia para o valor 'y' (se for um ponto {x, y}) ou usa o próprio ponto (se for apenas um número)
+    .map(point => (point && point.y !== undefined ? point.y : point)) 
+    // Filtra para garantir que apenas números válidos sejam considerados
+    .filter(v => typeof v === 'number' && !isNaN(v));
+
+  // 2. CÁLCULOS
+  const calculatedMin = numericValues.length > 0 ? Math.min(...numericValues) : 0;
+  const calculatedMax = numericValues.length > 0 ? Math.max(...numericValues) : 0;
+  const sum = numericValues.reduce((acc, curr) => acc + curr, 0);
+  const calculatedMed = numericValues.length > 0 ? sum / numericValues.length : 0;
+
+  // 3. FUNÇÃO DE FORMATAÇÃO
+  const formatValue = (val) => {
+    if (typeof val !== 'number' || isNaN(val)) return 'N/A';
+    // Formata para 2 casas decimais, ou mantém inteiro se for o caso
+    return val % 1 === 0 ? val : val.toFixed(2);
+  };
+
+  // 4. VALORES PARA EXIBIÇÃO
+  const displayMin = formatValue(calculatedMin);
+  const displayMed = formatValue(calculatedMed);
+  const displayMax = formatValue(calculatedMax);
 
   // Configuração do semáforo
   const statusConfig = {
@@ -157,9 +185,10 @@ const MetricCard = ({
           borderTop: `1px solid ${theme.palette.divider}`,
         }}
       >
-        <Stat label="Min" value={min} icon={TrendingDown} />
-        <Stat label="Méd" value={med} icon={Minus} />
-        <Stat label="Máx" value={max} icon={TrendingUp} />
+        {/* 🟢 CORRIGIDO: Usando valores calculados */}
+        <Stat label="Min" value={displayMin} icon={TrendingDown} />
+        <Stat label="Méd" value={displayMed} icon={Minus} />
+        <Stat label="Máx" value={displayMax} icon={TrendingUp} />
       </Box>
     </Paper>
   );

@@ -129,12 +129,11 @@ const MachineDashboard = () => {
   useEffect(() => {
     if (!machineId) return;
 
-    const url = `${
-      import.meta.env.VITE_API_URL
-    }/machines/stream/${machineId}`;
+    const url = `${import.meta.env.VITE_API_URL
+      }/machines/stream/${machineId}`;
     const source = new EventSource(url);
     console.log(url);
-    
+
 
     source.onmessage = (event) => {
       try {
@@ -355,6 +354,7 @@ const MachineDashboard = () => {
             min={machine.metrics?.rpm?.min}
             max={machine.metrics?.rpm?.max}
             status="good"
+            dataSeries={rpmData}
           />
         </MetricWrapper>
 
@@ -368,6 +368,7 @@ const MachineDashboard = () => {
             min={machine.metrics?.temp?.min}
             max={machine.metrics?.temp?.max}
             status="warning"
+            dataSeries={tempData}
           />
         </MetricWrapper>
 
@@ -381,6 +382,7 @@ const MachineDashboard = () => {
             min={machine.metrics?.oleo?.min}
             max={machine.metrics?.oleo?.max}
             status="good"
+            dataSeries={oleoData}
           />
         </MetricWrapper>
 
@@ -394,6 +396,7 @@ const MachineDashboard = () => {
             min={machine.metrics?.corrente?.min}
             max={machine.metrics?.corrente?.max}
             status="danger"
+            dataSeries={correnteData}
           />
         </MetricWrapper>
       </Box>

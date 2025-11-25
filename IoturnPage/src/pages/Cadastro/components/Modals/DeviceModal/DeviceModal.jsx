@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogActions, Box } from "@mui/material";
 import Buttons from "../../../components/BottonsActions";
 import DispositivoFormSection from "./DeviceFormSection";
@@ -9,6 +9,7 @@ import ApiService from "../../../../../services/ApiServices";
 const userId = JSON.parse(localStorage.getItem("login_info"));
 
 const DispositivoModal = ({ open, onClose }) => {
+  const [formErrors, setFormErrors] = useState({});
   const [formData, setFormData] = useState({
     clientId: userId.id,
     nodeId: "",
@@ -19,10 +20,32 @@ const DispositivoModal = ({ open, onClose }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (formErrors[name]) {
+      setFormErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    const requiredFields = ["nodeId", "description", "status"];
+
+    requiredFields.forEach((field) => {
+      if (!formData[field] || String(formData[field]).trim() === "") {
+        errors[field] = "Campo obrigatório";
+      }
+    });
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
     console.log("Novo dispositivo:", formData);
     ApiService.postRequest("/devices/create", formData);
     window.location.reload();
@@ -42,9 +65,9 @@ const DispositivoModal = ({ open, onClose }) => {
           borderRadius: "16px",
           boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.5)",
           "& .MuiDialogTitle-root, & .MuiDialogContent-root, & .MuiDialogActions-root":
-            {
-              bgcolor: "#000 !important",
-            },
+          {
+            bgcolor: "#000 !important",
+          },
         },
       }}
     >
@@ -63,6 +86,7 @@ const DispositivoModal = ({ open, onClose }) => {
           <DispositivoFormSection
             formData={formData}
             handleChange={handleChange}
+            formErrors={formErrors}
           />
         </Box>
       </DialogContent>

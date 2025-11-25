@@ -8,7 +8,7 @@ const statusOptions = [
   { value: "PROVISIONING", label: "Em Manutenção" },
 ];
 
-const GatewayFormSection = ({ formData, handleChange }) => (
+const GatewayFormSection = ({ formData, handleChange, formErrors = {} }) => (
   <Grid container spacing={4}>
     <Grid item xs={6}>
       <FormField
@@ -19,6 +19,8 @@ const GatewayFormSection = ({ formData, handleChange }) => (
         placeholder="Ex: ESP32-GW-A1B2C3D4E5F6"
         description="ID único do hardware (Chip ID do ESP32)"
         required
+        error={!!formErrors.gatewayId}
+        helperText={formErrors.gatewayId || ""}
       />
     </Grid>
 
@@ -32,6 +34,8 @@ const GatewayFormSection = ({ formData, handleChange }) => (
         required
         select
         options={statusOptions}
+        error={!!formErrors.status}
+        helperText={formErrors.status || ""}
       />
     </Grid>
 
@@ -42,7 +46,10 @@ const GatewayFormSection = ({ formData, handleChange }) => (
         value={formData.description}
         onChange={handleChange}
         placeholder="Ex: Gateway do Setor A"
-        description="Localização física ou identificação adicional (opcional)"
+        description="Localização física ou identificação adicional"
+        required
+        error={!!formErrors.description}
+        helperText={formErrors.description || ""}
       />
     </Grid>
   </Grid>

@@ -130,9 +130,11 @@ const MachineDashboard = () => {
     if (!machineId) return;
 
     const url = `${
-      import.meta.env.VITE_APP_API_URL
+      import.meta.env.VITE_API_URL
     }/machines/stream/${machineId}`;
     const source = new EventSource(url);
+    console.log(url);
+    
 
     source.onmessage = (event) => {
       try {

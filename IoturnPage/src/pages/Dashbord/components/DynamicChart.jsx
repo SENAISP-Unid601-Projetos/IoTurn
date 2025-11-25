@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import ApexCharts from "apexcharts";
-import { Box, Typography, Paper, useTheme, alpha } from "@mui/material";
+import { Box, Typography, Paper, useTheme, alpha, colors } from "@mui/material";
 
 // Constantes do gráfico
 const MAX_DATA_POINTS = 30;
@@ -17,6 +17,7 @@ const DynamicChart = ({
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
   const lastProcessedData = useRef([]);
+  const lastUpdateTimeRef = useRef(0);
 
   // Cor primária do tema
   const chartColor = theme.palette.primary.main;
@@ -57,10 +58,10 @@ const DynamicChart = ({
           offsetY: 0,
         },
         animations: {
-          enabled: false,
+          enabled: true,
           easing: "linear",
           dynamicAnimation: {
-            speed: 10000,
+            speed: 1000,
           },
         },
       },
@@ -73,7 +74,7 @@ const DynamicChart = ({
       colors: [chartColor],
       stroke: {
         curve: "smooth",
-        width: 3, // Aumentei para melhor visualização durante animação
+        width: 2,
       },
       dataLabels: {
         enabled: false,
@@ -87,7 +88,7 @@ const DynamicChart = ({
         },
       },
       markers: {
-        size: 4,
+        size: 0,
         strokeColors: chartColor,
         strokeWidth: 2,
         fillOpacity: 1,
@@ -124,7 +125,7 @@ const DynamicChart = ({
         tickAmount: 5,
         labels: {
           style: {
-            colors: theme.palette.text.secondary,
+            colors: theme.palette.text.primary,
             fontSize: "11px",
           },
           formatter: (val) => {
@@ -176,6 +177,8 @@ const DynamicChart = ({
     };
   }, [title, theme]);
 
+  // src/pages/Dashbord/components/DynamicChart.jsx (useEffect de atualização)
+
   // Efeito para atualizar os dados da série
   useEffect(() => {
     if (!chartInstance.current || !seriesData || seriesData.length === 0) {
@@ -192,61 +195,65 @@ const DynamicChart = ({
       return;
     }
 
+    // 🎯 Throttling 
+    const now = Date.now();
+    const THROTTLE_TIME = 1000;
+
+    if (now - lastUpdateTimeRef.current < THROTTLE_TIME) {
+      return;
+    }
+    lastUpdateTimeRef.current = now;
     lastProcessedData.current = processedData;
 
     try {
-      // Atualiza os dados da série
-      chartInstance.current.updateSeries(
-        [
+      const lastPoint = processedData[processedData.length - 1];
+
+      if (lastPoint) {
+        chartInstance.current.appendData([
           {
-            name: title,
-            data: processedData,
+            data: [lastPoint],
           },
         ],
-        true
-      );
-
-      // Ajusta dinamicamente o eixo Y baseado nos dados
-      if (processedData.length > 0) {
-        const values = processedData
-          .map((p) => p.y)
-          .filter((val) => !isNaN(val));
-        if (values.length > 0) {
-          const dataMin = Math.min(...values);
-          const dataMax = Math.max(...values);
-          const padding = Math.max((dataMax - dataMin) * 0.1, 1); // 10% de padding ou pelo menos 1
-
-          chartInstance.current.updateOptions(
-            {
-              yaxis: {
-                min: Math.max(0, dataMin - padding),
-                max: dataMax + padding,
-              },
-            },
-            false,
-            true
-          );
-        }
+          true
+        );
       }
     } catch (error) {
       console.error(`Erro ao atualizar gráfico ${title}:`, error);
     }
-  }, [seriesData, title]);
+  }, [seriesData, title]); // ...
 
   // Efeito para atualizar o Y-axis com limites externos
   useEffect(() => {
+    const color = theme.palette.text.primary;
+    const fontSize = "12px"
     if (chartInstance.current) {
       chartInstance.current.updateOptions(
         {
           yaxis: {
             min: Math.max(0, yMin - 5),
             max: yMax > 0 ? yMax * 1.1 : 100,
+            labels: {
+              style: {
+                colors: color,
+                fontSize: fontSize,
+              },
+            },
+          },
+
+          xaxis: {
+            labels: {
+              style: {
+                colors: color,
+                fontSize: fontSize,
+              },
+            },
           },
         },
         false,
         true
       );
     }
+
   }, [yMin, yMax]);
 
   return (

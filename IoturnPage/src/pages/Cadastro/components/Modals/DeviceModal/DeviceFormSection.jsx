@@ -8,7 +8,7 @@ const statusOptions = [
   { value: "OFFLINE", label: "Inativo" },
 ];
 
-const DispositivoFormSection = ({ formData, handleChange }) => (
+const DispositivoFormSection = ({ formData, handleChange, formErrors = {} }) => (
   <Grid container spacing={3}>
     <FormField
       xs={12}
@@ -19,6 +19,8 @@ const DispositivoFormSection = ({ formData, handleChange }) => (
       placeholder="Ex: HELTEC-A8F3B2"
       description="Identificador único do dispositivo"
       required
+      error={!!formErrors.nodeId}
+      helperText={formErrors.nodeId || ""}
     />
 
     <FormField
@@ -28,7 +30,10 @@ const DispositivoFormSection = ({ formData, handleChange }) => (
       value={formData.description}
       onChange={handleChange}
       placeholder="Ex: Sensor Setor A"
-      description="Localização física (opcional)"
+      description="Localização física ou identificação adicional"
+      required
+      error={!!formErrors.description}
+      helperText={formErrors.description || ""}
     />
 
     <FormField

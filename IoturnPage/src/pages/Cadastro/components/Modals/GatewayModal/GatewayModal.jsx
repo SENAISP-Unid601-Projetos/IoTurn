@@ -16,6 +16,7 @@ import ApiService from "../../../../../services/ApiServices";
 const userId = JSON.parse(localStorage.getItem("login_info"));
 
 const GatewayModal = ({ open, onClose }) => {
+  const [formErrors, setFormErrors] = useState({});
   const [formData, setFormData] = useState({
     clientId: userId.id,
     gatewayId: "",
@@ -26,10 +27,32 @@ const GatewayModal = ({ open, onClose }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    if (formErrors[name]) {
+      setFormErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    const requiredFields = ["gatewayId", "description", "status"];
+
+    requiredFields.forEach((field) => {
+      if (!formData[field] || String(formData[field]).trim() === "") {
+        errors[field] = "Campo obrigatório";
+      }
+    });
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
     console.log("Novo gateway:", formData);
     ApiService.postRequest("/gateways/create", formData);
     window.location.reload();
@@ -49,10 +72,10 @@ const GatewayModal = ({ open, onClose }) => {
           borderRadius: "16px",
           boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.5)",
           "& .MuiDialogTitle-root, & .MuiDialogContent-root, & .MuiDialogActions-root":
-            {
-              bgcolor: "#000 !important",
-              color: "#fff",
-            },
+          {
+            bgcolor: "#000 !important",
+            color: "#fff",
+          },
         },
       }}
     >
@@ -92,7 +115,7 @@ const GatewayModal = ({ open, onClose }) => {
             pb: 3,
           }}
         >
-          <GatewayFormSection formData={formData} handleChange={handleChange} />
+          <GatewayFormSection formData={formData} handleChange={handleChange} formErrors={formErrors} />
         </Box>
         <GatewayFunctionSection />
         <GatewayGuidelinesSection />

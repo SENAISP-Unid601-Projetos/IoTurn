@@ -58,11 +58,9 @@ export const RealtimeDataProvider = ({ children }) => {
 
         source.onopen = () => {
             setConnectionError(null);
-            console.log("Conexão SSE estabelecida com sucesso.");
         };
 
         source.onmessage = (event) => {
-            console.log("SSE RAW DATA:", event.data);
             processIncomingData(event.data);
         };
 

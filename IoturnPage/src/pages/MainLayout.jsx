@@ -4,6 +4,7 @@ import Sidebar from '../components/Sidebar';
 import { Menu } from 'lucide-react';
 import { Outlet } from 'react-router-dom';
 import theme from '../theme';
+import { RealtimeDataProvider } from '../context/RealtimeDataProvider';
 
 const MainLayout = () => {
   const [isSidebarExpanded, setSidebarExpanded] = useState(false);
@@ -27,9 +28,11 @@ const MainLayout = () => {
             : `${theme.layout.sidebarWidthCollapsed}px`,
         }}
       >
-        <Box >
-          <Outlet />
-        </Box>
+        <RealtimeDataProvider> 
+          <Box >
+            <Outlet />
+          </Box>
+        </RealtimeDataProvider>
 
       </Box>
     </Box>

@@ -1,30 +1,7 @@
 import React from 'react';
-import { Paper, Typography, Box, useTheme, alpha, Chip, Tooltip } from '@mui/material';
+import { Paper, Typography, Box, useTheme, Tooltip, Divider } from '@mui/material';
 import { Clock, Sparkles, Info, ArrowRight } from 'lucide-react';
 import theme from '../../../theme'
-
-const typeConfig = {
-    anomaly: {
-        label: 'Anomaly',
-        color: 'error',
-        iconColor: (theme) => theme.palette.error.main,
-    },
-    transition: {
-        label: 'Transition',
-        color: 'primary',
-        iconColor: (theme) => theme.palette.primary.main,
-    },
-    low_force_cluster: {
-        label: 'Baixa Força',
-        color: 'warning',
-        iconColor: (theme) => theme.palette.warning.main,
-    },
-    default: {
-        label: 'Evento',
-        color: 'secondary',
-        iconColor: (theme) => theme.palette.text.secondary,
-    }
-};
 
 const Metric = ({ label, value, unit = '' }) => (
     <Box>
@@ -38,9 +15,8 @@ const Metric = ({ label, value, unit = '' }) => (
 );
 
 const ClusterEventCard = ({ event }) => {
+    console.log(event)
     const theme = useTheme();
-    const config = typeConfig[event.eventType] || typeConfig.default;
-    const cardBorderColor = config.iconColor(theme);
 
     return (
         <Paper
@@ -48,7 +24,7 @@ const ClusterEventCard = ({ event }) => {
             sx={{
                 p: 3,
                 bgcolor: 'background.default',
-                border: `1px solid ${cardBorderColor}`,
+                border: `1px solid ${theme.palette.divider}`,
                 borderRadius: 3,
                 mb: 2,
             }}
@@ -66,23 +42,12 @@ const ClusterEventCard = ({ event }) => {
                 <Typography variant="h6" sx={{ fontWeight: 'bold', flexGrow: 1 }}>
                     {event.machineName}
                 </Typography>
-                <Chip
-                    label={config.label}
-                    color={config.color}
-                    variant="outlined"
-                    size="small"
-                />
                 <Typography variant="body2" color="text.secondary">
                     {event.time}
                 </Typography>
             </Box>
-
             {/* Card Body - Descrição e Cluster */}
             <Box sx={{ mb: 2.5, pl: 4.25 }}>
-                <Typography variant="body1" sx={{ mb: 1.5 }}>
-                    {event.description}
-                </Typography>
-
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
                     <Typography variant="body2" color="text.secondary">
                         Cluster: <Box component="span" sx={{ color: 'text.primary', fontWeight: 'bold' }}>{event.clusterId}</Box>
@@ -125,11 +90,11 @@ const ClusterEventCard = ({ event }) => {
                     <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                         Insight de IA
                     </Typography>
-                    <Chip label="Verificar Informações" color="warning" size="small" variant="outlined" />
                 </Box>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                     {event.insight}
                 </Typography>
+                <Divider />
                 <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
                     Este é um insight gerado automaticamente. Sempre verifique as informações e sua veracidade antes de tomar decisões ou conclusões.
                 </Typography>

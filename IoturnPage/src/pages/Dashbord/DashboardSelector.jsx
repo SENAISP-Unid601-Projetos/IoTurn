@@ -11,6 +11,7 @@ import {
 import MachineCard from "./components/MachineCard";
 import { fetchAllMachineData } from "../../services/machineService";
 import { Activity } from "lucide-react";
+import { useRealtimeData } from "../../context/RealtimeDataProvider"; // Importa o hook
 
 const DashboardSelectionPage = () => {
   const [machines, setMachines] = useState([]);
@@ -18,7 +19,11 @@ const DashboardSelectionPage = () => {
   const [error, setError] = useState(null);
   const [selectedMachineId, setSelectedMachineId] = useState(null);
   const theme = useTheme();
+  
+  // Consumir dados globais
+  const { latestMachineData } = useRealtimeData(); 
 
+  // Efeito para carregar dados iniciais (via REST) - Inalterado
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -36,85 +41,49 @@ const DashboardSelectionPage = () => {
     loadData();
   }, []);
 
+  // Efeito NOVO: Substitui o SSE por consumo do contexto
+  // O bloco useEffect anterior (com machines.forEach e new EventSource) foi REMOVIDO.
   useEffect(() => {
-    if (machines.length === 0 || loading) return;
+    if (Object.keys(latestMachineData).length === 0) return;
 
-    const API_BASE_URL_FOR_SSE = import.meta.env.VITE_API_URL;
-    const sseSources = [];
+    setMachines((prevMachines) => {
+      return prevMachines.map((m) => {
+        const newData = latestMachineData[m.id];
+        if (newData) {
+          let updatedMetrics = { ...m.metrics };
 
-    machines.forEach((machine) => {
-      const machineId = machine.id;
-      const url = `${API_BASE_URL_FOR_SSE}/machines/stream/${machineId}`;
-      let sseSource = new EventSource(url);
-
-      sseSource.onmessage = (event) => {
-        try {
-          const newData = JSON.parse(event.data);
-
-          setMachines((prevMachines) => {
-            return prevMachines.map((m) => {
-              if (m.id === machineId) {
-                let updatedMetrics = { ...m.metrics };
-
-                if (newData.rpm !== undefined) {
-                  updatedMetrics.rpm = {
-                    ...updatedMetrics.rpm,
-                    value: newData.rpm,
-                  };
-                }
-
-                if (newData.temperatura !== undefined) {
-                  updatedMetrics.temp = {
-                    ...updatedMetrics.temp,
-                    value: newData.temperatura,
-                  };
-                }
-
-                if (newData.nivel !== undefined) {
-                  updatedMetrics.oleo = {
-                    ...updatedMetrics.oleo,
-                    value: newData.nivel,
-                  };
-                }
-
-                if (newData.corrente !== undefined) {
-                  updatedMetrics.corrente = {
-                    ...updatedMetrics.corrente,
-                    value: newData.corrente,
-                  };
-                }
-
-                return { ...m, metrics: updatedMetrics };
-              }
-              return m;
-            });
-          });
-
-          console.log(machines);
-        } catch (e) {
-          console.error(
-            `Falha ao processar dado do SSE para máquina ${machineId}:`,
-            e
-          );
+          // Atualiza as métricas (suporta dados individuais ou do payload de cluster)
+          if (newData.rpm !== undefined) {
+            updatedMetrics.rpm = {
+              ...updatedMetrics.rpm,
+              value: newData.rpm,
+            };
+          }
+          if (newData.temperatura !== undefined || newData.oilTemperature !== undefined) {
+            updatedMetrics.temp = {
+              ...updatedMetrics.temp,
+              value: newData.temperatura ?? newData.oilTemperature, // Usa a métrica mais recente
+            };
+          }
+          if (newData.nivel !== undefined || newData.oilLevel !== undefined) {
+             updatedMetrics.oleo = {
+                ...updatedMetrics.oleo,
+                value: newData.nivel ?? newData.oilLevel, // Usa a métrica mais recente
+            };
+          }
+          if (newData.corrente !== undefined || newData.current !== undefined) {
+            updatedMetrics.corrente = {
+              ...updatedMetrics.corrente,
+              value: newData.corrente ?? newData.current, // Usa a métrica mais recente
+            };
+          }
+          
+          return { ...m, metrics: updatedMetrics };
         }
-      };
-
-      sseSource.onerror = (err) => {
-        console.error(`Erro no EventSource para máquina ${machineId}:`, err);
-        sseSource.close();
-      };
-
-      sseSources.push(sseSource);
-    });
-
-    return () => {
-      sseSources.forEach((source) => {
-        if (source) {
-          source.close();
-        }
+        return m;
       });
-    };
-  }, [machines, loading]);
+    });
+  }, [latestMachineData]); // Dependência do estado global
 
   const handleCardClick = (id) => {
     setSelectedMachineId(id);

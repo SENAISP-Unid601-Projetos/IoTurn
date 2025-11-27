@@ -357,18 +357,17 @@ function Registro() {
             />
 
             <Link
-              href="#"
+              href="/login"
               variant="body2"
               sx={{ alignSelf: "flex-end", textDecoration: "none" }}
             >
-              Esqueceu a senha?
+              Já tem uma conta ?
             </Link>
 
             <Button
               variant="contained"
               size="large"
               fullWidth
-              // href="/main/maquinas"
               sx={{ py: 1.5 }}
               onClick={handleLogin}
             >

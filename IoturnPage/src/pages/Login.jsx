@@ -208,11 +208,11 @@ function Login() {
             />
 
             <Link
-              href="#"
+              href="/registro"
               variant="body2"
               sx={{ alignSelf: "flex-end", textDecoration: "none" }}
             >
-              Esqueceu a senha?
+              Ainda não tem uma conta ?
             </Link>
 
             <Button

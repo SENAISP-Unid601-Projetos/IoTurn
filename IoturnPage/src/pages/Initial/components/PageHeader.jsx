@@ -1,6 +1,6 @@
 import React from 'react';
 import { AppBar, Toolbar, Button, Box, Container } from '@mui/material';
-import Logo from "../../../assets/LogoSemBorda.png";
+import Logo from "../../../assets/Logo.png";
 
 const PageHeader = () => (
     <AppBar
@@ -16,8 +16,8 @@ const PageHeader = () => (
                         src={Logo}
                         alt="IoTurn Logo"
                         sx={{
-                            height: "50px",
-                            transform: "scale(5)",
+                            height: "5rem",
+                            transform: "scale(1.5)",
                             width: "auto",
                             py: 2,
                         }}
@@ -32,7 +32,7 @@ const PageHeader = () => (
                         textTransform: "none",
                         px: 3,
                         py: 1,
-                        fontSize: "1rem",
+                        fontSize: "0.8rem",
                     }}
                 >
                     Acessar

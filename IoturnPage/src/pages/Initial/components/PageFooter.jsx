@@ -1,6 +1,6 @@
 import React from 'react';
 import { Typography, Box, Container } from '@mui/material';
-import Logo from "../../../assets/LogoSemBorda.png";
+import Logo from "../../../assets/Logo.png";
 
 const PageFooter = () => (
     <Box sx={{ width: "100%", py: 3 }}>
@@ -12,6 +12,7 @@ const PageFooter = () => (
                 alignItems: "center",
                 justifyContent: "space-between",
                 minHeight: { xs: "120px", md: "60px" },
+                height: {xs: '200px', md: "100px"}
             }}
         >
             <Box
@@ -19,8 +20,10 @@ const PageFooter = () => (
                 src={Logo}
                 alt="IoTurn Logo"
                 sx={{
-                    height: "50px",
-                    width: "auto",
+                    height: "5rem",
+                    transform: "scale(1.5)",
+                    width: 'auto',
+                    py: 2,
                 }}
             />
 

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
     Box,
     Typography,
@@ -10,7 +10,6 @@ import {
     LinearProgress,
     Avatar,
     useTheme,
-    alpha,
     Divider,
 } from "@mui/material";
 import {
@@ -23,6 +22,7 @@ import {
 import ApiService from "../../services/ApiServices";
 import ChatEmptyState from "./components/ChatEmptyState";
 import ChatLoadingIndicator from "./components/ChatLoadingIndicator";
+import FeedbackButton from "./components/FeedbackButton";
 
 export default function HermesAIPage() {
     const theme = useTheme();
@@ -32,6 +32,7 @@ export default function HermesAIPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [feedbacks, setFeedbacks] = useState({});
     const [loadingProgress, setLoadingProgress] = useState(0);
+
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
@@ -73,7 +74,7 @@ export default function HermesAIPage() {
         setIsLoading(true);
 
         try {
-            const apiResponse = await ApiService.postRequest("/hermes/ask", {
+            const apiResponse = await ApiService.postRequest("/hermes/ask/1", {
                 message: content,
             });
 
@@ -123,46 +124,30 @@ export default function HermesAIPage() {
 
     const handleFeedback = async (messageId, feedback) => {
         const currentFeedbackData = feedbacks[messageId];
+        const newFeedbackValue = feedback;
 
-        if (currentFeedbackData && currentFeedbackData.locked) {
+        // LÓGICA DE CLIQUE ÚNICO: Se já existe um feedback, ignora o novo clique.
+        if (currentFeedbackData) {
             return;
         }
 
-        const feedbackValue = feedback === 'positive' ? 1 : 0;
-        const newFeedbackValue = feedback; 
-        
-        if (currentFeedbackData?.value === feedback) {
-             return;
-        }
-
-        setFeedbacks((prev) => ({ 
-            ...prev, 
-            [messageId]: { value: newFeedbackValue, locked: false } 
+        setFeedbacks((prev) => ({
+            ...prev,
+            [messageId]: { value: newFeedbackValue }
         }));
-        
+
         const message = messages.find(m => m.id === messageId);
         const keyReturned = message?.cacheId;
+        const feedbackValue = feedback === 'positive' ? 1 : 0;
 
         if (keyReturned) {
             try {
-                await ApiService.postRequest("/feedback", {
+                await ApiService.postRequest("/hermes/feedback", {
                     feedback: feedbackValue,
                     keyReturned: keyReturned,
                 });
-                
-                setFeedbacks((prev) => ({ 
-                    ...prev, 
-                    [messageId]: { value: newFeedbackValue, locked: true } 
-                }));
-                
             } catch (error) {
                 console.error("Failed to send feedback:", error);
-                
-                setFeedbacks((prev) => {
-                    const newState = { ...prev };
-                    delete newState[messageId];
-                    return newState;
-                });
             }
         }
     };
@@ -243,12 +228,13 @@ export default function HermesAIPage() {
                 }}
             >
                 <Box sx={{ flexGrow: 1 }}>
+                    {/* Exibe o estado vazio se não houver mensagens */}
                     {messages.length === 0 && !isLoading && <ChatEmptyState onSuggestionClick={handleSuggestionClick} />}
 
                     {messages.map((message) => {
                         const feedbackData = feedbacks[message.id];
-                        const isLocked = feedbackData?.locked;
-                        
+                        const hasFeedback = !!feedbackData;
+
                         return (
                             <Box
                                 key={message.id}
@@ -262,8 +248,8 @@ export default function HermesAIPage() {
                                 {message.role === "assistant" && (
                                     <Avatar
                                         sx={{
-                                            bgcolor: alpha(theme.palette.primary.main, 0.1),
-                                            color: theme.palette.primary.main,
+                                            bgcolor: theme.palette.primary.main,
+                                            color: "white",
                                             width: 40,
                                             height: 40,
                                             mr: 1.5,
@@ -298,7 +284,7 @@ export default function HermesAIPage() {
                                         {message.content}
                                     </Typography>
 
-                                    {/* Feedback */}
+                                    {/* Botões de Feedback */}
                                     {message.role === "assistant" && (
                                         <Box style={{ display: message.content !== 'Desculpe, ocorreu um erro ao processar sua pergunta. Por favor, tente novamente.' ? 'flex' : 'none' }}
                                             sx={{
@@ -306,44 +292,28 @@ export default function HermesAIPage() {
                                                 gap: 0.5,
                                                 mt: 1.5,
                                                 pt: 1,
-                                                borderTop: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
+                                                borderTop: `1px solid ${theme.palette.divider}`,
                                             }}
                                         >
                                             <Typography variant="caption" color="text.secondary" mr={1}>
                                                 A mensagem foi útil?
                                             </Typography>
-                                            <IconButton
-                                                size="small"
+
+                                            <FeedbackButton
+                                                type="positive"
                                                 onClick={() => handleFeedback(message.id, "positive")}
-                                                disabled={isLocked}
-                                                sx={{
-                                                    color:
-                                                        feedbackData?.value === "positive"
-                                                            ? "success.main"
-                                                            : "text.secondary",
-                                                    "&:hover": {
-                                                        bgcolor: alpha(theme.palette.success.main, 0.1),
-                                                    },
-                                                }}
-                                            >
-                                                <ThumbsUp size={16} />
-                                            </IconButton>
-                                            <IconButton
-                                                size="small"
+                                                currentValue={feedbackData?.value}
+                                                Icon={ThumbsUp}
+                                                disabled={hasFeedback}
+                                            />
+
+                                            <FeedbackButton
+                                                type="negative"
                                                 onClick={() => handleFeedback(message.id, "negative")}
-                                                disabled={isLocked}
-                                                sx={{
-                                                    color:
-                                                        feedbackData?.value === "negative"
-                                                            ? "error.main"
-                                                            : "text.secondary",
-                                                    "&:hover": {
-                                                        bgcolor: alpha(theme.palette.error.main, 0.1),
-                                                    },
-                                                }}
-                                            >
-                                                <ThumbsDown size={16} />
-                                            </IconButton>
+                                                currentValue={feedbackData?.value}
+                                                Icon={ThumbsDown}
+                                                disabled={hasFeedback}
+                                            />
                                         </Box>
                                     )}
                                 </Paper>
@@ -356,6 +326,7 @@ export default function HermesAIPage() {
                 </Box>
             </Paper>
 
+            {/* Campo de Input e Botão de Envio */}
             <Box
                 component="form"
                 onSubmit={handleSubmit}

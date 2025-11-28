@@ -1,7 +1,7 @@
 #include "Sensor_HCSR04.h"
 #include "Arduino.h"
-#define TRIG 4
-#define ECHO 5
+#define TRIG 33
+#define ECHO 47
 
 void startLevel(){
     pinMode(TRIG, OUTPUT);

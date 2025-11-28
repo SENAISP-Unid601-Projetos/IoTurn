@@ -23,7 +23,7 @@
 #define RX_TIMEOUT_VALUE                            1000
 #define BUFFER_SIZE                                 64
 
-float pinSCT013 = A0;
+float pinSCT013 = 5;
 
 SSD1306Wire  factory_display(0x3c, 500000, SDA_OLED, SCL_OLED, GEOMETRY_128_64, RST_OLED);
 
@@ -94,7 +94,7 @@ void setup() {
                       true, 0, 0, LORA_IQ_INVERSION_ON, 3000);
                       
     nodeChipID = getChipId();
-    emon1.current(pinSCT013, 111.11);
+    emon1.current(pinSCT013, 7.4074);
     startTemperature(); 
     startRPM();
     startLevel();

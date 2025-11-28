@@ -1,13 +1,13 @@
 #include "Sensor_RPM.h"
 #include <Arduino.h>
 
-const int signalPulse = 6; 
+const int signalPulse = 48; 
 volatile unsigned long pulses = 0;
 int currentRpm = 0;
 const unsigned long CALCULATION_INTERVAL = 1000; 
 unsigned long previousMillis = 0;
 
-const unsigned int pulses_per_turn = 20;
+const unsigned int pulses_per_turn = 1;
 
 void IRAM_ATTR count() {
     pulses++;

@@ -16,13 +16,14 @@ import { GaugeCircle, Thermometer, Droplets, Zap } from "lucide-react";
 import { fetchMachineById } from "../../services/machineService";
 import MetricCard from "./components/MetricCard";
 import DynamicChart from "./components/DynamicChart";
+import { fetchAllMachineData } from "../../services/machineService";
 import { useRealtimeData } from "../../context/RealtimeDataProvider";
 
 const MAX_DATA_POINTS = 30;
 
 const MachineDashboard = () => {
   const { machineId } = useParams();
-  const { latestMachineData, connectionError } = useRealtimeData(); 
+  const { latestMachineData, connectionError } = useRealtimeData();
   const navigate = useNavigate();
 
   const [machine, setMachine] = useState(null);
@@ -32,6 +33,8 @@ const MachineDashboard = () => {
 
   const [period, setPeriod] = useState("last_hour");
   const [selectedMachine, setSelectedMachine] = useState(machineId);
+
+  const [dataMachines, setDataMachines] = useState('');
 
   const [lastUpdated, setLastUpdated] = useState(
     new Date().toLocaleTimeString()
@@ -102,8 +105,11 @@ const MachineDashboard = () => {
       try {
         setLoading(true);
         const data = await fetchMachineById(machineId);
+        const dataAllMachine = await fetchAllMachineData();
         setMachine(data);
-        setSelectedMachine(data.id);
+        setDataMachines(dataAllMachine);
+
+        setSelectedMachine(machineId);
 
         setRpmData([]);
         setTempData([]);
@@ -124,7 +130,7 @@ const MachineDashboard = () => {
 
     const incoming = latestMachineData[machineId];
     if (!incoming) return;
-    
+
     console.log(`[SSE - Máquina ${machineId}] DADOS RECEBIDOS:`, incoming);
 
     if (timeOffsetRef.current === 0) {
@@ -139,7 +145,7 @@ const MachineDashboard = () => {
         timeOffsetRef.current = calculateTimeOffset(timestamp);
       }
     }
-    
+
     if (incoming.rpm && incoming.timeStampRpm)
       addPoint(incoming.timeStampRpm, incoming.rpm, setRpmData);
 
@@ -161,19 +167,18 @@ const MachineDashboard = () => {
       );
 
     setLastUpdated(new Date().toLocaleTimeString());
-    
-  }, [machineId, latestMachineData, addPoint]); 
 
+  }, [machineId, latestMachineData, addPoint]);
 
   const recalculateTimeOffset = () => {
-    const currentMachineData = latestMachineData[machineId] || {}; 
+    const currentMachineData = latestMachineData[machineId] || {};
 
     const lastTimestamp =
       currentMachineData.timeStampRpm ||
       currentMachineData.timeStampTemperatura ||
       currentMachineData.timeStampNivel ||
       currentMachineData.timeStampCorrente ||
-      currentMachineData.timestamp; 
+      currentMachineData.timestamp;
 
     if (lastTimestamp) {
       timeOffsetRef.current = calculateTimeOffset(lastTimestamp);
@@ -195,12 +200,12 @@ const MachineDashboard = () => {
       </Box>
     );
 
-  if (error || connectionError) 
+  if (error || connectionError)
     return <Alert severity="error">Erro ao carregar máquina: {error || connectionError}</Alert>;
 
   if (!machine) return <Typography>Máquina não encontrada.</Typography>;
 
-  const currentMachineData = latestMachineData[machineId] || {}; 
+  const currentMachineData = latestMachineData[machineId] || {};
 
   return (
     <Box>
@@ -223,30 +228,12 @@ const MachineDashboard = () => {
                 (Offset: {Math.round(timeOffsetRef.current / 1000)}s)
               </span>
             )}
-            {connectionError && ( 
-                <span style={{ marginLeft: 8, color: 'red' }}>
-                  (Erro de Conexão)
-                </span>
+            {connectionError && (
+              <span style={{ marginLeft: 8, color: 'red' }}>
+                (Erro de Conexão)
+              </span>
             )}
           </Typography>
-        </Box>
-
-        <Box sx={{ display: "flex", gap: 1 }}>
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={recalculateTimeOffset}
-            title="Recalcular diferença de tempo"
-          >
-            Sincronizar Tempo
-          </Button>
-          <Button
-            variant="outlined"
-            sx={{ borderRadius: 2 }}
-            onClick={() => navigate("/main/maquinas")}
-          >
-            Início
-          </Button>
         </Box>
       </Box>
 
@@ -264,9 +251,11 @@ const MachineDashboard = () => {
             value={selectedMachine}
             onChange={(e) => navigate(`/main/dashboard/${e.target.value}`)}
           >
-            <MenuItem value={machine.id}>
-              {machine.name} – {machine.serialNumber}
-            </MenuItem>
+            {Array.isArray(dataMachines) && dataMachines.map((m) => (
+              <MenuItem key={m.id} value={m.id}>
+                {m.name} – {m.serialNumber}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
 

@@ -204,7 +204,7 @@ export const unifiedMachineStateService = {
               log: log.insight,
             }
             
-            redisService.publishMessageToCluster(getState.machineId,responseBodyMessage);
+            redisService.publishMessageToMachine(getState.machineId,responseBodyMessage);
 
           } catch (error) {
             throw new Error("Erro ao gerar log de diagnóstico: " + (error as Error).message);

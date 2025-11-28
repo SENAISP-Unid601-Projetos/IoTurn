@@ -104,11 +104,10 @@ const MetricCard = ({
   const config = statusConfig[status] || statusConfig.default;
 
   // Define as variáveis de cor
-  const borderColor = config.color;
-  const backgroundColor = config.bgcolor;
-  const valueTextColor = config.textColor || config.color;
-  const statusIconColor = config.iconColor || config.color;
-  const glow = config.glow;
+  const borderColor = theme.palette.divider;
+  const backgroundColor = theme.palette.background.default;
+  const valueTextColor = theme.palette.text.primary;
+  const glow = alpha(theme.palette.primary.main, 0.25);
 
   return (
     <Paper
@@ -144,7 +143,7 @@ const MetricCard = ({
           {Icon && <Icon size={18} />}
           {title}
         </Typography>
-        {Icon && <Icon size={18} color={statusIconColor} />}
+        {Icon && <Icon size={18} color={valueTextColor} />}
       </Box>
 
       {/* VALOR PRINCIPAL */}

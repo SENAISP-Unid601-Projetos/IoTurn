@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Box, Typography, IconButton, useTheme, Stack, CircularProgress, Alert } from '@mui/material';
-import { RefreshCw, Activity, AlertTriangle, Bug, ShieldAlert, ZapOff } from 'lucide-react';
+import { RefreshCw, Activity } from 'lucide-react';
 import SummaryStatCard from './components/SumaryStatCard';
 import ClusterEventCard from './components/ClusterEventCard';
 import { useRealtimeData } from '../../context/RealtimeDataProvider';
@@ -19,6 +19,7 @@ const formatSSEEvent = (sseEvent) => {
         eventType: eventType,
         clusterId: 'ANOMALIA',
         clusterForce: sseEvent.prediction_strength?.toFixed(2) || '0.00',
+        predicted_cluster: clusterId,
         time: new Date(timestamp).toLocaleTimeString("pt-BR", {
             hour: "2-digit",
             minute: "2-digit",
@@ -30,11 +31,7 @@ const formatSSEEvent = (sseEvent) => {
         temperature: sseEvent.oilTemperature?.toFixed(2) || 'N/A',
         oilLevel: sseEvent.oilLevel?.toFixed(2) || 'N/A',
         current: sseEvent.current?.toFixed(2) || 'N/A',
-
         insight: sseEvent.log,
-
-        previousClusterId: null,
-        previousClusterForce: null,
     };
 };
 
@@ -84,8 +81,20 @@ const ClusterAnalysisPage = () => {
 
     if (isLoadingInitial) {
         return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
-                <CircularProgress />
+            <Box>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                    <Box>
+                        <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                            Logs de Análise de Clusters
+                        </Typography>
+                        <Typography variant="body1" color="text.secondary">
+                            Monitoramento inteligente - Exibindo apenas eventos relevantes
+                        </Typography>
+                    </Box>
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
+                    <CircularProgress />
+                </Box>
             </Box>
         );
     }
@@ -96,10 +105,8 @@ const ClusterAnalysisPage = () => {
 
     const validEvents = displayData.events;
     const summary = displayData.summary;
+    console.log('sum', summary);
 
-    if (validEvents.length === 0) {
-        return <Typography>Nenhum evento de cluster recebido.</Typography>;
-    }
 
     return (
         <Box>
@@ -110,19 +117,9 @@ const ClusterAnalysisPage = () => {
                         Logs de Análise de Clusters
                     </Typography>
                     <Typography variant="body1" color="text.secondary">
-                        Monitoramento inteligente HDBSCAN - Exibindo apenas eventos relevantes
+                        Monitoramento inteligente - Exibindo apenas eventos relevantes
                     </Typography>
                 </Box>
-                {/* O botão Refresh agora apenas recalcula os dados (não faz fetch REST) */}
-                <IconButton
-                    onClick={() => console.log("Recarregar dados: Apenas recalcula o resumo do SSE.")}
-                    sx={{
-                        border: `1px solid ${theme.palette.divider}`,
-                        borderRadius: 2,
-                    }}
-                >
-                    <RefreshCw size={18} />
-                </IconButton>
             </Box>
 
             {/* Summary Cards */}

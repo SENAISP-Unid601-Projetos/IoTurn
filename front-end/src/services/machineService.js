@@ -1,0 +1,68 @@
+import ApiService from "./ApiServices";
+import { formatTimestamp } from "../utils/formatters";
+
+const API_URL = "/machines/getAll";
+
+const formatMachineData = (machine) => {
+  const companyName = machine.client?.companyName || "–";
+  const deviceId = machine.device?.nodeId || "–";
+
+  return {
+    id: machine.id,
+    name: machine.name,
+    serialNumber: machine.serialNumber,
+    manufacturer: machine.manufacturer,
+    model: machine.model,
+    company: companyName,
+    iotDevice: deviceId,
+    lastUpdate: formatTimestamp(machine.lastRpm?.timestamp),
+    status: machine.status,
+    metrics: {
+      rpm: {
+        name: "RPM",
+        value: 0,
+        unit: "",
+        min: machine.lastRpm?.min ?? 0,
+        med: machine.lastRpm?.med ?? 0,
+        max: machine.lastRpm?.max ?? 0,
+      },
+      temp: {
+        name: "Temperatura",
+        value: 0,
+        unit: "°C",
+        min: machine.lastOilTemperature?.min ?? 0,
+        med: machine.lastOilTemperature?.med ?? 0,
+        max: machine.lastOilTemperature?.max ?? 0,
+      },
+      oleo: {
+        name: "Nível de Óleo",
+        value: 0,
+        unit: "%",
+        min: machine.lastOilLevel?.min ?? 0,
+        med: machine.lastOilLevel?.med ?? 0,
+        max: machine.lastOilLevel?.max ?? 0,
+      },
+      corrente: {
+        name: "Corrente",
+        value: 0,
+        unit: "A",
+        min: machine.lastCurrent?.min ?? 0,
+        med: machine.lastCurrent?.med ?? 0,
+        max: machine.lastCurrent?.max ?? 0,
+      },
+    },
+  };
+};
+
+export const fetchAllMachineData = async () => {
+  const rawData = await ApiService.getRequest(API_URL);
+  const formattedData = rawData.map(formatMachineData);
+  return formattedData;
+};
+
+export const fetchMachineById = async (id) => {
+  const rawData = await ApiService.getRequest(API_URL);
+  const formattedData = formatMachineData(rawData);
+
+  return formattedData;
+};

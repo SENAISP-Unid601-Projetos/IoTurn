@@ -1,0 +1,57 @@
+# ==============================================================================
+# 1. Deployment: Gerencia os pods que executam a aplicação Vite (Nginx)
+# ==============================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vite-app-deployment
+  labels:
+    app: vite-app
+spec:
+  # Garante 2 réplicas (pods) rodando para alta disponibilidade
+  replicas: 2 
+  selector:
+    matchLabels:
+      app: vite-app
+  template:
+    metadata:
+      labels:
+        app: vite-app
+    spec:
+      containers:
+      - name: vite-app-container
+        # SUBSTITUA ESTA IMAGEM PELA SUA IMAGEM PUBLICADA
+        image: pedroleme/vite-app:v1.0.0 
+        imagePullPolicy: IfNotPresent 
+        ports:
+        - containerPort: 80 # A porta padrão do Nginx dentro do container
+          name: http-port
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "64Mi"
+          limits:
+            cpu: "500m"
+            memory: "128Mi"
+---
+# ==============================================================================
+# 2. Service: Expõe o Deployment usando NodePort
+# ==============================================================================
+apiVersion: v1
+kind: Service
+metadata:
+  name: vite-app-service
+  labels:
+    app: vite-app
+spec:
+  # NodePort: Permite acessar o Service usando o IP de qualquer nó do cluster
+  # e uma porta de alto valor (geralmente entre 30000-32767).
+  type: NodePort 
+  selector:
+    # O Service direciona o tráfego para os Pods com esta label
+    app: vite-app 
+  ports:
+    - protocol: TCP
+      port: 80       # A porta que o Service expõe internamente
+      targetPort: 80 # A porta do container (Nginx)
+      nodePort: 31224 # Opcional: Você pode especificar a porta (30000-32767)

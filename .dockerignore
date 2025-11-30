@@ -1,0 +1,7 @@
+# Ignora a pasta de dependências do Node.js
+node_modules
+# Ignora a pasta de build (será gerada no container)
+dist
+# Ignora o Dockerfile e o .dockerignore
+Dockerfile
+.dockerignore

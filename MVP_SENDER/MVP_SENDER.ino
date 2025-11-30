@@ -10,7 +10,11 @@
 #include <numeric>
 #include "Sensor_RPM.h"
 #include "EmonLib.h"
+#include <UnicViewAD.h>
+#include <HardhareSerial.h>
 
+
+// Configurações LoRa
 #define RF_FREQUENCY                                915000000 // Hz
 #define TX_OUTPUT_POWER                             20        // dBm
 #define LORA_BANDWIDTH                              0         // [0: 125 kHz]
@@ -23,11 +27,24 @@
 #define RX_TIMEOUT_VALUE                            1000
 #define BUFFER_SIZE                                 64
 
+// Configurações dos pinos da Serial 1
+#define PIN_RX 48
+#define PIN_TX 47
+
+
 float pinSCT013 = 5;
 
+HardwareSerial DisplaySerial(1);
+LCM Lcm(DisplaySerial);
 SSD1306Wire  factory_display(0x3c, 500000, SDA_OLED, SCL_OLED, GEOMETRY_128_64, RST_OLED);
-
 EnergyMonitor emon1;
+
+
+// Variáveis do Display Victor Vision
+LcmVar Rpm(100);
+LcmVar Corrente(110);
+LcmVar Temperatura(120);
+LcmVar NivelTanque(130);
 
 char txpacket[BUFFER_SIZE];
 StaticJsonDocument<256> doc;
@@ -67,6 +84,8 @@ double stagedCurrent;
 unsigned long lastReadTime = 0;
 const int readInterval = 1000; 
 
+
+// 
 // --- Protótipos de Funções ---
 static RadioEvents_t RadioEvents;
 void OnTxDone(void);
@@ -93,6 +112,10 @@ void setup() {
                       LORA_PREAMBLE_LENGTH, LORA_FIX_LENGTH_PAYLOAD_ON,
                       true, 0, 0, LORA_IQ_INVERSION_ON, 3000);
                       
+    pinMode(PIN_RX, INPUT_PULLUP);
+    pinMode(PIN_TX, OUTPUT);
+    DisplaySerial.begin(115200, SERIAL_8N1, PIN_RX, PIN_TX);
+    Lcm.begin();
     nodeChipID = getChipId();
     emon1.current(pinSCT013, 7.4074);
     startTemperature(); 
@@ -145,6 +168,12 @@ void loop() {
         
         averageRPM = std::accumulate(rpmReadings.begin(), rpmReadings.end(), 0) / (float)rpmReadings.size();
 
+        // Atualiza o display Victor Vision
+        Rpm.write(round(averageRPM));
+        Corrente.write(Irms);
+        Temperatura.write(currentTemperature);
+        NivelTanque.write(currentLevelPercentage);
+        
         bool shouldSend = false;
         doc.clear();
   

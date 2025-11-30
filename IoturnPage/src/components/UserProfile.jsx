@@ -2,16 +2,29 @@ import React from "react";
 import { Avatar, Box, Typography, useTheme } from "@mui/material";
 import { User as UserIcon } from "lucide-react";
 import { alpha } from '@mui/material/styles';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 
-const UserProfile = ({ user }) => {
+const UserProfile = ({ user, isSidebarExpanded }) => {
   const theme = useTheme();
   const navigate = useNavigate();
 
   if (!user) return null;
 
   const handleProfileClick = () => {
-    navigate('/'); 
+    navigate('/main/gerenciamento/usuarios');
+  };
+
+  const textSx = {
+    opacity: isSidebarExpanded ? 1 : 0,
+    width: isSidebarExpanded ? 'auto' : 0,
+    minWidth: isSidebarExpanded ? 'auto' : 0,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    transition: theme.transitions.create(['opacity', 'width', 'min-width'], {
+      easing: theme.transitions.easing.easeInOut,
+      duration: theme.transitions.duration.complex,
+      delay: isSidebarExpanded ? '100ms' : '0ms',
+    }),
   };
 
   return (
@@ -23,25 +36,35 @@ const UserProfile = ({ user }) => {
         alignItems: "center",
         width: "100%",
         p: 2,
-        cursor: "pointer", 
+        cursor: "pointer",
+        transition: theme.transitions.create('padding', {
+          duration: theme.transitions.duration.complex,
+        }),
       }}
     >
       <Box
         sx={{
           display: "flex",
           alignItems: "center",
-          gap: 1.8,
-          px: 1.5,
-          py: 1.8,
-          borderRadius: 3,
-          background: `linear-gradient(135deg, ${theme.palette.background.default}, ${theme.palette.background.paper})`,
           width: "100%",
           maxWidth: "100%",
+          borderRadius: 3,
+          gap: isSidebarExpanded ? 1.8 : 0,
+          px: isSidebarExpanded ? 1.5 : 0,
+          py: isSidebarExpanded ? 1.8 : 0,
+          background: isSidebarExpanded
+            ? `linear-gradient(135deg, ${theme.palette.background.default}, ${theme.palette.background.paper})`
+            : 'transparent',
+
+          transition: theme.transitions.create(['gap', 'padding', 'background'], {
+            easing: theme.transitions.easing.easeInOut,
+            duration: theme.transitions.duration.complex,
+          }),
         }}
       >
         <Box sx={{ position: "relative" }}>
           <Avatar
-            aria-label={`Perfil de ${user.name}`} 
+            aria-label={`Perfil de ${user.name}`}
             sx={{
               bgcolor: alpha(theme.palette.primary.main, 0.12),
               border: `1px solid ${alpha(theme.palette.primary.main, 0.5)}`,
@@ -53,7 +76,8 @@ const UserProfile = ({ user }) => {
             <UserIcon size={22} />
           </Avatar>
         </Box>
-        <Box>
+
+        <Box sx={textSx}>
           <Typography
             variant="subtitle1"
             sx={{

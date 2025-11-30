@@ -1,123 +1,319 @@
 {
-  "machines": [
+  "clients": [
     {
-      "id": 1,
-      "name": "Torno CNC",
-      "sector": "Setor A",
-      "machineId": "HELTEC-A8F3B2",
-      "company": "Indústria Metalúrgica Silva LTDA",
-      "lastUpdate": "2 min atrás",
-      "status": "online"
+      "id": "cuid_client_1",
+      "companyName": "Indústria Metalúrgica ABC"
     },
     {
-      "id": 2,
-      "name": "Fresadora",
-      "sector": "Setor B",
-      "machineId": "HELTEC-C4D9E1",
-      "company": "Fábrica de Componentes Tech SA",
-      "lastUpdate": "1 min atrás",
-      "status": "alert"
-    },
-    {
-      "id": 3,
-      "name": "Prensa",
-      "sector": "Setor C",
-      "machineId": "HELTEC-C4D9E1",
-      "company": "Fábrica de Componentes Tech SA",
-      "lastUpdate": "1 min atrás",
-      "status": "alert"
+      "id": "cuid_client_2",
+      "companyName": "Senai Operations"
     }
   ],
-  "metrics": [
+  "users": [
     {
-      "id": 1,
-      "machineId": 1,
-      "metrics": [
-        {
-          "name": "RPM",
-          "value": "1520",
-          "unit": "",
-          "status": "normal"
-        },
-        {
-          "name": "Temp",
-          "value": "72",
-          "unit": "°C",
-          "status": "normal"
-        },
-        {
-          "name": "Óleo",
-          "value": "85",
-          "unit": "%",
-          "status": "normal"
-        },
-        {
-          "name": "Corrente",
-          "value": "12.3",
-          "unit": "A",
-          "status": "normal"
-        }
-      ]
+      "id": "cuid_user_1",
+      "name": "João Silva",
+      "email": "joao.silva@empresaabc.com",
+      "userType": "Admin",
+      "status": "ACTIVE",
+      "createdAt": "2025-01-15T09:30:00.000Z",
+      "clientId": "cuid_client_1",
+      "client": {
+        "companyName": "Indústria Metalúrgica ABC"
+      }
     },
     {
-      "id": 2,
-      "machineId": 2,
-      "metrics": [
-        {
-          "name": "RPM",
-          "value": "1680",
-          "unit": "",
-          "status": "normal"
-        },
-        {
-          "name": "Temp",
-          "value": "82",
-          "unit": "°C",
-          "status": "warning"
-        },
-        {
-          "name": "Óleo",
-          "value": "78",
-          "unit": "%",
-          "status": "normal"
-        },
-        {
-          "name": "Corrente",
-          "value": "14.1",
-          "unit": "A",
-          "status": "normal"
-        }
-      ]
+      "id": "cuid_user_2",
+      "name": "Maria Oliveira",
+      "email": "maria.oliveira@empresaabc.com",
+      "userType": "Manager",
+      "status": "ACTIVE",
+      "createdAt": "2025-02-20T11:00:00.000Z",
+      "clientId": "cuid_client_1",
+      "client": {
+        "companyName": "Indústria Metalúrgica ABC"
+      }
     },
     {
-      "id": 3,
-      "machineId": 3,
-      "metrics": [
-        {
-          "name": "RPM",
-          "value": "8",
-          "unit": "",
-          "status": "danger"
-        },
-        {
-          "name": "Temp",
-          "value": "45",
-          "unit": "°C",
-          "status": "normal"
-        },
-        {
-          "name": "Óleo",
-          "value": "92",
-          "unit": "%",
-          "status": "normal"
-        },
-        {
-          "name": "Corrente",
-          "value": "57",
-          "unit": "A",
-          "status": "danger"
-        }
-      ]
+      "id": "cuid_user_3",
+      "name": "Carlos Pereira",
+      "email": "carlos.pereira@empresaabc.com",
+      "userType": "Operator",
+      "status": "SUSPENDED",
+      "createdAt": "2025-03-10T16:45:00.000Z",
+      "clientId": "cuid_client_1",
+      "client": {
+        "companyName": "Indústria Metalúrgica ABC"
+      }
+    },
+    {
+      "id": "cuid_user_4",
+      "name": "Ana Souza",
+      "email": "ana.souza@senai.com.br",
+      "userType": "Admin",
+      "status": "ACTIVE",
+      "createdAt": "2025-01-10T08:00:00.000Z",
+      "clientId": "cuid_client_2",
+      "client": {
+        "companyName": "Senai Operations"
+      }
     }
-  ]
+  ],
+  "gateways": [
+    {
+      "id": "cuid_gateway_1",
+      "gatewayId": "GW-ESP32-001",
+      "description": "Gateway principal da planta 1",
+      "status": "ONLINE",
+      "lastHeartbeat": "2025-11-03T14:31:32.017Z",
+      "connectedDevices": 2,
+      "clientId": "cuid_client_1"
+    },
+    {
+      "id": "cuid_gateway_2",
+      "gatewayId": "GW-ESP32-002",
+      "description": "Gateway do Setor de Prensas",
+      "status": "OFFLINE",
+      "lastHeartbeat": "2025-11-01T10:05:00.000Z",
+      "connectedDevices": 1,
+      "clientId": "cuid_client_2"
+    }
+  ],
+  "devices": [
+    {
+      "id": "cuid_device_1",
+      "nodeId": "NODE-001",
+      "description": "Sensor do Torno CNC TX1000",
+      "status": "ONLINE",
+      "lastHeartbeat": "2025-11-03T14:32:06.844Z",
+      "machineId": "cuid_machine_1",
+      "gatewayId": "cuid_gateway_1",
+      "clientId": "cuid_client_1",
+      "machine": {
+        "name": "Torno CNC TX1000"
+      },
+      "gateway": {
+        "gatewayId": "GW-ESP32-001"
+      }
+    },
+    {
+      "id": "cuid_device_2",
+      "nodeId": "NODE-002",
+      "description": "Sensor da Fresadora Setor B",
+      "status": "ONLINE",
+      "lastHeartbeat": "2025-11-03T14:31:59.123Z",
+      "machineId": "cuid_machine_2",
+      "gatewayId": "cuid_gateway_1",
+      "clientId": "cuid_client_1",
+      "machine": {
+        "name": "Fresadora Setor B"
+      },
+      "gateway": {
+        "gatewayId": "GW-ESP32-001"
+      }
+    },
+    {
+      "id": "cuid_device_3",
+      "nodeId": "NODE-003",
+      "description": "Sensor da Prensa Hidráulica",
+      "status": "OFFLINE",
+      "lastHeartbeat": "2025-11-01T10:04:30.000Z",
+      "machineId": "cuid_machine_3",
+      "gatewayId": "cuid_gateway_2",
+      "clientId": "cuid_client_2",
+      "machine": {
+        "name": "Prensa Hidráulica P100"
+      },
+      "gateway": {
+        "gatewayId": "GW-ESP32-002"
+      }
+    }
+  ],
+  "machines": [
+    {
+      "id": "cuid_machine_1",
+      "name": "Torno CNC TX1000",
+      "serialNumber": "TX1000-SN-8892",
+      "manufacturer": "Makino",
+      "model": "TX1000",
+      "status": "ACTIVE",
+      "clientId": "cuid_client_1",
+      "client": {
+        "companyName": "Indústria Metalúrgica ABC"
+      },
+      "device": {
+        "nodeId": "NODE-001"
+      },
+      "lastRpm": {
+        "rpm": 1250,
+        "timestamp": "2025-11-03T14:32:10.000Z",
+        "min": 1200,
+        "med": 1250,
+        "max": 1300
+      },
+      "lastOilTemperature": {
+        "temperature": 68.5,
+        "timestamp": "2025-11-03T14:32:10.000Z",
+        "min": 65,
+        "med": 68,
+        "max": 72
+      },
+      "lastOilLevel": {
+        "level": 82,
+        "timestamp": "2025-11-03T14:30:00.000Z",
+        "min": 80,
+        "med": 82,
+        "max": 85
+      },
+      "lastCurrent": {
+        "current": 14.2,
+        "timestamp": "2025-11-03T14:32:10.000Z",
+        "min": 14,
+        "med": 14.2,
+        "max": 15.1
+      }
+    },
+    {
+      "id": "cuid_machine_2",
+      "name": "Fresadora Setor B",
+      "serialNumber": "FRS-SN-1100",
+      "manufacturer": "Haas",
+      "model": "VF-2",
+      "status": "ACTIVE",
+      "clientId": "cuid_client_1",
+      "client": {
+        "companyName": "Indústria Metalúrgica ABC"
+      },
+      "device": {
+        "nodeId": "NODE-002"
+      },
+      "lastRpm": {
+        "rpm": 1620,
+        "timestamp": "2025-11-03T16:45:29.000Z",
+        "min": 1500,
+        "med": 1600,
+        "max": 1800
+      },
+      "lastOilTemperature": {
+        "temperature": 79.0,
+        "timestamp": "2025-11-03T16:45:29.000Z",
+        "min": 75,
+        "med": 78,
+        "max": 82
+      },
+      "lastOilLevel": {
+        "level": 62,
+        "timestamp": "2025-11-03T16:40:00.000Z",
+        "min": 60,
+        "med": 62,
+        "max": 65
+      },
+      "lastCurrent": {
+        "current": 13.1,
+        "timestamp": "2025-11-03T16:45:29.000Z",
+        "min": 12.5,
+        "med": 13,
+        "max": 14
+      }
+    },
+    {
+      "id": "cuid_machine_3",
+      "name": "Prensa Hidráulica P100",
+      "serialNumber": "PH100-SN-0050",
+      "manufacturer": "Schuler",
+      "model": "P100",
+      "status": "OFFLINE",
+      "clientId": "cuid_client_2",
+      "client": {
+        "companyName": "Senai Operations"
+      },
+      "device": {
+        "nodeId": "NODE-003"
+      },
+      "lastRpm": {
+        "rpm": 0,
+        "timestamp": "2025-11-01T10:04:30.000Z",
+        "min": 0,
+        "med": 0,
+        "max": 0
+      },
+      "lastOilTemperature": {
+        "temperature": 40.0,
+        "timestamp": "2025-11-01T10:04:30.000Z",
+        "min": 40,
+        "med": 40,
+        "max": 40
+      },
+      "lastOilLevel": {
+        "level": 70,
+        "timestamp": "2025-11-01T10:00:00.000Z",
+        "min": 70,
+        "med": 70,
+        "max": 70
+      },
+      "lastCurrent": {
+        "current": 0.5,
+        "timestamp": "2025-11-01T10:04:30.000Z",
+        "min": 0.5,
+        "med": 0.5,
+        "max": 0.5
+      }
+    }
+  ],
+  "cluster_analysis": {
+    "summary": {
+      "totalEvents": 3,
+      "critical": 1,
+      "warnings": 2,
+      "anomalies": 1,
+      "lowForce": 1
+    },
+    "events": [
+      {
+        "id": "clog_cuid_1",
+        "machineName": "Torno CNC Setor A",
+        "eventType": "anomaly",
+        "timestamp": "2025-11-03T17:52:29.000Z",
+        "description": "Anomalia detectada: dados fora de todos os clusters conhecidos",
+        "clusterId": "ANOMALIA",
+        "clusterForce": 0.88,
+        "insight": "Padrão anômalo detectado devido a temperatura elevada, nível de óleo baixo, RPM acima do normal. Recomenda-se inspeção imediata para evitar falha catastrófica.",
+        "rpm": 2100,
+        "temperature": 85,
+        "oilLevel": 45,
+        "current": 13
+      },
+      {
+        "id": "clog_cuid_2",
+        "machineName": "Fresadora Setor B",
+        "eventType": "transition",
+        "timestamp": "2025-11-03T16:45:29.000Z",
+        "description": "Mudança de cluster detectada durante operação",
+        "clusterId": "#1",
+        "clusterForce": 0.67,
+        "previousClusterId": "#8",
+        "previousClusterForce": 0.91,
+        "insight": "Transição do cluster #8 para #1 indica mudança no regime operacional. Verificar se corresponde a ajuste intencional ou deriva não planejada.",
+        "rpm": 1620,
+        "temperature": 79,
+        "oilLevel": 62,
+        "current": 13.1
+      },
+      {
+        "id": "clog_cuid_3",
+        "machineName": "Fresadora Setor B",
+        "eventType": "low_force_cluster",
+        "timestamp": "2025-11-03T14:30:10.000Z",
+        "description": "Cluster de baixa força - monitoramento intensificado",
+        "clusterId": "#2",
+        "clusterForce": 0.18,
+        "insight": "Baixa força do cluster correlacionada com nível de óleo reduzido. Lubrificação inadequada pode estar causando desvio operacional.",
+        "rpm": 1550,
+        "temperature": 75,
+        "oilLevel": 60,
+        "current": 12.8
+      }
+    ]
+  },
+  "gemini_feedback": []
 }

@@ -7,26 +7,38 @@ import {
   Droplets,
   Zap,
 } from "lucide-react";
-
+import { useNavigate } from "react-router-dom";
 
 const iconMap = {
   RPM: GaugeCircle,
   Temp: Thermometer,
-  Óleo: Droplets,
+  'Nível de Óleo': Droplets,
   Corrente: Zap,
 };
 
 const MachineCard = ({ machine, onClick }) => {
   const theme = useTheme();
+  const navigate = useNavigate();
 
   const leftMetrics =
-    machine.metrics?.filter((m) => ["Óleo", "Corrente"].includes(m.name)) || [];
+    Object.values(machine.metrics || {}).filter((m) =>
+      ["Nível de Óleo", "Corrente"].includes(m.name)
+    ) || [];
   const rightMetrics =
-    machine.metrics?.filter((m) => ["RPM", "Temp"].includes(m.name)) || [];
+    Object.values(machine.metrics || {}).filter((m) =>
+      ["RPM", "Temperatura"].includes(m.name)
+    ) || [];
+
+  const handleCardClick = () => {
+    if (onClick) {
+      onClick(machine.id);
+    }
+    navigate(`/main/dashboard/${machine.id}`);
+  };
 
   return (
     <Box
-      onClick={() => onClick(machine.id)}
+      onClick={handleCardClick}
       sx={{
         flexGrow: 1,
         minHeight: { xs: 220, sm: 250, md: 280 },
@@ -76,7 +88,7 @@ const MachineCard = ({ machine, onClick }) => {
         <Typography
           sx={{ mb: 1.5, color: "text.secondary", fontSize: "0.875rem" }}
         >
-          {machine.machineId}
+          {machine.serialNumber}
         </Typography>
         <Typography variant="body2">{machine.company}</Typography>
         <Typography variant="caption" sx={{ flexGrow: 1 }}>
@@ -110,11 +122,13 @@ const MachineCard = ({ machine, onClick }) => {
                       mb: 0.3,
                     }}
                   >
-                    <IconComponent
-                      color={theme.palette.text.secondary}
-                      size={16}
-                      style={{ marginRight: theme.spacing(0.5) }}
-                    />
+                    {IconComponent && (
+                      <IconComponent
+                        color={theme.palette.text.secondary}
+                        size={16}
+                        style={{ marginRight: theme.spacing(0.5) }}
+                      />
+                    )}
                     {metric.name}
                   </Typography>
                   <Typography
@@ -134,7 +148,7 @@ const MachineCard = ({ machine, onClick }) => {
             {rightMetrics.map((metric) => {
               const IconComponent = iconMap[metric.name];
               const metricColor = theme.palette.text.primary;
-            
+
               return (
                 <Box key={metric.name} sx={{ mb: 1 }}>
                   <Typography
@@ -146,11 +160,13 @@ const MachineCard = ({ machine, onClick }) => {
                       mb: 0.3,
                     }}
                   >
-                    <IconComponent
-                      color={theme.palette.text.secondary}
-                      size={16}
-                      style={{ marginRight: theme.spacing(0.5) }}
-                    />
+                    {IconComponent && (
+                      <IconComponent
+                        color={theme.palette.text.secondary}
+                        size={16}
+                        style={{ marginRight: theme.spacing(0.5) }}
+                      />
+                    )}
                     {metric.name}
                   </Typography>
                   <Typography

@@ -1,5 +1,6 @@
 import { Container, Typography, Box } from "@mui/material";
 import { Activity, BarChart3, Bell, Shield, Zap, Globe } from "lucide-react";
+import { motion } from "framer-motion";
 
 const cardData = [
   {
@@ -38,8 +39,27 @@ const cardData = [
   },
 ];
 
+const cardVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: "easeOut",
+    },
+  },
+};
+
+const MotionBox = motion(Box);
+
 const InfoCard = ({ icon, title, description }) => (
-  <Box
+  <MotionBox
+    component="div"
+    initial="hidden"
+    whileInView="visible"
+    viewport={{ once: true, amount: 0.3 }}
+    variants={cardVariants}
     sx={{
       p: 3,
       textAlign: "left",
@@ -47,6 +67,7 @@ const InfoCard = ({ icon, title, description }) => (
       border: "1px solid",
       borderColor: "grey.800",
       borderRadius: 3,
+      cursor: 'pointer',
       display: "flex",
       flexDirection: "column",
       gap: 1.5,
@@ -83,7 +104,7 @@ const InfoCard = ({ icon, title, description }) => (
       {title}
     </Typography>
     <Typography color="text.secondary">{description}</Typography>
-  </Box>
+  </MotionBox>
 );
 
 const MoreInfos = () => (
@@ -103,7 +124,7 @@ const MoreInfos = () => (
         gridTemplateColumns: {
           xs: "repeat(1, 1fr)",
           sm: "repeat(2, 1fr)",
-          md: "repeat(3, 1fr)", 
+          md: "repeat(3, 1fr)",
         },
         gap: 3,
       }}

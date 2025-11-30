@@ -1,71 +1,68 @@
-// const API_URL = 'http://10.110.12.12:3000/machines/getAllUsersMachine/1';
-// const formatTimestamp = (timestamp) => {
-//   if (!timestamp) return 'N/A';
-//   const date = new Date(timestamp);
-//   return date.toLocaleString('pt-BR');
-// };
+import ApiService from "./ApiServices";
+import { formatTimestamp } from "../utils/formatters";
 
+const API_URL = "/machines/getAll";
 
-// export const fetchAllMachineData = async () => {
-//   console.log("Buscando dados da nova API...");
-//   const response = await fetch(API_URL);
+const formatMachineData = (machine) => {
+  const companyName = machine.client?.companyName || "–";
+  const deviceId = machine.device?.nodeId || "–";
 
-//   if (!response.ok) {
-//     throw new Error('Falha ao buscar os dados da nova API');
-//   }
-
-//   const rawData = await response.json();
-//   console.log("Dados brutos recebidos:", rawData);
-
-//   const formattedData = rawData.map(machine => {
-//     return {
-//       id: machine.id,
-//       name: machine.name,
-//       sector: machine.model || '', 
-//       machineId: machine.serialNumber, 
-//       company: machine.manufacturer,   
-//       lastUpdate: formatTimestamp(machine.lastRpm?.timestamp), 
-
-//       metrics: [
-//         { name: 'RPM', value: machine.lastRpm?.rpm ?? 'N/A', unit: '' },
-//         { name: 'Temp', value: machine.lastOilTemperature?.temperature ?? 'N/A', unit: '°C' },
-//         { name: 'Óleo', value: machine.lastOilLevel?.level ?? 'N/A', unit: '%' },
-//         { name: 'Corrente', value: machine.lastCurrent?.current ?? 'N/A', unit: 'A' },
-//       ]
-//     };
-//   });
-
-//   console.log("Dados formatados para o front-end:", formattedData);
-//   return formattedData;
-// };
-
-
-
-const MACHINES_URL = 'http://localhost:3001/machines';
-const METRICS_BASE_URL = 'http://localhost:3001/metrics';
+  return {
+    id: machine.id,
+    name: machine.name,
+    serialNumber: machine.serialNumber,
+    manufacturer: machine.manufacturer,
+    model: machine.model,
+    company: companyName,
+    iotDevice: deviceId,
+    lastUpdate: formatTimestamp(machine.lastRpm?.timestamp),
+    status: machine.status,
+    metrics: {
+      rpm: {
+        name: "RPM",
+        value: 0,
+        unit: "",
+        min: machine.lastRpm?.min ?? 0,
+        med: machine.lastRpm?.med ?? 0,
+        max: machine.lastRpm?.max ?? 0,
+      },
+      temp: {
+        name: "Temperatura",
+        value: 0,
+        unit: "°C",
+        min: machine.lastOilTemperature?.min ?? 0,
+        med: machine.lastOilTemperature?.med ?? 0,
+        max: machine.lastOilTemperature?.max ?? 0,
+      },
+      oleo: {
+        name: "Nível de Óleo",
+        value: 0,
+        unit: "%",
+        min: machine.lastOilLevel?.min ?? 0,
+        med: machine.lastOilLevel?.med ?? 0,
+        max: machine.lastOilLevel?.max ?? 0,
+      },
+      corrente: {
+        name: "Corrente",
+        value: 0,
+        unit: "A",
+        min: machine.lastCurrent?.min ?? 0,
+        med: machine.lastCurrent?.med ?? 0,
+        max: machine.lastCurrent?.max ?? 0,
+      },
+    },
+  };
+};
 
 export const fetchAllMachineData = async () => {
-  const machinesResponse = await fetch(MACHINES_URL);
-  if (!machinesResponse.ok) throw new Error('Falha ao buscar a lista de máquinas');
-  const machinesData = await machinesResponse.json();
+  const rawData = await ApiService.getRequest(API_URL);
+  const formattedData = rawData.map(formatMachineData);
+  return formattedData;
+};
 
-  const metricsPromises = machinesData.map(machine =>
-    fetch(`${METRICS_BASE_URL}?machineId=${machine.id}`)
-      .then(res => res.json())
-      .then(data => data[0])
-  );
+export const fetchMachineById = async (id) => {
+  const rawData = await ApiService.getRequest(API_URL);
+  const formattedData = formatMachineData(rawData);
 
-  const metricsResults = await Promise.all(metricsPromises);
-
-  const combinedData = machinesData.map(machine => {
-
-    const machineMetrics = metricsResults.find(m => m && m.machineId === Number(machine.id));
-    
-    return {
-      ...machine,
-      metrics: machineMetrics ? machineMetrics.metrics : [],
-    };
-  });
-
-  return combinedData;
+  return formattedData;
 };

@@ -1,26 +1,29 @@
-# --- Etapa 1: Build da Aplicação ---
-FROM node:20-alpine as builder
+# IoTurn/Dockerfile (Versão Definitiva)
+# --- ESTÁGIO 1: BUILD (Corrigido para forçar reinstalação limpa) ---
+FROM node:20-slim as builder
 WORKDIR /app
 
-# Mantenha esta ordem:
-# 1. Copia arquivos de lock/dependências para cache
-COPY package.json package-lock.json ./ 
+# 1. Copia o package.json para cachear a camada de instalação
+COPY package.json ./ 
 
-# 2. ADICIONA ETAPA: Limpa o npm cache (opcional, mas seguro) e remove o lock file.
-# Isso garante que a instalação a seguir seja "fresca".
-RUN npm cache clean --force && rm -f package-lock.json
-
-# 3. Executa a instalação das dependências (agora mais limpa)
+# 2. Instala as dependências de forma limpa (ci é melhor que install para builds)
+# Se npm ci falhar por falta de lockfile, use `npm install --legacy-peer-deps`
 RUN npm install
 
-# 4. Copia o restante do código
+# 3. Copia o restante do código-fonte (incluindo package-lock.json)
 COPY . .
 
-# 5. Gera os arquivos estáticos
+# 4. Executa o build do Vite (cria a pasta 'dist')
 RUN npm run build
 
-# --- Etapa 2: Imagem Final (Produção) ---
+# --- ESTÁGIO 2: IMAGEM FINAL (Servindo com Nginx) ---
 FROM nginx:stable-alpine
-COPY --from=builder /app/dist /usr/share/nginx/html
 EXPOSE 80
+
+# 1. Copia a configuração do Nginx (para o React Router)
+COPY nginx/default.conf /etc/nginx/conf.d/default.conf 
+
+# 2. Copia os arquivos estáticos gerados pelo Vite (pasta 'dist')
+COPY --from=builder /app/dist /usr/share/nginx/html
+
 CMD ["nginx", "-g", "daemon off;"]
